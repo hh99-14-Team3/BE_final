@@ -30,6 +30,33 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
+
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	//jwt
+	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
+	// 스프링 시큐리티
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Redis
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.4.10'
+
+	// Swagger
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.8'
+
+	// 데이터 크롤링
+	implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.9.0'
+
+	//spring email
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+//	// AWS S3
+//	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+//	implementation "com.amazonaws:aws-java-sdk-s3:1.12.281"
 }
 
 tasks.named('test') {
