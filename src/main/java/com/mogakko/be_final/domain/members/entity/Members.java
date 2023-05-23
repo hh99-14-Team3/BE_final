@@ -6,12 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -25,11 +19,8 @@ public class Members {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = true)
-    private Long kakaoId;
-
     @Column(nullable = false)
-    private String nickName;
+    private String nickname;
 
     @Column(nullable = false)
     private String password;
@@ -42,8 +33,8 @@ public class Members {
 
     public Members( String email, String nickname, String password, boolean isAgreed, boolean emailAuth){
         this.email = email;
+        this.nickname = nickname;
         this.password = password;
-        this.nickName = nickname;
         this.isAgreed = isAgreed;
         this.emailAuth = emailAuth;
     }
@@ -52,11 +43,10 @@ public class Members {
         this.emailAuth = true;
     }
 
-    public Members kakaoIdUpdate(Long kakaoId) {
-        this.kakaoId = kakaoId;
-        return this;
-    }
-
+//    public Members kakaoIdUpdate(Long kakaoId) {
+//        this.kakaoId = kakaoId;
+//        return this;
+//    }
 
 
 }

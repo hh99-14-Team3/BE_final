@@ -36,7 +36,8 @@ public class WebSecurityConfig {
             "/webjars/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/bus/v3/api-docs/**"
+            "/bus/v3/api-docs/**",
+            "/api/members/*"
     };
 
     @Bean
@@ -75,6 +76,8 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.addAllowedOrigin("http://localhost:3000");
+
+        config.addAllowedOrigin("http://localhost:8080");
 
         config.addExposedHeader(JwtUtil.ACCESS_KEY);
 

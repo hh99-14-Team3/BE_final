@@ -15,6 +15,9 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 비밀번호 입니다."),
     NOT_AUTHORIZED_USER(HttpStatus.BAD_REQUEST, "작성자만 수정,삭제할 수 있습니다."),
     USED_TOKEN(HttpStatus.BAD_REQUEST, "사용된 토큰입니다."),
+    INVALID_AUTH_KEY(HttpStatus.BAD_REQUEST, "이메일의 인증 키가 잘못되었습니다"),
+    EXPIRED_AUTH_KEY(HttpStatus.BAD_REQUEST, "만료된 링크입니다"),
+    NOT_VERIFIED_EMAIL(HttpStatus.BAD_REQUEST, "인증되지 않은 이메일입니다."),
 
     //404 NOT_FOUND,
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),

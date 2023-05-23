@@ -1,7 +1,7 @@
 package com.mogakko.be_final.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mogakko.be_final.domain.members.repository.MemberRepository;
+import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final MemberRepository memberRepository;
+    private final MembersRepository membersRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

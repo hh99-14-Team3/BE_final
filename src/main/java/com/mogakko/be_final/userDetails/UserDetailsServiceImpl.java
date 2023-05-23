@@ -1,7 +1,7 @@
 package com.mogakko.be_final.userDetails;
 
 
-import com.mogakko.be_final.domain.members.repository.MemberRepository;
+import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final MemberRepository memberRepository;
+    private final MembersRepository membersRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
