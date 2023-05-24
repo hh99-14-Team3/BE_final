@@ -51,17 +51,7 @@ public class MembersService {
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        Optional<Members> findMembersByEmail = membersRepository.findByEmail(email);
-        if (findMembersByEmail.isPresent()) {
-            log.info("중복된 이메일 입니다.");
-            throw new CustomException(DUPLICATE_IDENTIFIER);
-        }
 
-        Optional<Members> findMembersByNickname = membersRepository.findByNickname(nickname);
-        if (findMembersByNickname.isPresent()) {
-            log.info("중복된 닉네임 입니다.");
-            throw new CustomException(DUPLICATE_IDENTIFIER);
-        }
         boolean agree = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
 
         if(!agree){
@@ -79,6 +69,40 @@ public class MembersService {
         return new ResponseEntity<>(message, HttpStatus.OK);
 
     }
+
+    public boolean checkEmail(String email) {
+        Optional<Members> findMembersByEmail = membersRepository.findByEmail(email);
+//        if (findMembersByEmail.isPresent()) {
+//            log.info("중복된 이메일 입니다.");
+//            throw new CustomException(DUPLICATE_IDENTIFIER);
+//        }
+
+        return findMembersByEmail.isPresent();
+
+    }
+
+    public boolean checkNickname(String nickname) {
+        Optional<Members> findMembersByNickname = membersRepository.findByNickname(nickname);
+//        if (findMembersByEmail.isPresent()) {
+//            log.info("중복된 닉네임 입니다.");
+//            throw new CustomException(DUPLICATE_IDENTIFIER);
+//        }
+
+        return findMembersByNickname.isPresent();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     //서비스 자체로그인
     public ResponseEntity<Message> login(LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse){
