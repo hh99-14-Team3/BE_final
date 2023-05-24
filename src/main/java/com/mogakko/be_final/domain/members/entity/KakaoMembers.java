@@ -10,11 +10,14 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Members {
+public class KakaoMembers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
+
+    @Column(nullable = false, unique = true)
+    private Long kakaoId;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -28,25 +31,21 @@ public class Members {
     @Column(nullable = false)
     private boolean isAgreed;
 
-    @Column(nullable = false)
-    private boolean emailAuth;
 
-    public Members( String email, String nickname, String password, boolean isAgreed, boolean emailAuth){
+    public KakaoMembers( String email, String nickname, String password, boolean isAgreed){
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.isAgreed = isAgreed;
-        this.emailAuth = emailAuth;
+
     }
 
-    public void emailVerifiedSuccess() {
-        this.emailAuth = true;
-    }
 
-//    public Members kakaoIdUpdate(Long kakaoId) {
-//        this.kakaoId = kakaoId;
-//        return this;
-//    }
+    public KakaoMembers kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
+    }
 
 
 }
+

@@ -1,18 +1,18 @@
-//package com.jeju.be_final.kakao;
+package com.mogakko.be_final.kakao;
 //
-//import lombok.Getter;
-//import lombok.NoArgsConstructor;
-//
-//@Getter
-//@NoArgsConstructor
-//public class KakaoUserInfoDto {
-//    private Long id;
-//    private String email;
-//    private String nicknmae;
-//
-//    public KakaoUserInfoDto(Long id, String nicknmae, String email) {
-//        this.id = id;
-//        this.nicknmae = nicknmae;
-//        this.email = email;
-//    }
-//}
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+public class KakaoUserInfoDto {
+    private Long id;
+    private String email;
+    private String nickname;
+
+    public KakaoUserInfoDto(Long id, String nickname, String email) {
+        this.id = id;
+        this.nickname = nickname;
+        this.email = email;
+    }
+}

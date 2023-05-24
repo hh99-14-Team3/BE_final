@@ -1,7 +1,6 @@
 package com.mogakko.be_final.userDetails;
 
-
-import com.mogakko.be_final.domain.members.entity.Member;
+import com.mogakko.be_final.domain.members.entity.Members;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,16 +8,16 @@ import java.util.Collection;
 
 public class UserDetailsImpl implements UserDetails {
 
-    private final Member member;
+    private final Members members;
     private final String email;
 
-    public UserDetailsImpl(Member member, String email) {
-        this.member = member;
+    public UserDetailsImpl(Members members, String email) {
+        this.members = members;
         this.email = email;
     }
 
-    public Member getMember() {
-        return member;
+    public Members getMembers() {
+        return members;
     }
 
     public String getEmail() {

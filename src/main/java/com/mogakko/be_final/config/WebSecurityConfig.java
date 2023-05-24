@@ -36,7 +36,9 @@ public class WebSecurityConfig {
             "/webjars/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/bus/v3/api-docs/**"
+            "/bus/v3/api-docs/**",
+            "/api/members/*",
+            "/api/members/signup/*"
     };
 
     @Bean
@@ -48,6 +50,7 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         // resources 접근 허용 설정
         return (web) -> web.ignoring()
+                .requestMatchers(PathRequest.toH2Console())
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
@@ -74,6 +77,8 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.addAllowedOrigin("http://localhost:3000");
+
+        config.addAllowedOrigin("http://localhost:8080");
 
         config.addExposedHeader(JwtUtil.ACCESS_KEY);
 
