@@ -9,7 +9,6 @@ import com.mogakko.be_final.domain.members.repository.KakaoMembersRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.jwt.JwtUtil;
 import com.mogakko.be_final.util.Message;
-import com.mogakko.be_final.util.StatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -46,7 +45,7 @@ public class KakaoService {
 
         response.addHeader(JwtUtil.ACCESS_KEY, createToken);
 
-        Message message = Message.setSuccess(StatusEnum.OK, "로그인 성공", createToken);
+        Message message = Message.setSuccess("로그인 성공", createToken);
 
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
