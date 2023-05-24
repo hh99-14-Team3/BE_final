@@ -6,6 +6,7 @@ import com.mogakko.be_final.domain.members.entity.EmailVerification;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.EmailVerificationRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.jwt.JwtUtil;
 import com.mogakko.be_final.jwt.TokenDto;
@@ -41,6 +42,7 @@ public class MembersService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final EmailVerificationRepository emailVerificationRepository;
     private final MailSendService mailSendService;
+    private final NotificationService notificationService;
 
 
     @Transactional
@@ -100,6 +102,8 @@ public class MembersService {
             RefreshToken newToken = new RefreshToken(tokenDto.getRefreshToken(), members.getEmail());
             refreshTokenRepository.save(newToken);
         }
+
+        notificationService.sendLoginNotification(members);
 
         httpServletResponse.addHeader(JwtUtil.ACCESS_KEY, tokenDto.getAccessToken());
 //        httpServletResponse.addHeader(JwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
