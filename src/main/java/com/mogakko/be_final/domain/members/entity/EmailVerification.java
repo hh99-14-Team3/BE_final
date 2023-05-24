@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.members.entity;
 
+import com.mogakko.be_final.util.Timestamped;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-public class EmailVerification {
+public class EmailVerification extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
