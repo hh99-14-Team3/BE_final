@@ -1,0 +1,91 @@
+package com.mogakko.be_final.domain.chatroom.comtroller;
+
+import com.mogakko.be_final.domain.chatroom.dto.request.ChatRoomCreateRequestDto;
+import com.mogakko.be_final.domain.chatroom.dto.request.ChatRoomEnterDataRequestDto;
+import com.mogakko.be_final.domain.chatroom.dto.request.Mogakko5kmRequestDto;
+import com.mogakko.be_final.domain.chatroom.service.MogakkoService;
+import com.mogakko.be_final.userDetails.UserDetailsImpl;
+import com.mogakko.be_final.util.Message;
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+@Tag(name = "모각코방 관련 API", description = "모각코방 관련 API 입니다.")
+public class MogakkoController {
+
+    private final MogakkoService mogakkoService;
+
+    @PostMapping("/mogakko")
+    @Operation(summary = "모각코 방 생성", description = "모각코 방을 생성하는 메서드입니다.")
+    public ResponseEntity<Message> createMogakko(@Valid @RequestBody ChatRoomCreateRequestDto chatRoomCreateRequestDto,
+                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) throws Exception {
+        return mogakkoService.createMogakko(chatRoomCreateRequestDto, userDetails.getMembers());
+    }
+
+    @PostMapping("/mogakko/{sessionId}")
+    @Operation(summary = "모각코 방 입장", description = "모각코 방에 입장하는 메서드입니다.")
+    public ResponseEntity<Message> enterMogakko(@PathVariable(name = "sessionId") String sessionId,
+                                                @RequestBody(required = false) ChatRoomEnterDataRequestDto requestData,
+                                                @AuthenticationPrincipal UserDetailsImpl userDetails) throws OpenViduJavaClientException, OpenViduHttpException {
+        return mogakkoService.enterMogakko(sessionId, requestData, userDetails.getMembers());
+    }
+
+    @DeleteMapping("/mogakko/{sessionId}/delete")
+    @Operation(summary = "모각코 방 퇴장", description = "브라우저 종료 시 모각코 방이 퇴장되는 메서드입니다.")
+    public ResponseEntity<Message> outMogakko(@PathVariable(name = "sessionId") String sessionId,
+                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return mogakkoService.outMogakko(sessionId, userDetails.getMembers(), false);
+    }
+
+    @DeleteMapping("/mogakko/{sessionId}")
+    @Operation(summary = "모각코 방 퇴장", description = "퇴장하기 버튼 눌렀을때 모각코 방이 퇴장되는 메서드입니다.")
+    public ResponseEntity<Message> outClickMogakko(@PathVariable(name = "sessionId") String sessionId,
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                   @RequestParam boolean prev) {
+        return mogakkoService.outMogakko(sessionId, userDetails.getMembers(), prev);
+    }
+
+//    @GetMapping("/mogakko")
+//    @Operation(summary = "모각코 전체 목록 조회", description = "내 위치 기반 5km 이내 모각코 방 전체 목록을 조회하는 메서드입니다.")
+//    public ResponseEntity<Message> getAllMogakkos(Mogakko5kmRequestDto mogakko5kmRequestDto) {
+//        return mogakkoService.getAllMogakkos(mogakko5kmRequestDto);
+//    }
+
+    @GetMapping("/mogakko/search")
+    @Operation(summary = "모각코 검색", description = "모각코 방을 검색하는 메서드입니다.")
+    public ResponseEntity<Message> searchMogakko(@RequestParam(value = "searchKeyword") String searchKeyword, @RequestParam(required = false) String language) {
+        return mogakkoService.searchMogakko(searchKeyword, language);
+    }
+
+
+    @GetMapping("/mogakko/{sessionId}/users")
+    @Operation(summary = "모각코 유저 조회", description = "모각코에 있는 유저의 정보를 조회하는 메서드입니다.")
+    public ResponseEntity<Message> getMogakkoMembersData(@PathVariable(name = "sessionId") String sessionId,
+                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return mogakkoService.getMogakkoMembersData(sessionId, userDetails.getMembers());
+    }
+
+
+//    @GetMapping("/rooms/{sessionid}/openvidu")
+//    public ResponseEntity<PrivateResponseBody> getAllOpenviduUsers(@PathVariable(name = "sessionid") String sessionId,
+//                                                           @Authenticated OAuth2UserInfoAuthentication authentication) {
+//
+//        User user = (User) authentication.getPrincipal();
+//
+//        return new ResponseUtil<>().forSuccess(chatRoomService.getRoomUserData(sessionId, user));
+//    }
+
+}
