@@ -54,10 +54,19 @@ dependencies {
 	//spring email
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-	//test H2
-	runtimeOnly 'com.h2database:h2'
-
 	implementation group: 'com.querydsl', name: 'querydsl-jpa', version: '5.0.0'
+
+	// Open Vidu
+	implementation 'io.openvidu:openvidu-java-client:2.25.0'
+
+	// mapper
+	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
+
+	// Web Socket (채팅)
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.webjars:stomp-websocket:2.3.3-1'
+	implementation 'org.webjars:sockjs-client:1.1.2'
 
 //	// AWS S3
 //	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
