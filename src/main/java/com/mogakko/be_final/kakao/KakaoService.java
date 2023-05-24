@@ -46,7 +46,7 @@ public class KakaoService {
 
         response.addHeader(JwtUtil.ACCESS_KEY, createToken);
 
-        Message message = Message.setSuccess(StatusEnum.OK, "로그인 성공", createToken);
+        Message message = Message.setSuccess("로그인 성공", createToken);
 
         return new ResponseEntity<>(message, HttpStatus.OK);
     }

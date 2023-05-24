@@ -14,7 +14,6 @@ import com.mogakko.be_final.jwt.refreshToken.RefreshToken;
 import com.mogakko.be_final.jwt.refreshToken.RefreshTokenRepository;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.util.Message;
-import com.mogakko.be_final.util.StatusEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -65,7 +64,7 @@ public class MembersService {
 
         mailSendService.sendAuthMail(email);
 
-        Message message = Message.setSuccess(StatusEnum.OK, "이메일 인증을 완료해 주세요.");
+        Message message = Message.setSuccess( "이메일 인증을 완료해 주세요.");
         return new ResponseEntity<>(message, HttpStatus.OK);
 
     }
@@ -132,7 +131,7 @@ public class MembersService {
         httpServletResponse.addHeader(JwtUtil.ACCESS_KEY, tokenDto.getAccessToken());
 //        httpServletResponse.addHeader(JwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
 
-        Message message = Message.setSuccess(StatusEnum.OK, "로그인 성공");
+        Message message = Message.setSuccess("로그인 성공");
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -144,7 +143,7 @@ public class MembersService {
             Long tokenTime = jwtUtil.getExpirationTime(accessToken);
             redisUtil.setBlackList(accessToken, "access_token", tokenTime);
             refreshTokenRepository.deleteByEmail(members.getEmail());
-            Message message = Message.setSuccess(StatusEnum.OK, "로그아웃 성공", members.getEmail());
+            Message message = Message.setSuccess("로그아웃 성공", members.getEmail());
             return new ResponseEntity<>(message, HttpStatus.OK);
         }
         throw new CustomException(USER_NOT_FOUND);
@@ -179,9 +178,10 @@ public class MembersService {
 
         emailVerificationRepository.delete(emailVerificationRecord.get());
 
-        Message message = Message.setSuccess(StatusEnum.OK, "이메일 인증이 완료되었습니다.");
+        Message message = Message.setSuccess("이메일 인증이 완료되었습니다.");
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+
 
 
 
