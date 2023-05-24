@@ -6,6 +6,7 @@ import com.mogakko.be_final.domain.members.entity.EmailVerification;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.EmailVerificationRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.jwt.JwtUtil;
 import com.mogakko.be_final.jwt.TokenDto;
@@ -40,6 +41,7 @@ public class MembersService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final EmailVerificationRepository emailVerificationRepository;
     private final MailSendService mailSendService;
+    private final NotificationService notificationService;
 
 
     @Transactional
@@ -48,17 +50,7 @@ public class MembersService {
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
 
-        Optional<Members> findMembersByEmail = membersRepository.findByEmail(email);
-        if (findMembersByEmail.isPresent()) {
-            log.info("중복된 이메일 입니다.");
-            throw new CustomException(DUPLICATE_IDENTIFIER);
-        }
 
-        Optional<Members> findMembersByNickname = membersRepository.findByNickname(nickname);
-        if (findMembersByNickname.isPresent()) {
-            log.info("중복된 닉네임 입니다.");
-            throw new CustomException(DUPLICATE_IDENTIFIER);
-        }
         boolean agree = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
 
         if(!agree){
@@ -73,9 +65,44 @@ public class MembersService {
         mailSendService.sendAuthMail(email);
 
         Message message = Message.setSuccess("이메일 인증을 완료해 주세요.", null);
+
         return new ResponseEntity<>(message, HttpStatus.OK);
 
     }
+
+    public boolean checkEmail(String email) {
+        Optional<Members> findMembersByEmail = membersRepository.findByEmail(email);
+//        if (findMembersByEmail.isPresent()) {
+//            log.info("중복된 이메일 입니다.");
+//            throw new CustomException(DUPLICATE_IDENTIFIER);
+//        }
+
+        return findMembersByEmail.isPresent();
+
+    }
+
+    public boolean checkNickname(String nickname) {
+        Optional<Members> findMembersByNickname = membersRepository.findByNickname(nickname);
+//        if (findMembersByEmail.isPresent()) {
+//            log.info("중복된 닉네임 입니다.");
+//            throw new CustomException(DUPLICATE_IDENTIFIER);
+//        }
+
+        return findMembersByNickname.isPresent();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     //서비스 자체로그인
     public ResponseEntity<Message> login(LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse){
@@ -100,10 +127,14 @@ public class MembersService {
             refreshTokenRepository.save(newToken);
         }
 
+        notificationService.sendLoginNotification(members);
+
         httpServletResponse.addHeader(JwtUtil.ACCESS_KEY, tokenDto.getAccessToken());
 //        httpServletResponse.addHeader(JwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
 
+
         Message message = Message.setSuccess("로그인 성공",null);
+
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -151,8 +182,10 @@ public class MembersService {
         emailVerificationRepository.delete(emailVerificationRecord.get());
 
         Message message = Message.setSuccess("이메일 인증이 완료되었습니다.", null);
+
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+
 
 
 

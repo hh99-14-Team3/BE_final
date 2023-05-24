@@ -46,6 +46,18 @@ public class MembersController {
         return membersService.verifyEmail(email, authKey);
 
     }
+    @GetMapping("/signup/checkEmail")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam("email") String email ){
+        boolean isDuplicate = membersService.checkEmail(email);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
+    @GetMapping("/signup/checkNickname")
+    public ResponseEntity<Boolean> checkNickname(@RequestParam("nickname") String nickname ){
+        boolean isDuplicate = membersService.checkNickname(nickname);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
 
     @GetMapping("/kakaoLogin")
     public ResponseEntity<Message> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
