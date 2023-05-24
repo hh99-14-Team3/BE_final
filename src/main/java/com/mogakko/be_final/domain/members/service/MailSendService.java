@@ -46,15 +46,15 @@ public class MailSendService {
         try {
             MailUtils sendMail = new MailUtils(mailSender);
             String content = new StringBuilder()
-                    .append("<h1>[Email authentication]</h1>")
-                    .append("<p>Click the link below to complete email verification.</p>")
-                    .append("<a href='http://localhost:8080/api/members/signUpConfirm?email=")
+                    .append("<h1>[이메일 인증!]</h1>")
+                    .append("<p>아래의 링크를 클릭해서 인증을 완료하세요.</p>")
+                    .append("<a href='http://localhost:8080/api/members/signup/confirm?email=")
                     .append(email)
                     .append("&authKey=")
                     .append(authKey)
-                    .append("' target='_blenk'>Verify Email Verification</a>")
+                    .append("' target='_blenk'>인증 링크</a>")
                     .toString();
-            sendMail.createMessage("Verification of member registration email", content, "bhjun95@gmail", "Admin", email);
+            sendMail.createMessage("회원가입 인증 메일", content, "bhjun95@gmail", "Admin", email);
             sendMail.send();
         } catch (MessagingException | UnsupportedEncodingException e) {
             e.printStackTrace();

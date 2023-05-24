@@ -37,7 +37,8 @@ public class WebSecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/bus/v3/api-docs/**",
-            "/api/members/*"
+            "/api/members/*",
+            "/api/members/signup/*"
     };
 
     @Bean

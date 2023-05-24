@@ -1,6 +1,7 @@
 package com.mogakko.be_final.domain.members.service;
 
-import com.mogakko.be_final.domain.members.dto.MembersRequestDto;
+import com.mogakko.be_final.domain.members.dto.LoginRequestDto;
+import com.mogakko.be_final.domain.members.dto.SignupRequestDto;
 import com.mogakko.be_final.domain.members.entity.EmailVerification;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.EmailVerificationRepository;
@@ -43,10 +44,10 @@ public class MembersService {
 
 
     @Transactional
-    public ResponseEntity<Message> signup(MembersRequestDto membersRequestDto){
-        String email = membersRequestDto.getEmail();
-        String password = passwordEncoder.encode(membersRequestDto.getPassword());
-        String nickname = membersRequestDto.getNickname();
+    public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto){
+        String email = signupRequestDto.getEmail();
+        String password = passwordEncoder.encode(signupRequestDto.getPassword());
+        String nickname = signupRequestDto.getNickname();
 
         Optional<Members> findMembersByEmail = membersRepository.findByEmail(email);
         if (findMembersByEmail.isPresent()) {
@@ -59,7 +60,13 @@ public class MembersService {
             log.info("중복된 닉네임 입니다.");
             throw new CustomException(DUPLICATE_IDENTIFIER);
         }
+        boolean agree = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
 
+        if(!agree){
+            log.info("필수 항목에 동의해 주세요.");
+            throw new CustomException(IS_NOT_AGREED);
+
+        }
 
         Members members = new Members(email, nickname, password, true, false);
         membersRepository.save(members);
@@ -72,21 +79,21 @@ public class MembersService {
     }
 
     //서비스 자체로그인
-    public ResponseEntity<Message> login(MembersRequestDto membersRequestDto, HttpServletResponse httpServletResponse){
-        Members members = membersRepository.findByEmail(membersRequestDto.getEmail()).orElseThrow(
+    public ResponseEntity<Message> login(LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse){
+        Members members = membersRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
         if (!members.isEmailAuth()) {
             throw new CustomException(NOT_VERIFIED_EMAIL);
         }
 
-        if (!passwordEncoder.matches(membersRequestDto.getPassword(), members.getPassword())){
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), members.getPassword())){
             throw new CustomException(INVALID_PASSWORD);
         }
 
         TokenDto tokenDto = jwtUtil.createAllToken(members.getEmail());
 
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(membersRequestDto.getEmail());
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(loginRequestDto.getEmail());
         if (refreshToken.isPresent()) {
             refreshToken.get().updateToken(tokenDto.getRefreshToken());
         } else { // 존재하지 않을 경우 새로 발급
@@ -135,19 +142,16 @@ public class MembersService {
         // check if the auth key has expired
         LocalDateTime now = LocalDateTime.now();
         if (now.isAfter(emailVerificationRecord.get().getExpirationTime())) {
-            log.error("Auth key expired for email: " + email);
             throw new CustomException(EXPIRED_AUTH_KEY);
         }
 
-        // set emailAuth to true
         Members member = findMemberByEmail.get();
         member.emailVerifiedSuccess();
         membersRepository.save(member);
 
-        // remove the email verification record as it is no longer needed
         emailVerificationRepository.delete(emailVerificationRecord.get());
 
-        Message message = Message.setSuccess(StatusEnum.OK, "Email verification successful");
+        Message message = Message.setSuccess(StatusEnum.OK, "이메일 인증이 완료되었습니다.");
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 

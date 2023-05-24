@@ -5,11 +5,11 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class MembersRequestDto {
+public class SignupRequestDto {
 
     private String email;
     private String nickname;
     private String password;
-
+    private String isAgreed;
 
 }
