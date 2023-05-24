@@ -31,6 +31,13 @@ public class Members {
     @Column(nullable = false)
     private boolean emailAuth;
 
+    @Column
+    @Lob
+    private String profileImage;
+
+    @Column
+    private String socialUid;
+
     public Members( String email, String nickname, String password, boolean isAgreed, boolean emailAuth){
         this.email = email;
         this.nickname = nickname;

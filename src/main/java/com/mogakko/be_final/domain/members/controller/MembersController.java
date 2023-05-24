@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class MembersController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<Message> signup(@RequestBody SignupRequestDto requestDto){
+    public ResponseEntity<Message> signup(@Valid @RequestBody SignupRequestDto requestDto) {
         return membersService.signup(requestDto);
     }
 
@@ -52,6 +53,12 @@ public class MembersController {
     }
 
 
+//    /*자신이 참여 했던 방 리스트 보여주기. 참여 히스토리.*/
+//    @GetMapping("/rooms/{page}/history")
+//    public ResponseEntity<PrivateResponseBody> getAllHistoryRooms(@PathVariable int page,
+//                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return new ResponseUtil<>().forSuccess(mogakkoService.getAllHistoryChatRooms(page, userDetails.getMembers()));
+//    }
 
 
 }
