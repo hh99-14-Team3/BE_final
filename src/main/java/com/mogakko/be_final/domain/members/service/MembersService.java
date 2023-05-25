@@ -64,7 +64,8 @@ public class MembersService {
 
         mailSendService.sendAuthMail(email);
 
-        Message message = Message.setSuccess( "이메일 인증을 완료해 주세요.");
+        Message message = Message.setSuccess("이메일 인증을 완료해 주세요.", null);
+
         return new ResponseEntity<>(message, HttpStatus.OK);
 
     }
@@ -119,7 +120,9 @@ public class MembersService {
         httpServletResponse.addHeader(JwtUtil.ACCESS_KEY, tokenDto.getAccessToken());
 //        httpServletResponse.addHeader(JwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
 
-        Message message = Message.setSuccess("로그인 성공");
+
+        Message message = Message.setSuccess("로그인 성공",null);
+
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -166,7 +169,8 @@ public class MembersService {
 
         emailVerificationRepository.delete(emailVerificationRecord.get());
 
-        Message message = Message.setSuccess("이메일 인증이 완료되었습니다.");
+        Message message = Message.setSuccess("이메일 인증이 완료되었습니다.", null);
+
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
