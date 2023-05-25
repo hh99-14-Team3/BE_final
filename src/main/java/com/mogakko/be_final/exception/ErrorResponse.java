@@ -9,16 +9,14 @@ import org.springframework.http.ResponseEntity;
 @Builder
 public class ErrorResponse {
     private String message;
-    private int status;
-    private String detail;
+    private String data;
 
     // 에러 반환 형식
     public static ResponseEntity<ErrorResponse> toResponseEntity(ErrorCode errorCode) {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(ErrorResponse.builder()
-                        .message(errorCode.getDetail())
-                        .status(errorCode.getHttpStatus().value())
+                        .message(errorCode.getData())
                         .build()
                 );
     }
@@ -29,18 +27,16 @@ public class ErrorResponse {
                 .status(httpStatus.value())
                 .body(ErrorResponse.builder()
                         .message(errorCode)
-                        .status(httpStatus.value())
                         .build()
                 );
     }
 
-    public static ResponseEntity<ErrorResponse> toResponseEntity(HttpStatus httpStatus, String detail) {
+    public static ResponseEntity<ErrorResponse> toResponseEntity(HttpStatus httpStatus, String data) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.builder()
                         .message(httpStatus.name())
-                        .detail(detail)
-                        .status(httpStatus.value())
+                        .data(data)
                         .build()
                 );
     }
