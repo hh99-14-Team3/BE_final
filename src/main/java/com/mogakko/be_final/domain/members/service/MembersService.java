@@ -91,18 +91,6 @@ public class MembersService {
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     //서비스 자체로그인
     public ResponseEntity<Message> login(LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse){
         Members members = membersRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(

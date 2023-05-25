@@ -9,12 +9,14 @@ import com.mogakko.be_final.kakao.KakaoService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +28,14 @@ public class MembersController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<Message> signup(@RequestBody SignupRequestDto requestDto){
+    public ResponseEntity<Message> signup(@RequestBody SignupRequestDto requestDto, HttpSession session){
+        Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
+        Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
+
+        if (emailChecked == null || nicknameChecked == null || !emailChecked || !nicknameChecked) {
+            Message message = Message.setSuccess("닉네임 중복검사 혹은 이메일 중복검사를 완료해주세요");
+            return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+        }
         return membersService.signup(requestDto);
     }
 
@@ -46,14 +55,16 @@ public class MembersController {
 
     }
     @GetMapping("/signup/checkEmail")
-    public ResponseEntity<Boolean> checkEmail(@RequestParam("email") String email ){
+    public ResponseEntity<Boolean> checkEmail(@RequestParam("email") String email, HttpSession session){
         boolean isDuplicate = membersService.checkEmail(email);
+        session.setAttribute("emailChecked", true);
         return ResponseEntity.ok(isDuplicate);
     }
 
     @GetMapping("/signup/checkNickname")
-    public ResponseEntity<Boolean> checkNickname(@RequestParam("nickname") String nickname ){
+    public ResponseEntity<Boolean> checkNickname(@RequestParam("nickname") String nickname, HttpSession session ){
         boolean isDuplicate = membersService.checkNickname(nickname);
+        session.setAttribute("nicknameChecked", true);
         return ResponseEntity.ok(isDuplicate);
     }
 
