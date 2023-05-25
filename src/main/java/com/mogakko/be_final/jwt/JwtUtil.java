@@ -1,6 +1,5 @@
 package com.mogakko.be_final.jwt;
 
-
 import com.mogakko.be_final.jwt.refreshToken.RefreshToken;
 import com.mogakko.be_final.jwt.refreshToken.RefreshTokenRepository;
 import com.mogakko.be_final.redis.util.RedisUtil;
@@ -24,7 +23,6 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
-
 
 @Slf4j
 @Component
@@ -57,6 +55,19 @@ public class JwtUtil {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }
+        return null;
+    }
+
+    // Socket Access 토큰의 유효성 검증
+    public String socketResolveToken(String bearerToken) {
+        log.info("resolve socket Token ...");
+
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            // Bearer- 제외 토큰 값만 리턴
+            return bearerToken.substring(7);
+        }
+
+        // 토큰이 없다면 null 리턴
         return null;
     }
 
