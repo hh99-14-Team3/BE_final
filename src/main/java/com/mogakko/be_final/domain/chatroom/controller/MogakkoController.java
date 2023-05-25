@@ -1,8 +1,7 @@
-package com.mogakko.be_final.domain.chatroom.comtroller;
+package com.mogakko.be_final.domain.chatroom.controller;
 
 import com.mogakko.be_final.domain.chatroom.dto.request.ChatRoomCreateRequestDto;
 import com.mogakko.be_final.domain.chatroom.dto.request.ChatRoomEnterDataRequestDto;
-import com.mogakko.be_final.domain.chatroom.dto.request.Mogakko5kmRequestDto;
 import com.mogakko.be_final.domain.chatroom.service.MogakkoService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
