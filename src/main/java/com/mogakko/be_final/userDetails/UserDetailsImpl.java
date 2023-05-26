@@ -8,16 +8,16 @@ import java.util.Collection;
 
 public class UserDetailsImpl implements UserDetails {
 
-    private final Members members;
+    private final Members member;
     private final String email;
 
-    public UserDetailsImpl(Members members, String email) {
-        this.members = members;
+    public UserDetailsImpl(Members member, String email) {
+        this.member = member;
         this.email = email;
     }
 
-    public Members getMembers() {
-        return members;
+    public Members getMember() {
+        return member;
     }
 
     public String getEmail() {

@@ -1,15 +1,18 @@
 package com.mogakko.be_final.domain.members.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mogakko.be_final.domain.members.dto.ChangePwRequestDto;
+import com.mogakko.be_final.domain.members.dto.EmailConfirmRequestDto;
 import com.mogakko.be_final.domain.members.dto.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.SignupRequestDto;
-import com.mogakko.be_final.domain.members.service.MailSendService;
+import com.mogakko.be_final.domain.members.email.EmailService;
 import com.mogakko.be_final.domain.members.service.MembersService;
 import com.mogakko.be_final.kakao.KakaoService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,71 +22,72 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
+@Tag(name = "회원 관련 API", description = "회원 관련 API 입니다.")
 public class MembersController {
-    private final KakaoService kakaoService;
     private final MembersService membersService;
-    private final MailSendService mss;
+    private final KakaoService kakaoService;
+    private final EmailService emailService;
 
 
     @PostMapping("/signup")
-    public ResponseEntity<Message> signup(@Valid@RequestBody SignupRequestDto requestDto, HttpSession session){
-        Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
-        Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
-
-        if (emailChecked == null || nicknameChecked == null || !emailChecked || !nicknameChecked) {
-            Message message = Message.setSuccess("닉네임 중복검사 혹은 이메일 중복검사를 완료해주세요");
-            return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-        }
-        return membersService.signup(requestDto);
+    @Operation(summary = "회원 가입 API", description = "회원가입하는 메서드입니다.")
+    public ResponseEntity<Message> signup(@Valid @RequestBody SignupRequestDto requestDto, HttpSession session) {
+        return membersService.signup(requestDto, session);
     }
 
     @PostMapping("/login")
+    @Operation(summary = "로그인 API", description = "로그인하는 메서드입니다.")
     public ResponseEntity<Message> login(@RequestBody LoginRequestDto requestDto, HttpServletResponse httpServletResponse) {
         return membersService.login(requestDto, httpServletResponse);
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "로그아웃 API", description = "로그아웃하는 메서드입니다.")
     public ResponseEntity<Message> logout(@AuthenticationPrincipal UserDetailsImpl userDetails, HttpServletRequest request) {
-        return membersService.logout(userDetails.getMembers(), request);
+        return membersService.logout(userDetails.getMember(), request);
     }
 
-    @GetMapping("/signup/confirm")
-    public ResponseEntity<Message> verifyEmail(@RequestParam String email, @RequestParam String authKey) {
-        return membersService.verifyEmail(email, authKey);
-
+    @Operation(summary = "이메일 전송", description = "비밀번호 찾기를 위한 이메일 전송 메서드입니다.")
+    @PostMapping("/find-password")
+    public ResponseEntity<Message> sendEmailToFindPassword(@RequestBody EmailConfirmRequestDto requestDto) throws Exception {
+        return emailService.sendSimpleMessage(requestDto);
     }
+
+    @Operation(summary = "비밀번호 변경", description = "이메일 확인 후 비밀번호 변경 메서드입니다.")
+    @PostMapping("/confirm-email")
+    public ResponseEntity<Message> confirmEmailToFindPassword(@Valid @RequestParam String token, @Valid @RequestBody ChangePwRequestDto requestDto) {
+        return membersService.confirmEmailToFindPassword(token, requestDto);
+    }
+
+
     @GetMapping("/signup/checkEmail")
-    public ResponseEntity<Boolean> checkEmail(@RequestParam("email") String email, HttpSession session){
-        boolean isDuplicate = membersService.checkEmail(email);
+    @Operation(summary = "이메일 중복 체크 API", description = "이메일 중복 체크를 하는 메서드입니다.")
+    public ResponseEntity<Message> checkEmail(@RequestParam("email") String email, HttpSession session) {
         session.setAttribute("emailChecked", true);
-        return ResponseEntity.ok(isDuplicate);
+        return membersService.checkEmail(email);
     }
 
     @GetMapping("/signup/checkNickname")
-    public ResponseEntity<Boolean> checkNickname(@RequestParam("nickname") String nickname, HttpSession session ){
-        boolean isDuplicate = membersService.checkNickname(nickname);
+    @Operation(summary = "닉네임 중복 체크 API", description = "닉네임 중복 체크를 하는 메서드입니다.")
+    public ResponseEntity<Message> checkNickname(@RequestParam("nickname") String nickname, HttpSession session) {
         session.setAttribute("nicknameChecked", true);
-        return ResponseEntity.ok(isDuplicate);
+        return membersService.checkNickname(nickname);
     }
 
-
     @GetMapping("/kakaoLogin")
+    @Operation(summary = "카카오 소셜 로그인 API", description = "카카오로 소셜 로그인을 하는 메서드입니다.")
     public ResponseEntity<Message> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
         return kakaoService.kakaoLogin(code, response);
     }
 
-
-//    /*자신이 참여 했던 방 리스트 보여주기. 참여 히스토리.*/
-//    @GetMapping("/rooms/{page}/history")
-//    public ResponseEntity<PrivateResponseBody> getAllHistoryRooms(@PathVariable int page,
-//                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return new ResponseUtil<>().forSuccess(mogakkoService.getAllHistoryChatRooms(page, userDetails.getMembers()));
-//    }
-
+    @GetMapping("/mypage")
+    @Operation(summary = "마이페이지 API", description = "마이페이지에서 '참여중인 모각코방', '총 참여 시간'을 보여주는 메서드입니다.")
+    public ResponseEntity<Message> myPage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return membersService.readMyPage(userDetails.getMember());
+    }
 
 }
 
