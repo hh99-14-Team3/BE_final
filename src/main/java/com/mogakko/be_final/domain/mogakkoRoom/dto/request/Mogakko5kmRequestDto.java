@@ -1,5 +1,6 @@
-package com.mogakko.be_final.domain.chatroom.dto.request;
+package com.mogakko.be_final.domain.mogakkoRoom.dto.request;
 
+import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,5 +10,5 @@ public class Mogakko5kmRequestDto {
 
     private double longitudeX;
     private double latitudeY;
-    private String language;
+    private LanguageEnum language;
 }

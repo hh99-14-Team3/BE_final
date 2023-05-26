@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.chatroom.entity;
+package com.mogakko.be_final.domain.mogakkoRoom.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,15 +16,16 @@ import java.time.LocalTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRoomMembers {
+public class MogakkoRoomMembers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomMemberId;
 
     // 방 번호
-    @Column
-    private String sessionId;
+    @ManyToOne
+    @JoinColumn(name = "session_id")
+    private MogakkoRoom mogakkoRoom;
 
     @Column
     private Long memberId;
@@ -43,7 +44,7 @@ public class ChatRoomMembers {
 
     // 입/퇴장 여부
     @Column
-    private boolean isEntered;
+    private boolean isEntered = Boolean.FALSE;
 
     // 방에 들어온 시간
     @Column
@@ -74,7 +75,6 @@ public class ChatRoomMembers {
     // 방에 재입장 하는 경우
     public void reEnterRoomMembers(String enterRoomToken, String nickname) {
         this.isEntered = true;
-//        this.roomEnterTime = LocalDateTime.now();
         this.roomEnterTime = Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime();
         this.roomExitTime = null;
         this.enterRoomToken = enterRoomToken;
