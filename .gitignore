@@ -19,6 +19,7 @@ bin/
 
 ### IntelliJ IDEA ###
 application.properties
+email.properties
 .idea
 *.iws
 *.iml
