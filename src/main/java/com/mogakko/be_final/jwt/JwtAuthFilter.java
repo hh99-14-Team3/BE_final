@@ -43,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 //Refresh토큰으로 유저명 가져오기
                 String email = jwtUtil.getUserInfoFromToken(refresh_token);
                 //유저명으로 유저 정보 가져오기
-//                Member member = memberRepository.findByEmail(email).get();
+//                Members member = memberRepository.findByEmail(email).get();
                 //새로운 ACCESS TOKEN 발급
                 String newAccessToken = jwtUtil.createToken(email, "Access");
                 //Header에 ACCESS TOKEN 추가
