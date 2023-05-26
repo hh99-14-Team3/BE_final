@@ -1,14 +1,14 @@
-package com.mogakko.be_final.domain.chatroom.entity;
+package com.mogakko.be_final.domain.mogakkoRoom.entity;
 
-import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,7 +16,9 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatRoom extends Timestamped {
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE mogakko_room SET is_deleted = true WHERE session_id = ? ")
+public class MogakkoRoom extends Timestamped {
 
     // 방 번호
     @Id
@@ -27,7 +29,7 @@ public class ChatRoom extends Timestamped {
     private String title;
 
     // 방 공개여부
-    @Column
+    @Column(name = "is_opened")
     private boolean isOpened;
 
     // 비공개 시 사용할 패스워드
@@ -35,7 +37,8 @@ public class ChatRoom extends Timestamped {
     private String password;
 
     // 주특기 언어 카테고리
-    @Column
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private LanguageEnum language;
 
     // 방장
@@ -55,8 +58,7 @@ public class ChatRoom extends Timestamped {
     private Long cntMembers;
 
     // 방 삭제 여부
-    @Column
-    private Boolean isDeleted;
+    private boolean isDeleted = Boolean.FALSE;
 
     // 방이 삭제된 시간
     @Column
@@ -69,6 +71,9 @@ public class ChatRoom extends Timestamped {
     // 위치 값 - 위도
     @Column
     private double latitudeY;
+
+    @Column
+    private String dongNe;
 
 
     //    @OneToMany(mappedBy = "sessionId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -85,11 +90,6 @@ public class ChatRoom extends Timestamped {
 
     public void setDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
-    }
-
-    // TODO : 뭐임?
-    public boolean validateMembers(Members member) {
-        return !this.master.equals(member.getSocialUid());
     }
 
 }
