@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.chatroom.service;
+package com.mogakko.be_final.domain.mogakkoRoom;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
