@@ -2,6 +2,7 @@ package com.mogakko.be_final.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -50,10 +51,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 jwtUtil.setHeaderAccessToken(response, newAccessToken);
                 setAuthentication(email);
             } else if (refresh_token == null) {
-                jwtExceptionHandler(response, "AccessToken Expired.", HttpStatus.BAD_REQUEST.value());
+                jwtExceptionHandler(response, "AccessToken Expired.");
                 return;
             } else {
-                jwtExceptionHandler(response, "RefreshToken Expired.", HttpStatus.BAD_REQUEST.value());
+                jwtExceptionHandler(response, "RefreshToken Expired.");
                 return;
             }
             // 다음 필터로 요청과 응답을 전달하여 필터 체인 계속 실행
@@ -69,11 +70,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         SecurityContextHolder.setContext(context);
     }
 
-    public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
-        response.setStatus(statusCode);
+    public void jwtExceptionHandler(HttpServletResponse response, String msg) {
+
         response.setContentType("application/json");
         try {
-            String json = new ObjectMapper().writeValueAsString(new SecurityExceptionDto(statusCode, msg));
+            String json = new ObjectMapper().writeValueAsString(new Message(msg, null));
             response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
