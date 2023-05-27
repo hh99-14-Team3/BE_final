@@ -231,7 +231,7 @@ public class MogakkoService {
                 // 방 논리 삭제 + 방 삭제된 시간 기록
                 LocalDateTime roomDeleteTime = Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime();
                 mogakkoRoom.deleteRoom(roomDeleteTime);
-                return new ResponseEntity<>(new Message("모각코 삭제 성공", null), HttpStatus.OK);
+                return new ResponseEntity<>(new Message("모각코 퇴장 및 방 삭제 성공", null), HttpStatus.OK);
             }
 
             // 모각코의 유저 수가 1명 이상있다면 유저 수만 변경

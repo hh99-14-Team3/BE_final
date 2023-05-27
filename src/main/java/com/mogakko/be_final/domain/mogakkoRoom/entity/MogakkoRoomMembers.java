@@ -34,9 +34,6 @@ public class MogakkoRoomMembers {
     private String nickname;
 
     @Column
-    private String email;
-
-    @Column
     private String profileImage;
 
     @Column
