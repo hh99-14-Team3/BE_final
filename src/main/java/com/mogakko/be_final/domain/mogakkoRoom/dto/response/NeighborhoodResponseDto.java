@@ -5,13 +5,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class DongNeResponseDto {
+public class NeighborhoodResponseDto {
 
     private long count;
-    private String dongNe;
+    private String neighborhood;
 
-    public DongNeResponseDto(long count, String dongNe) {
+    public NeighborhoodResponseDto(long count, String neighborhood) {
         this.count = count;
-        this.dongNe = dongNe;
+        this.neighborhood = neighborhood;
     }
 }

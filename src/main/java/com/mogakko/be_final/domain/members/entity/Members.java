@@ -31,10 +31,6 @@ public class Members extends Timestamped {
     private String password;
 
     @Column(nullable = false)
-    @JsonIgnore
-    private boolean isAgreed;
-
-    @Column(nullable = false)
     private boolean emailAuth;
 
     @Column(nullable = false)
@@ -44,18 +40,17 @@ public class Members extends Timestamped {
     private SocialType socialType;
 
     @Column
+    private String socialUid;
+
+    @Column
     @Lob
     private String profileImage;        //TODO : 디폴트 프사 생기면 url 넣을 예졍
 
-    @Column
-    private String socialUid;
 
-
-    public Members( String email, String nickname, String password, boolean isAgreed){
+    public Members( String email, String nickname, String password){
         this.email = email;
         this.nickname = nickname;
         this.password = password;
-        this.isAgreed = isAgreed;
     }
 
     public void changePassword(String password) {

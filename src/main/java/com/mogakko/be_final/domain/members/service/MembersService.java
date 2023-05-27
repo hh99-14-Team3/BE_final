@@ -1,11 +1,13 @@
 package com.mogakko.be_final.domain.members.service;
 
-import com.mogakko.be_final.domain.members.dto.*;
+import com.mogakko.be_final.domain.members.dto.ChangePwRequestDto;
+import com.mogakko.be_final.domain.members.dto.LoginRequestDto;
+import com.mogakko.be_final.domain.members.dto.MyPageResponseDto;
+import com.mogakko.be_final.domain.members.dto.SignupRequestDto;
 import com.mogakko.be_final.domain.members.email.ConfirmationToken;
 import com.mogakko.be_final.domain.members.email.ConfirmationTokenService;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
@@ -31,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.sql.Time;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,18 +52,13 @@ public class MembersService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final NotificationService notificationService;
     private final ConfirmationTokenService confirmationTokenService;
-    private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
+
     // 회원가입
     public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
-        boolean isAgreed = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
 
-        if (!isAgreed) {
-            log.info("필수 항목에 동의해 주세요.");
-            throw new CustomException(IS_NOT_AGREED);
-        }
         Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
         Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
 
@@ -70,12 +66,11 @@ public class MembersService {
             return new ResponseEntity<>(new Message("이메일과 닉네임 중복검사를 완료해주세요", null), HttpStatus.BAD_REQUEST);
         }
 
-        Members members = new Members(email, nickname, password, true);
+        Members members = new Members(email, nickname, password);
         membersRepository.save(members);
         MogakkoRoomTime mogakkoRoomTimes = new MogakkoRoomTime(email, Time.valueOf("00:00:00"));
         mogakkoRoomTimeRepository.save(mogakkoRoomTimes);
         return new ResponseEntity<>(new Message("회원 가입 성공", null), HttpStatus.OK);
-
     }
 
     @Transactional(readOnly = true)
@@ -85,14 +80,13 @@ public class MembersService {
             throw new CustomException(DUPLICATE_IDENTIFIER);
         }
         return new ResponseEntity<>(new Message("중복 확인 성공", null), HttpStatus.OK);
-
     }
 
     @Transactional(readOnly = true)
     public ResponseEntity<Message> checkNickname(String nickname) {
         if (membersRepository.findByNickname(nickname).isPresent()) {
             log.info("중복된 닉네임 입니다.");
-            throw new CustomException(DUPLICATE_IDENTIFIER);
+            throw new CustomException(DUPLICATE_NICKNAME);
         }
         return new ResponseEntity<>(new Message("중복 확인 성공", null), HttpStatus.OK);
     }
@@ -147,7 +141,7 @@ public class MembersService {
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
         List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
-        MogakkoRoomTime mogakkoTotalTime = mogakkoRoomTimeRepository.findByMember(member.getEmail());
+        Time mogakkoTotalTime = mogakkoRoomMembersRepository.findRoomStayTimeByMemberId(member.getId());
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member);
 
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);

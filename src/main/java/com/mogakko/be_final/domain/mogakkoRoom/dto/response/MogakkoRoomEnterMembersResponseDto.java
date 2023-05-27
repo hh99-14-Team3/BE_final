@@ -16,7 +16,7 @@ public class MogakkoRoomEnterMembersResponseDto {
     private boolean isOpened;
     private String password;
     private LanguageEnum language;
-    private String master;
+    private Long masterId;
     private Long cntMember;
     List<MogakkoRoomEnterMemberResponseDto> mogakkoRoomMemberList;
 
@@ -28,7 +28,7 @@ public class MogakkoRoomEnterMembersResponseDto {
         this.isOpened = room.isOpened();
         this.password = room.getPassword();
         this.language = room.getLanguage();
-        this.master = room.getMaster();
+        this.masterId = room.getMasterMemberId();
         this.cntMember = room.getCntMembers();
         this.mogakkoRoomMemberList = mogakkoRoomMemberResponseDtos;
     }

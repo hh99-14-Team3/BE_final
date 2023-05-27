@@ -22,6 +22,8 @@ public class SignupRequestDto {
             message = "비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.")
     private String password;
 
-    private String isAgreed;
+    private String emailAuth;
+
+    private String role;                // TODO: 소셜로그인 부분 체크하고 dto 다시 설정 예정
 
 }

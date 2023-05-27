@@ -22,7 +22,6 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
 @Tag(name = "모각코방 관련 API", description = "모각코방 관련 API 입니다.")
 public class MogakkoController {
 
@@ -76,7 +75,7 @@ public class MogakkoController {
         return mogakkoService.topMogakko();
     }
 
-    @GetMapping("/mogakko/{sessionId}/users")
+    @GetMapping("/mogakko/{sessionId}/members")
     @Operation(summary = "모각코 유저 조회 API", description = "모각코에 있는 유저의 정보를 조회하는 메서드입니다.")
     public ResponseEntity<Message> getMogakkoMembersData(@PathVariable(name = "sessionId") String sessionId,
                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {

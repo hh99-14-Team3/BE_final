@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.mogakkoRoom.repository;
 
-import com.mogakko.be_final.domain.members.dto.MyMogakkoRoomListDto;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
 import org.hibernate.annotations.Where;

@@ -47,7 +47,6 @@ public class OAuthAttributes {
                 .nickname(oauth2UserInfo.getNickname())
                 .profileImage(oauth2UserInfo.getProfileImage())
                 .role(Role.GUEST)
-                .isAgreed(true)
                 .emailAuth(oauth2UserInfo.isEmailVerified())
                 .password(UUID.randomUUID().toString())
                 .build();

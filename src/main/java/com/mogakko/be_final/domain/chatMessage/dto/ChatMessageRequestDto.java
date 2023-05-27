@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatMessageRequestDto {
     private String sessionId;
-    private String email;
     private String nickname;
     private String profile;
     private String message;
