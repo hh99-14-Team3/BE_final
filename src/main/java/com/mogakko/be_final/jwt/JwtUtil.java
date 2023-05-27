@@ -130,6 +130,10 @@ public class JwtUtil {
         response.setHeader(ACCESS_KEY, accessToken);
     }
 
+    public void setHeaderRefreshToken(HttpServletResponse response, String refreshToken) {
+        response.setHeader(REFRESH_KEY, refreshToken);
+    }
+
     public long getExpirationTime(String token) {
         // 토큰에서 만료 시간 정보를 추출
         Claims claims = Jwts.parser()
