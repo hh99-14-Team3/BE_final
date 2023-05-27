@@ -45,7 +45,6 @@ public class MogakkoRoomMemberResponseDto {
         this.mogakkoRoom = responseDto.getMogakkoRoom();
         this.memberId = responseDto.getMemberId();
         this.nickname = responseDto.getNickname();
-        this.email = responseDto.getEmail();
         this.profileImage = responseDto.getProfileImage();
         this.enterRoomToken = responseDto.getEnterRoomToken();
         this.roomEnterTime = responseDto.getRoomEnterTime();
