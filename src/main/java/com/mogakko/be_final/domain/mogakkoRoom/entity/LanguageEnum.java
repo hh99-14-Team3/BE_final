@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 // 주특기 언어 카테고리
 public enum LanguageEnum {
 
-    JAVA("JAVA"), C("C"), Cplpl("C++"), Csharp("C#"),
+    JAVA("JAVA"), C("C"), CPLPL("C++"), CSHARP  ("C#"),
     PYTHON("PYTHON"), RUBY("RUBY"), KOTLIN("KOTLIN"),
     SWIFT("SWIFT"), JAVASCRIPT("JAVASCRIPT"), GO("GO"),
     PHP("PHP"), RUST("RUST"), LUA("LUA");
