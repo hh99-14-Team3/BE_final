@@ -21,9 +21,9 @@ public interface MogakkoRoomMembersRepository extends JpaRepository<MogakkoRoomM
 
     List<MogakkoRoomMembers> findAllByMogakkoRoomAndIsEntered(MogakkoRoom mogakkoRoom, boolean isEntered);
 
-    @Query("SELECT SEC_TO_TIME(sum(TIME_TO_SEC(m.roomStayTime))) from MogakkoRoomMembers m where m.email = :email and m.mogakkoRoom.isDeleted = false")
-    Time findRoomStayTimeByEmail(@Param("email") String email);
+    @Query("SELECT SEC_TO_TIME(sum(TIME_TO_SEC(m.roomStayTime))) from MogakkoRoomMembers m where m.memberId = :memberId and m.mogakkoRoom.isDeleted = false")
+    Time findRoomStayTimeByMemberId(@Param("memberId") long memberId);
 
-    @Query("SELECT m FROM MogakkoRoomMembers m WHERE m.email = :email AND m.mogakkoRoom.isDeleted = false")
-    List<MogakkoRoomMembers> findAllByEmailAndMogakkoRoomIsDeletedFalse(@Param("email") String email);
+    @Query("SELECT m FROM MogakkoRoomMembers m WHERE m.memberId = :memberId AND m.mogakkoRoom.isDeleted = false")
+    List<MogakkoRoomMembers> findAllByMemberIdAndMogakkoRoomIsDeletedFalse(@Param("memberId") long memberId);
 }

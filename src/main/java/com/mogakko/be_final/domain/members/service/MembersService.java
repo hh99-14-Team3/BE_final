@@ -146,8 +146,8 @@ public class MembersService {
     // 마이페이지 조회 - 내가 참여중인 모각코 방, 총 참여 시간
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
-        List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByEmailAndMogakkoRoomIsDeletedFalse(member.getEmail());
-        Time mogakkoTotalTime = mogakkoRoomMembersRepository.findRoomStayTimeByEmail(member.getEmail());
+        List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
+        MogakkoRoomTime mogakkoTotalTime = mogakkoRoomTimeRepository.findByMember(member.getEmail());
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member);
 
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
