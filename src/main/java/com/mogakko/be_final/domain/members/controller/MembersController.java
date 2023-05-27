@@ -51,13 +51,13 @@ public class MembersController {
     }
 
     @Operation(summary = "이메일 전송", description = "비밀번호 찾기를 위한 이메일 전송 메서드입니다.")
-    @PostMapping("/find-password")
+    @PostMapping("/sendEmail")
     public ResponseEntity<Message> sendEmailToFindPassword(@RequestBody EmailConfirmRequestDto requestDto) throws Exception {
         return emailService.sendSimpleMessage(requestDto);
     }
 
     @Operation(summary = "비밀번호 변경", description = "이메일 확인 후 비밀번호 변경 메서드입니다.")
-    @PostMapping("/confirm-email")
+    @PostMapping("/updatePassword")
     public ResponseEntity<Message> confirmEmailToFindPassword(@Valid @RequestParam String token, @Valid @RequestBody ChangePwRequestDto requestDto) {
         return membersService.confirmEmailToFindPassword(token, requestDto);
     }
