@@ -49,6 +49,6 @@ public interface MogakkoRoomRepository extends JpaRepository<MogakkoRoom, String
     List<MogakkoRoom> findAllByLanguage(@Param("languageEnum") LanguageEnum languageEnum);
 
     @Query("SELECT NEW com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponseDto(COUNT(m), m.neighborhood) FROM MogakkoRoom m GROUP BY m.neighborhood ORDER BY COUNT(m) DESC")
-    List<NeighborhoodResponseDto> findByTop8DongNeCount();
+    List<NeighborhoodResponseDto> findByTop8NeighborhoodCount();
 
 }

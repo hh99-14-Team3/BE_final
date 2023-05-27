@@ -52,6 +52,7 @@ public class MembersService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final NotificationService notificationService;
     private final ConfirmationTokenService confirmationTokenService;
+    private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
 
     // 회원가입
     public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
@@ -141,7 +142,7 @@ public class MembersService {
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
         List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
-        Time mogakkoTotalTime = mogakkoRoomMembersRepository.findRoomStayTimeByMemberId(member.getId());
+        MogakkoRoomTime mogakkoTotalTime = mogakkoRoomTimeRepository.findByMember(member.getEmail());
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member);
 
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);

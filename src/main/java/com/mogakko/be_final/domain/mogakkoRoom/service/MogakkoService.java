@@ -327,7 +327,7 @@ public class MogakkoService {
     // 인기 모각코 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> topMogakko() {
-        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop8DongNeCount();
+        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop8NeighborhoodCount();
         return new ResponseEntity<>(new Message("인기 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 
