@@ -11,9 +11,11 @@ import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomEnterMemb
 import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
+import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
 import io.openvidu.java.client.*;
@@ -22,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +48,7 @@ public class MogakkoService {
 
     private final MogakkoRoomRepository mogakkoRoomRepository;
     private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
+    private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
 
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
@@ -145,7 +149,6 @@ public class MogakkoService {
             MogakkoRoomMembers mogakkoRoomMembers = MogakkoRoomMembers.builder()
                     .mogakkoRoom(mogakkoRoom)
                     .memberId(member.getId())
-                    .email(member.getEmail())
                     .profileImage(member.getProfileImage())
                     .enterRoomToken(enterRoomToken)
                     .roomEnterTime(Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime())
@@ -153,7 +156,6 @@ public class MogakkoService {
                     .roomStayTime(Time.valueOf("00:00:00"))
                     .isEntered(true)
                     .build();
-
             // 현재 방에 접속한 유저 저장
             mogakkoRoomMembersRepository.save(mogakkoRoomMembers);
         }
@@ -217,7 +219,8 @@ public class MogakkoService {
 
         // 4. 채팅방 유저 논리 삭제, 방에서 나간 시간 저장, 방에 머문 시간 교체
         mogakkoRoomMembers.deleteRoomMembers(chatRoomExitTime, chatRoomStayTime, roomStayDay);
-
+        MogakkoRoomTime mogakkoRoomTime = mogakkoRoomTimeRepository.findByMember(members.getEmail());
+        mogakkoRoomTime.stopTime(chatRoomStayTime);
         // 채팅방 유저 수 확인
         // 채팅방 유저가 0명이라면 방 논리삭제
         synchronized (mogakkoRoom) {
@@ -228,7 +231,7 @@ public class MogakkoService {
                 // 방 논리 삭제 + 방 삭제된 시간 기록
                 LocalDateTime roomDeleteTime = Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime();
                 mogakkoRoom.deleteRoom(roomDeleteTime);
-                return new ResponseEntity<>(new Message("모각코 삭제 성공", null), HttpStatus.OK);
+                return new ResponseEntity<>(new Message("모각코 퇴장 및 방 삭제 성공", null), HttpStatus.OK);
             }
 
             // 모각코의 유저 수가 1명 이상있다면 유저 수만 변경

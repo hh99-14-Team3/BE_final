@@ -43,7 +43,6 @@ public class MogakkoRoomEnterMemberResponseDto {
         this.mogakkoRoom = mogakkoRoomMembers.getMogakkoRoom();
         this.memberId = mogakkoRoomMembers.getMemberId();
         this.nickname = mogakkoRoomMembers.getNickname();
-        this.email = mogakkoRoomMembers.getEmail();
         this.ProfileImage = mogakkoRoomMembers.getProfileImage();
         this.enterRoomToken = mogakkoRoomMembers.getEnterRoomToken();
         this.stayTime = mogakkoRoomMembers.getRoomStayTime();

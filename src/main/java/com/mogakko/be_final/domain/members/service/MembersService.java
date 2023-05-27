@@ -7,8 +7,10 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
+import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.jwt.JwtUtil;
@@ -49,8 +51,7 @@ public class MembersService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final NotificationService notificationService;
     private final ConfirmationTokenService confirmationTokenService;
-    private final MogakkoRoomRepository mogakkoRoomRepository;
-
+    private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
     // 회원가입
     public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
         String email = signupRequestDto.getEmail();
@@ -71,6 +72,8 @@ public class MembersService {
 
         Members members = new Members(email, nickname, password, true);
         membersRepository.save(members);
+        MogakkoRoomTime mogakkoRoomTimes = new MogakkoRoomTime(email, Time.valueOf("00:00:00"));
+        mogakkoRoomTimeRepository.save(mogakkoRoomTimes);
         return new ResponseEntity<>(new Message("회원 가입 성공", null), HttpStatus.OK);
 
     }
@@ -143,8 +146,8 @@ public class MembersService {
     // 마이페이지 조회 - 내가 참여중인 모각코 방, 총 참여 시간
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
-        List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByEmailAndMogakkoRoomIsDeletedFalse(member.getEmail());
-        Time mogakkoTotalTime = mogakkoRoomMembersRepository.findRoomStayTimeByEmail(member.getEmail());
+        List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
+        MogakkoRoomTime mogakkoTotalTime = mogakkoRoomTimeRepository.findByMember(member.getEmail());
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member);
 
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
