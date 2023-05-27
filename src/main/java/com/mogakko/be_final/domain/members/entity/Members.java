@@ -30,31 +30,35 @@ public class Members extends Timestamped {
     @JsonIgnore
     private String password;
 
-    @Column(nullable = false)
-    private boolean emailAuth;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
     @Column
     private SocialType socialType;
-
-    @Column
-    private String socialUid;
 
     @Column
     @Lob
     private String profileImage;        //TODO : 디폴트 프사 생기면 url 넣을 예졍
 
+    @Column
+    private String socialUid;
 
-    public Members( String email, String nickname, String password){
+
+    public Members( String email, String nickname, String password, Role role){
         this.email = email;
         this.nickname = nickname;
         this.password = password;
+        this.role = role;
     }
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    public void changeRole(Role newRole) {
+        this.role = newRole;
     }
 
 

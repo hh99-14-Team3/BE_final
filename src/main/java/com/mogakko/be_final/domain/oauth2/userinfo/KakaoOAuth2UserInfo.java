@@ -39,13 +39,6 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
 
 
     @Override
-    public boolean isEmailVerified() {
-        Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
-        return (Boolean)account.get("is_email_verified");
-
-    }
-
-    @Override
     public String getEmail() {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
         return (String) account.get("email");

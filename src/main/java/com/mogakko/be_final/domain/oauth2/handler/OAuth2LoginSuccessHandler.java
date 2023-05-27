@@ -1,7 +1,11 @@
 package com.mogakko.be_final.domain.oauth2.handler;
 
+import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
+import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.oauth2.CustomOAuth2User;
+import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.jwt.JwtUtil;
 import com.mogakko.be_final.jwt.TokenDto;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,7 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
+    private final MembersRepository membersRepository;
 
 
     @Override
@@ -32,14 +37,17 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             // User의 Role이 GUEST일 경우 처음 요청한 회원이므로 회원가입 페이지로 리다이렉트
             if(oAuth2User.getRole() == Role.GUEST) {
-                String accessToken = jwtUtil.createToken(oAuth2User.getEmail(), "Access");
+                Members member =membersRepository.findByEmail(oAuth2User.getEmail()).orElseThrow(
+                        () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+                );
+                member.changeRole(Role.USER);
+                membersRepository.save(member);
 
-                response.sendRedirect("/api/members/signup/agreement"); // 프론트의 회원가입 추가 정보 입력 폼으로 리다이렉트
+                loginSuccess(response, oAuth2User);
 
-                jwtUtil.setHeaderAccessToken(response, accessToken);
 
             } else {
-                loginSuccess(response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
+                loginSuccess(response, oAuth2User);
             }
         } catch (Exception e) {
             throw e;
@@ -52,5 +60,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         jwtUtil.setHeaderAccessToken(response, token.getAccessToken());
         jwtUtil.setHeaderRefreshToken(response, token.getRefreshToken());
+
+        response.sendRedirect("/api/main");
+        //TODO:추후에 클라이언트랑 연결되면 위에코드 지우고 아래코드사용
+        //response.setStatus(HttpServletResponse.SC_OK);
     }
 }
