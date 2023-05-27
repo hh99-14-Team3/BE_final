@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Mogakko5kmRequestDto {
 
-    private double longitudeX;
-    private double latitudeY;
+    private double lon;
+    private double lat;
     private LanguageEnum language;
 }

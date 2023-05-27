@@ -19,7 +19,6 @@ public class RoomMessage extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long messageId;
-    private String email;
     private String nickname;
     private String profile;
     private String message;
@@ -27,7 +26,6 @@ public class RoomMessage extends Timestamped {
     private boolean isDelete = false;
 
     public RoomMessage(ChatMessageRequestDto chatMessageRequestDto) {
-        this.email = chatMessageRequestDto.getEmail();
         this.nickname = chatMessageRequestDto.getNickname();
         this.profile = chatMessageRequestDto.getProfile();
         this.message = chatMessageRequestDto.getMessage();

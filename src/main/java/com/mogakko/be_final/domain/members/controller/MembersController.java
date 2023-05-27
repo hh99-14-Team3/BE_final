@@ -24,7 +24,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/members")
+@RequestMapping("/members")
 @Tag(name = "회원 관련 API", description = "회원 관련 API 입니다.")
 public class MembersController {
     private final MembersService membersService;
@@ -36,6 +36,20 @@ public class MembersController {
     @Operation(summary = "회원 가입 API", description = "회원가입하는 메서드입니다.")
     public ResponseEntity<Message> signup(@Valid @RequestBody SignupRequestDto requestDto, HttpSession session) {
         return membersService.signup(requestDto, session);
+    }
+
+    @GetMapping("/signup/checkEmail")
+    @Operation(summary = "이메일 중복 체크 API", description = "이메일 중복 체크를 하는 메서드입니다.")
+    public ResponseEntity<Message> checkEmail(@RequestParam("email") String email, HttpSession session) {
+        session.setAttribute("emailChecked", true);
+        return membersService.checkEmail(email);
+    }
+
+    @GetMapping("/signup/checkNickname")
+    @Operation(summary = "닉네임 중복 체크 API", description = "닉네임 중복 체크를 하는 메서드입니다.")
+    public ResponseEntity<Message> checkNickname(@RequestParam("nickname") String nickname, HttpSession session) {
+        session.setAttribute("nicknameChecked", true);
+        return membersService.checkNickname(nickname);
     }
 
     @PostMapping("/login")
@@ -60,21 +74,6 @@ public class MembersController {
     @PostMapping("/updatePassword")
     public ResponseEntity<Message> confirmEmailToFindPassword(@Valid @RequestParam String token, @Valid @RequestBody ChangePwRequestDto requestDto) {
         return membersService.confirmEmailToFindPassword(token, requestDto);
-    }
-
-
-    @GetMapping("/signup/checkEmail")
-    @Operation(summary = "이메일 중복 체크 API", description = "이메일 중복 체크를 하는 메서드입니다.")
-    public ResponseEntity<Message> checkEmail(@RequestParam("email") String email, HttpSession session) {
-        session.setAttribute("emailChecked", true);
-        return membersService.checkEmail(email);
-    }
-
-    @GetMapping("/signup/checkNickname")
-    @Operation(summary = "닉네임 중복 체크 API", description = "닉네임 중복 체크를 하는 메서드입니다.")
-    public ResponseEntity<Message> checkNickname(@RequestParam("nickname") String nickname, HttpSession session) {
-        session.setAttribute("nicknameChecked", true);
-        return membersService.checkNickname(nickname);
     }
 
     @GetMapping("/kakaoLogin")

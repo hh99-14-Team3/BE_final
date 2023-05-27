@@ -41,10 +41,6 @@ public class MogakkoRoom extends Timestamped {
     @Enumerated(EnumType.STRING)
     private LanguageEnum language;
 
-    // 방장
-    @Column
-    private String master;
-
     // 방장 고유번호
     @Column
     private Long masterMemberId;
@@ -66,18 +62,15 @@ public class MogakkoRoom extends Timestamped {
 
     // 위치 값 - 경도
     @Column
-    private double longitudeX;
+    private double lon;
 
     // 위치 값 - 위도
     @Column
-    private double latitudeY;
+    private double lat;
 
     @Column
-    private String dongNe;
+    private String neighborhood;
 
-
-    //    @OneToMany(mappedBy = "sessionId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    //    private List<ChatRoomMembers> chatRoomMembersList;
 
     public void updateCntMembers(Long cntMembers) {
         this.cntMembers = cntMembers;

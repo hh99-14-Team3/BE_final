@@ -61,7 +61,7 @@ public class MogakkoRoomScheduler {
         for (MogakkoRoom mogakkoRoom : allMogakkoRooms) {
             Session activeSession = openvidu.getActiveSession(mogakkoRoom.getSessionId());
             // 더미 방은 제외하고 삭제
-            if (activeSession == null && !mogakkoRoom.getMaster().equals("코딩왕")) {
+            if (activeSession == null && !mogakkoRoom.getMasterMemberId().equals(0)) {
                 log.info("===== { " + mogakkoRoom.getSessionId() + " } 는 Openvidu에 존재하지않습니다.");
 
                 List<MogakkoRoomMembers> mogakkoRoomMembersList = mogakkoRoomMembersRepository.findAllByMogakkoRoomAndIsEntered(mogakkoRoom, false);

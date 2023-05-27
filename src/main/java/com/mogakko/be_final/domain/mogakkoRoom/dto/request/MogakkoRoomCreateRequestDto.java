@@ -20,17 +20,17 @@ public class MogakkoRoomCreateRequestDto {
     @NotNull(message = "최대 인원을 설정해주세요!")
     private Long maxMembers;
 
-    @NotNull(message = "방의 상태를 설정해 주세요!")
+    @NotNull(message = "방의 공개여부를 설정해 주세요!")
     private Boolean isOpened;
 
     @NotNull(message = "동네를 설정해 주세요!")
-    private String dongNe;
+    private String neighborhood;
 
     private String password;
 
-    private double longitudeX;
+    private double lon;
 
-    private double latitudeY;
+    private double lat;
 
 }
 
