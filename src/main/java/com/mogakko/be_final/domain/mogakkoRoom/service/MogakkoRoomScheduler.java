@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.mogakkoRoom;
+package com.mogakko.be_final.domain.mogakkoRoom.service;
 
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
