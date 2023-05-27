@@ -2,7 +2,7 @@ package com.mogakko.be_final.domain.mogakkoRoom.service;
 
 
 import com.mogakko.be_final.domain.members.entity.Members;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko5kmRequestDto;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomCreateResponseDto;
@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -243,7 +242,7 @@ public class MogakkoService {
 
     //     위치 기반 5km 이내 모각코 조회
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> getAllMogakkos(Mogakko5kmRequestDto requestDto) {
+    public ResponseEntity<Message> getAllMogakkos(Mogakko12kmRequestDto requestDto) {
         double lon = requestDto.getLon();
         double lat = requestDto.getLat();
         LanguageEnum language = requestDto.getLanguage();

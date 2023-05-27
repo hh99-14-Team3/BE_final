@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class Mogakko5kmRequestDto {
+public class Mogakko12kmRequestDto {
 
     private double lon;
     private double lat;
