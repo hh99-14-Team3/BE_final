@@ -240,7 +240,7 @@ public class MogakkoService {
         }
     }
 
-    //     위치 기반 5km 이내 모각코 조회
+    // 위치 기반 12km 이내 모각코 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> getAllMogakkos(Mogakko12kmRequestDto requestDto) {
         double lon = requestDto.getLon();
