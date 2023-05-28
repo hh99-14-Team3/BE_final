@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.chatMessage.dto;
+package com.mogakko.be_final.domain.chatMessage.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
