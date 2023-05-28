@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.members.email;
+package com.mogakko.be_final.domain.email.entity;
 
 import javax.persistence.*;
 import lombok.Getter;

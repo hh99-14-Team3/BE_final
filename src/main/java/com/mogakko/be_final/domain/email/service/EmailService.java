@@ -1,7 +1,9 @@
-package com.mogakko.be_final.domain.members.email;
+package com.mogakko.be_final.domain.email.service;
 
-
-import com.mogakko.be_final.domain.members.dto.EmailConfirmRequestDto;
+import com.mogakko.be_final.domain.email.dto.EmailConfirmRequestDto;
+import com.mogakko.be_final.domain.email.entity.ConfirmationToken;
+import com.mogakko.be_final.domain.email.repository.ConfirmationTokenRepository;
+import com.mogakko.be_final.domain.members.dto.request.ChangePwRequestDto;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.exception.CustomException;
@@ -11,12 +13,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import static com.mogakko.be_final.exception.ErrorCode.EMAIL_NOT_FOUND;
+import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 
 
 @Service
@@ -25,6 +29,9 @@ public class EmailService {
     private final JavaMailSender emailSender;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final MembersRepository memberRepository;
+    private final ConfirmationTokenService confirmationTokenService;
+    private final MembersRepository membersRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private MimeMessage createMessage(String receiverEmail)throws Exception{
         Members findMember = memberRepository.findByEmail(receiverEmail).orElseThrow(
@@ -78,5 +85,19 @@ public class EmailService {
             throw new IllegalArgumentException();
         }
         return new ResponseEntity<>(new Message("이메일을 성공적으로 보냈습니다.", null), HttpStatus.OK);
+    }
+
+
+    //이메일 검증 후 비밀번호 변경
+    public ResponseEntity<Message> confirmEmailToFindPassword(String token, ChangePwRequestDto requestDto) {
+        ConfirmationToken findConfirmationToken = confirmationTokenService.findByIdAndExpired(token);
+        Members findMember = membersRepository.findByEmail(findConfirmationToken.getEmail()).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND));
+        String password = passwordEncoder.encode(requestDto.getPassword());
+
+        findConfirmationToken.useToken();
+
+        findMember.changePassword(password);
+        return new ResponseEntity<>(new Message("비밀번호 변경 성공", null), HttpStatus.OK);
     }
 }

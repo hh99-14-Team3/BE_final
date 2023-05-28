@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.members.dto;
+package com.mogakko.be_final.domain.email.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

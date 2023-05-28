@@ -1,5 +1,7 @@
-package com.mogakko.be_final.domain.members.email;
+package com.mogakko.be_final.domain.email.service;
 
+import com.mogakko.be_final.domain.email.entity.ConfirmationToken;
+import com.mogakko.be_final.domain.email.repository.ConfirmationTokenRepository;
 import com.mogakko.be_final.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

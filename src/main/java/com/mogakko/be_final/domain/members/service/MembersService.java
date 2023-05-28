@@ -1,11 +1,8 @@
 package com.mogakko.be_final.domain.members.service;
 
-import com.mogakko.be_final.domain.members.dto.request.ChangePwRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
-import com.mogakko.be_final.domain.members.email.ConfirmationToken;
-import com.mogakko.be_final.domain.members.email.ConfirmationTokenService;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
@@ -52,7 +49,6 @@ public class MembersService {
     private final RedisUtil redisUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final NotificationService notificationService;
-    private final ConfirmationTokenService confirmationTokenService;
     private final MogakkoRoomRepository mogakkoRoomRepository;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
 
@@ -156,19 +152,5 @@ public class MembersService {
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member);
 
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
-    }
-
-
-    //이메일 검증 후 비밀번호 변경
-    public ResponseEntity<Message> confirmEmailToFindPassword(String token, ChangePwRequestDto requestDto) {
-        ConfirmationToken findConfirmationToken = confirmationTokenService.findByIdAndExpired(token);
-        Members findMember = membersRepository.findByEmail(findConfirmationToken.getEmail()).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND));
-        String password = passwordEncoder.encode(requestDto.getPassword());
-
-        findConfirmationToken.useToken();
-
-        findMember.changePassword(password);
-        return new ResponseEntity<>(new Message("비밀번호 변경 성공", null), HttpStatus.OK);
     }
 }
