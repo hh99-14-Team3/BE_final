@@ -7,7 +7,7 @@ import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.security.jwt.JwtUtil;
 import com.mogakko.be_final.security.jwt.TokenDto;
-import com.mogakko.be_final.security.oauth2.CustomOAuth2User;
+import com.mogakko.be_final.security.oauth2.util.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

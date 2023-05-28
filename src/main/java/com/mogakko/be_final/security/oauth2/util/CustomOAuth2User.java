@@ -1,4 +1,4 @@
-package com.mogakko.be_final.security.oauth2;
+package com.mogakko.be_final.security.oauth2.util;
 
 import com.mogakko.be_final.domain.members.entity.Role;
 import lombok.Getter;
