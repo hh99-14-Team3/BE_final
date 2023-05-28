@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.oauth2.userinfo;
+package com.mogakko.be_final.security.oauth2.userinfo;
 
 import java.util.Map;
 

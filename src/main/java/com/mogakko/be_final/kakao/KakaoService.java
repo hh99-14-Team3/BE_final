@@ -7,7 +7,7 @@ import com.mogakko.be_final.domain.members.entity.KakaoMembers;
 
 import com.mogakko.be_final.domain.members.repository.KakaoMembersRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtUtil;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,10 @@
-package com.mogakko.be_final.domain.oauth2.service;
+package com.mogakko.be_final.security.oauth2.service;
 
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.SocialType;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.oauth2.CustomOAuth2User;
-import com.mogakko.be_final.domain.oauth2.OAuthAttributes;
+import com.mogakko.be_final.security.oauth2.CustomOAuth2User;
+import com.mogakko.be_final.security.oauth2.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.oauth2.handler;
+package com.mogakko.be_final.security.oauth2.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;

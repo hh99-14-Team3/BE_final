@@ -1,13 +1,13 @@
-package com.mogakko.be_final.domain.oauth2.handler;
+package com.mogakko.be_final.security.oauth2.handler;
 
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.oauth2.CustomOAuth2User;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
-import com.mogakko.be_final.jwt.JwtUtil;
-import com.mogakko.be_final.jwt.TokenDto;
+import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.TokenDto;
+import com.mogakko.be_final.security.oauth2.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

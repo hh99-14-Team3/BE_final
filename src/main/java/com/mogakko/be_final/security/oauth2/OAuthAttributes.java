@@ -1,10 +1,10 @@
-package com.mogakko.be_final.domain.oauth2;
+package com.mogakko.be_final.security.oauth2;
 
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.entity.SocialType;
-import com.mogakko.be_final.domain.oauth2.userinfo.KakaoOAuth2UserInfo;
-import com.mogakko.be_final.domain.oauth2.userinfo.OAuth2UserInfo;
+import com.mogakko.be_final.security.oauth2.userinfo.KakaoOAuth2UserInfo;
+import com.mogakko.be_final.security.oauth2.userinfo.OAuth2UserInfo;
 import lombok.Builder;
 import lombok.Getter;
 
