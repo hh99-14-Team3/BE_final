@@ -1,5 +1,8 @@
 package com.mogakko.be_final.config;
 
+import com.mogakko.be_final.domain.oauth2.handler.OAuth2LoginFailureHandler;
+import com.mogakko.be_final.domain.oauth2.handler.OAuth2LoginSuccessHandler;
+import com.mogakko.be_final.domain.oauth2.service.CustomOAuth2UserService;
 import com.mogakko.be_final.jwt.JwtAuthFilter;
 import com.mogakko.be_final.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
     private static final String[] PERMIT_URL_ARRAY = {
             "/v2/api-docs",
@@ -39,7 +45,8 @@ public class WebSecurityConfig {
             "/bus/v3/api-docs/**",
             "/api/members/*",
             "/api/members/signup/*",
-            "/api/notification"
+            "/api/notification",
+            "/h2-console"
     };
 
     @Bean
@@ -67,7 +74,13 @@ public class WebSecurityConfig {
                 .antMatchers("/**").permitAll()
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 .anyRequest().authenticated()
-                .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login()
+                .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정
+                .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService);;
+
 
 
         return httpSecurity.build();
