@@ -1,11 +1,10 @@
-package com.mogakko.be_final.jwt;
+package com.mogakko.be_final.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

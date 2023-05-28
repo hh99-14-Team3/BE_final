@@ -1,4 +1,4 @@
-package com.mogakko.be_final.jwt;
+package com.mogakko.be_final.security.jwt;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

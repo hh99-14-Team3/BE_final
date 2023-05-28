@@ -1,4 +1,4 @@
-package com.mogakko.be_final.jwt.refreshToken;
+package com.mogakko.be_final.security.refreshToken;
 
 
 import lombok.Getter;

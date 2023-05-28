@@ -1,10 +1,10 @@
-package com.mogakko.be_final.config;
+package com.mogakko.be_final.security.config;
 
 import com.mogakko.be_final.domain.oauth2.handler.OAuth2LoginFailureHandler;
 import com.mogakko.be_final.domain.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.mogakko.be_final.domain.oauth2.service.CustomOAuth2UserService;
-import com.mogakko.be_final.jwt.JwtAuthFilter;
-import com.mogakko.be_final.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtAuthFilter;
+import com.mogakko.be_final.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

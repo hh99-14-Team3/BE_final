@@ -16,11 +16,11 @@ import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.jwt.JwtUtil;
-import com.mogakko.be_final.jwt.TokenDto;
-import com.mogakko.be_final.jwt.refreshToken.RefreshToken;
-import com.mogakko.be_final.jwt.refreshToken.RefreshTokenRepository;
 import com.mogakko.be_final.redis.util.RedisUtil;
+import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.TokenDto;
+import com.mogakko.be_final.security.refreshToken.RefreshToken;
+import com.mogakko.be_final.security.refreshToken.RefreshTokenRepository;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.sql.Time;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +58,7 @@ public class MembersService {
 
 
     // 회원가입
-    public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
+        public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
