@@ -1,11 +1,9 @@
 package com.mogakko.be_final.domain.members.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mogakko.be_final.domain.members.dto.ChangePwRequestDto;
-import com.mogakko.be_final.domain.members.dto.EmailConfirmRequestDto;
-import com.mogakko.be_final.domain.members.dto.LoginRequestDto;
-import com.mogakko.be_final.domain.members.dto.SignupRequestDto;
-import com.mogakko.be_final.domain.members.email.EmailService;
+import com.mogakko.be_final.domain.members.dto.request.ChangePwRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.service.MembersService;
 import com.mogakko.be_final.kakao.KakaoService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
@@ -29,8 +27,6 @@ import javax.validation.Valid;
 public class MembersController {
     private final MembersService membersService;
     private final KakaoService kakaoService;
-    private final EmailService emailService;
-
 
     @PostMapping("/signup")
     @Operation(summary = "회원 가입 API", description = "회원가입하는 메서드입니다.")
@@ -62,18 +58,6 @@ public class MembersController {
     @Operation(summary = "로그아웃 API", description = "로그아웃하는 메서드입니다.")
     public ResponseEntity<Message> logout(@AuthenticationPrincipal UserDetailsImpl userDetails, HttpServletRequest request) {
         return membersService.logout(userDetails.getMember(), request);
-    }
-
-    @Operation(summary = "이메일 전송", description = "비밀번호 찾기를 위한 이메일 전송 메서드입니다.")
-    @PostMapping("/sendEmail")
-    public ResponseEntity<Message> sendEmailToFindPassword(@RequestBody EmailConfirmRequestDto requestDto) throws Exception {
-        return emailService.sendSimpleMessage(requestDto);
-    }
-
-    @Operation(summary = "비밀번호 변경", description = "이메일 확인 후 비밀번호 변경 메서드입니다.")
-    @PostMapping("/updatePassword")
-    public ResponseEntity<Message> confirmEmailToFindPassword(@Valid @RequestParam String token, @Valid @RequestBody ChangePwRequestDto requestDto) {
-        return membersService.confirmEmailToFindPassword(token, requestDto);
     }
 
     @GetMapping("/kakaoLogin")

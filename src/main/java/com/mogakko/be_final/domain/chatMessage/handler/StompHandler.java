@@ -1,7 +1,7 @@
 package com.mogakko.be_final.domain.chatMessage.handler;
 
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;

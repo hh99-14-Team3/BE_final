@@ -1,7 +1,7 @@
 package com.mogakko.be_final.redis.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mogakko.be_final.domain.chatMessage.dto.ChatMessageResponseDto;
+import com.mogakko.be_final.domain.chatMessage.dto.response.ChatMessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;

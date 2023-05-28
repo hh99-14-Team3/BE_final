@@ -1,7 +1,7 @@
 package com.mogakko.be_final.domain.chatMessage.controller;
 
-import com.mogakko.be_final.domain.chatMessage.dto.ChatMessageRequestDto;
-import com.mogakko.be_final.domain.chatMessage.dto.ChatMessageResponseDto;
+import com.mogakko.be_final.domain.chatMessage.dto.request.ChatMessageRequestDto;
+import com.mogakko.be_final.domain.chatMessage.dto.response.ChatMessageResponseDto;
 import com.mogakko.be_final.domain.chatMessage.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

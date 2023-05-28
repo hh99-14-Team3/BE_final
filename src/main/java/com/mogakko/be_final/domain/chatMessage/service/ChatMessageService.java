@@ -1,7 +1,7 @@
 package com.mogakko.be_final.domain.chatMessage.service;
 
-import com.mogakko.be_final.domain.chatMessage.dto.ChatMessageRequestDto;
-import com.mogakko.be_final.domain.chatMessage.dto.ChatMessageResponseDto;
+import com.mogakko.be_final.domain.chatMessage.dto.request.ChatMessageRequestDto;
+import com.mogakko.be_final.domain.chatMessage.dto.response.ChatMessageResponseDto;
 import com.mogakko.be_final.domain.chatMessage.entity.RoomMessage;
 import com.mogakko.be_final.domain.chatMessage.repository.RoomMessageRepository;
 import lombok.RequiredArgsConstructor;

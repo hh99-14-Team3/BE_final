@@ -1,11 +1,8 @@
 package com.mogakko.be_final.domain.members.service;
 
-import com.mogakko.be_final.domain.members.dto.ChangePwRequestDto;
-import com.mogakko.be_final.domain.members.dto.LoginRequestDto;
-import com.mogakko.be_final.domain.members.dto.MyPageResponseDto;
-import com.mogakko.be_final.domain.members.dto.SignupRequestDto;
-import com.mogakko.be_final.domain.members.email.ConfirmationToken;
-import com.mogakko.be_final.domain.members.email.ConfirmationTokenService;
+import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
+import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
@@ -16,11 +13,11 @@ import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.jwt.JwtUtil;
-import com.mogakko.be_final.jwt.TokenDto;
-import com.mogakko.be_final.jwt.refreshToken.RefreshToken;
-import com.mogakko.be_final.jwt.refreshToken.RefreshTokenRepository;
 import com.mogakko.be_final.redis.util.RedisUtil;
+import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.TokenDto;
+import com.mogakko.be_final.security.refreshToken.RefreshToken;
+import com.mogakko.be_final.security.refreshToken.RefreshTokenRepository;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.sql.Time;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,22 +49,21 @@ public class MembersService {
     private final RedisUtil redisUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final NotificationService notificationService;
-    private final ConfirmationTokenService confirmationTokenService;
     private final MogakkoRoomRepository mogakkoRoomRepository;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
 
 
     // 회원가입
-    public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
+        public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
-        boolean isAgreed = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
-
-        if (!isAgreed) {
-            log.info("필수 항목에 동의해 주세요.");
-            throw new CustomException(IS_NOT_AGREED);
-        }
+//        boolean isAgreed = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
+//
+//        if (!isAgreed) {
+//            log.info("필수 항목에 동의해 주세요.");
+//            throw new CustomException(IS_NOT_AGREED);
+//        }
         Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
         Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
 
@@ -157,19 +152,5 @@ public class MembersService {
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member);
 
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
-    }
-
-
-    //이메일 검증 후 비밀번호 변경
-    public ResponseEntity<Message> confirmEmailToFindPassword(String token, ChangePwRequestDto requestDto) {
-        ConfirmationToken findConfirmationToken = confirmationTokenService.findByIdAndExpired(token);
-        Members findMember = membersRepository.findByEmail(findConfirmationToken.getEmail()).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND));
-        String password = passwordEncoder.encode(requestDto.getPassword());
-
-        findConfirmationToken.useToken();
-
-        findMember.changePassword(password);
-        return new ResponseEntity<>(new Message("비밀번호 변경 성공", null), HttpStatus.OK);
     }
 }
