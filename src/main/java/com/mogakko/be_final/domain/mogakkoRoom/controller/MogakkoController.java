@@ -2,7 +2,7 @@ package com.mogakko.be_final.domain.mogakkoRoom.controller;
 
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko5kmRequestDto;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.service.MogakkoService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
@@ -59,8 +59,8 @@ public class MogakkoController {
 
     @GetMapping("/mogakko")
     @Operation(summary = "모각코 전체 목록 조회 API", description = "내 위치 기반 5km 이내 모각코 방 전체 목록을 조회하는 메서드입니다.")
-    public ResponseEntity<Message> getAllMogakkos(Mogakko5kmRequestDto mogakko5kmRequestDto) {
-        return mogakkoService.getAllMogakkos(mogakko5kmRequestDto);
+    public ResponseEntity<Message> getAllMogakkos(Mogakko12kmRequestDto mogakko12KmRequestDto) {
+        return mogakkoService.getAllMogakkos(mogakko12KmRequestDto);
     }
 
     @GetMapping("/mogakko/search")

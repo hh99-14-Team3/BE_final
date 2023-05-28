@@ -28,13 +28,13 @@ public interface MogakkoRoomRepository extends JpaRepository<MogakkoRoom, String
     Optional<MogakkoRoom> findBySessionId(String chatRoomId);
 
 
-    // 반경 5km 이내 모각코 조회
-    @Query("SELECT cr FROM MogakkoRoom cr WHERE (6371 * acos(cos(radians(:lon)) * cos(radians(cr.lat)) * cos(radians(cr.lon) - radians(:lat)) + sin(radians(:lon)) * sin(radians(cr.lat)))) <= 5")
+    // 반경 12km 이내 모각코 조회
+    @Query("SELECT cr FROM MogakkoRoom cr WHERE (6371 * acos(cos(radians(:lat)) * cos(radians(cr.lat)) * cos(radians(cr.lon) - radians(:lon)) + sin(radians(:lat)) * sin(radians(cr.lat)))) <= 12")
     List<MogakkoRoom> findAllByLonAndLat(@Param("lat") double lat, @Param("lon") double lon);
 
-    // 반경 5km 이내 모각코 조회 (언어 선택)
-    @Query("SELECT cr FROM MogakkoRoom cr WHERE (6371 * acos(cos(radians(:lon)) * cos(radians(cr.lat)) * cos(radians(cr.lon) - radians(:lat)) + sin(radians(:lon)) * sin(radians(cr.lat)))) <= 5" +
-            "AND cr.language = :languageEnum")
+    // 반경 12km 이내 모각코 조회 (언어 선택)
+    @Query("SELECT cr FROM MogakkoRoom cr WHERE (6371 * acos(cos(radians(:lat)) * cos(radians(cr.lat)) * cos(radians(cr.lon) - radians(:lon)) + sin(radians(:lat)) * sin(radians(cr.lat)))) <= 12" +
+            "AND cr.language = :language")
     List<MogakkoRoom> findAllByLonAndLatAndLanguage(@Param("lat") double lat, @Param("lon") double lon, @Param("language") LanguageEnum language);
 
 
@@ -49,6 +49,6 @@ public interface MogakkoRoomRepository extends JpaRepository<MogakkoRoom, String
     List<MogakkoRoom> findAllByLanguage(@Param("languageEnum") LanguageEnum languageEnum);
 
     @Query("SELECT NEW com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponseDto(COUNT(m), m.neighborhood) FROM MogakkoRoom m GROUP BY m.neighborhood ORDER BY COUNT(m) DESC")
-    List<NeighborhoodResponseDto> findByTop8DongNeCount();
+    List<NeighborhoodResponseDto> findByTop8NeighborhoodCount();
 
 }
