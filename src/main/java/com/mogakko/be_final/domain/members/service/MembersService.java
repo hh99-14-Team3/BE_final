@@ -1,9 +1,9 @@
 package com.mogakko.be_final.domain.members.service;
 
-import com.mogakko.be_final.domain.members.dto.ChangePwRequestDto;
-import com.mogakko.be_final.domain.members.dto.LoginRequestDto;
-import com.mogakko.be_final.domain.members.dto.MyPageResponseDto;
-import com.mogakko.be_final.domain.members.dto.SignupRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.ChangePwRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
+import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
 import com.mogakko.be_final.domain.members.email.ConfirmationToken;
 import com.mogakko.be_final.domain.members.email.ConfirmationTokenService;
 import com.mogakko.be_final.domain.members.entity.Members;

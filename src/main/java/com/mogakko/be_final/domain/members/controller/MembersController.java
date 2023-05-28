@@ -1,10 +1,10 @@
 package com.mogakko.be_final.domain.members.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mogakko.be_final.domain.members.dto.ChangePwRequestDto;
-import com.mogakko.be_final.domain.members.dto.EmailConfirmRequestDto;
-import com.mogakko.be_final.domain.members.dto.LoginRequestDto;
-import com.mogakko.be_final.domain.members.dto.SignupRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.ChangePwRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.EmailConfirmRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
+import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.email.EmailService;
 import com.mogakko.be_final.domain.members.service.MembersService;
 import com.mogakko.be_final.kakao.KakaoService;

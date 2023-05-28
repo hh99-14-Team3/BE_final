@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.members.dto;
+package com.mogakko.be_final.domain.members.dto.response;
 
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
