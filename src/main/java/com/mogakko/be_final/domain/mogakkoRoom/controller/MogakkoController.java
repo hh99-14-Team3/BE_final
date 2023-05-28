@@ -57,9 +57,9 @@ public class MogakkoController {
         return mogakkoService.outMogakko(sessionId, userDetails.getMember(), prev);
     }
 
-    @GetMapping("/mogakko")
-    @Operation(summary = "모각코 전체 목록 조회 API", description = "내 위치 기반 5km 이내 모각코 방 전체 목록을 조회하는 메서드입니다.")
-    public ResponseEntity<Message> getAllMogakkos(Mogakko12kmRequestDto mogakko12KmRequestDto) {
+    @PostMapping("/mogakkos")
+    @Operation(summary = "주변 12km 모각코 목록 조회 API", description = "내 위치 기반 12km 이내 모각코 방 전체 목록을 조회하는 메서드입니다.")
+    public ResponseEntity<Message> getAllMogakkos(@RequestBody Mogakko12kmRequestDto mogakko12KmRequestDto) {
         return mogakkoService.getAllMogakkos(mogakko12KmRequestDto);
     }
 
