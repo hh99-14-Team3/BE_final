@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.mogakkoRoom.service;
+package com.mogakko.be_final.scheduler.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
