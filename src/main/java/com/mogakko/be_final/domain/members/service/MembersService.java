@@ -62,12 +62,12 @@ public class MembersService {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
-        boolean isAgreed = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
-
-        if (!isAgreed) {
-            log.info("필수 항목에 동의해 주세요.");
-            throw new CustomException(IS_NOT_AGREED);
-        }
+//        boolean isAgreed = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
+//
+//        if (!isAgreed) {
+//            log.info("필수 항목에 동의해 주세요.");
+//            throw new CustomException(IS_NOT_AGREED);
+//        }
         Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
         Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
 
