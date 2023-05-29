@@ -58,15 +58,10 @@ public class MogakkoController {
     }
 
     @PostMapping("/mogakkos")
-    @Operation(summary = "주변 12km 모각코 목록 조회 API", description = "내 위치 기반 12km 이내 모각코 방 전체 목록을 조회하는 메서드입니다.")
-    public ResponseEntity<Message> getAllMogakkos(@RequestBody Mogakko12kmRequestDto mogakko12KmRequestDto) {
-        return mogakkoService.getAllMogakkos(mogakko12KmRequestDto);
-    }
-
-    @GetMapping("/mogakko/search")
-    @Operation(summary = "모각코 검색 API", description = "모각코 방을 검색하는 메서드입니다.")
-    public ResponseEntity<Message> searchMogakko(@RequestParam(required = false) String searchKeyword, @RequestParam(required = false) String language) {
-        return mogakkoService.searchMogakko(searchKeyword, language);
+    @Operation(summary = "주변 12km 모각코 목록 조회 / 검색 API", description = "내 위치 기반 12km 이내 모각코 방 전체 목록을 조회하는 메서드입니다.")
+    public ResponseEntity<Message> getAllMogakkos(@RequestParam(required = false) String searchKeyword, @RequestParam(required = false) String language,
+                                                  @RequestBody Mogakko12kmRequestDto mogakko12KmRequestDto) {
+        return mogakkoService.getAllMogakkosOrSearch(searchKeyword, language, mogakko12KmRequestDto);
     }
 
     @GetMapping("/mogakko/read")
