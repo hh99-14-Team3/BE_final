@@ -60,11 +60,9 @@ public class MogakkoRoom extends Timestamped {
     @Column
     private LocalDateTime roomDeleteTime;
 
-    // 위치 값 - 경도
     @Column
     private double lon;
 
-    // 위치 값 - 위도
     @Column
     private double lat;
 

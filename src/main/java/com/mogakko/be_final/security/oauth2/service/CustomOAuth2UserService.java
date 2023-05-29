@@ -70,9 +70,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private SocialType getSocialType(String registrationId) {
 
-        if(KAKAO.equals(registrationId)) {
+        if (KAKAO.equals(registrationId)) {
             return SocialType.KAKAO;
-        }else {
+        } else {
             throw new IllegalArgumentException("지원하지 않는 소셜 로그인입니다");
         }
     }
@@ -82,10 +82,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * 만약 찾은 회원이 있다면, 그대로 반환하고 없다면 saveUser()를 호출하여 회원을 저장한다.
      */
     private Members getMembers(OAuthAttributes attributes, SocialType socialType) {
-        Members findUser = membersRepository.findBySocialUidAndSocialType(attributes.getOauth2UserInfo().getId(),socialType)
+        Members findUser = membersRepository.findBySocialUidAndSocialType(attributes.getOauth2UserInfo().getId(), socialType)
                 .orElse(null);
 
-        if(findUser == null) {
+        if (findUser == null) {
             return saveMembers(attributes, socialType);
         }
         return findUser;

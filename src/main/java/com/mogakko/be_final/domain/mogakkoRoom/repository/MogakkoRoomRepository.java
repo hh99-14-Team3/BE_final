@@ -1,8 +1,8 @@
 package com.mogakko.be_final.domain.mogakkoRoom.repository;
 
 import com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponseDto;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;

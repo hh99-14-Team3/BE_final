@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.chatMessage.dto.response;
+package com.mogakko.be_final.domain.chatMessage.dto;
 
 import com.mogakko.be_final.domain.chatMessage.entity.RoomMessage;
 import lombok.Getter;

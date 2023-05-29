@@ -33,7 +33,7 @@ public class KakaoMembers extends Timestamped {
     private boolean isAgreed;
 
 
-    public KakaoMembers( String email, String nickname, String password, boolean isAgreed){
+    public KakaoMembers(String email, String nickname, String password, boolean isAgreed) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
@@ -41,12 +41,9 @@ public class KakaoMembers extends Timestamped {
 
     }
 
-
     public KakaoMembers kakaoIdUpdate(Long kakaoId) {
         this.kakaoId = kakaoId;
         return this;
     }
-
-
 }
 

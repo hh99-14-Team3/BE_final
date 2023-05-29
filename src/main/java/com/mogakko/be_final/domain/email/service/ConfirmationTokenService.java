@@ -15,9 +15,8 @@ import static com.mogakko.be_final.exception.ErrorCode.USED_TOKEN;
 public class ConfirmationTokenService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
 
-    public ConfirmationToken findByIdAndExpired(String confirmationTokenId){
+    public ConfirmationToken findByIdAndExpired(String confirmationTokenId) {
         Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findByIdAndExpired(confirmationTokenId, false);
-        return confirmationToken.orElseThrow(()-> new CustomException(USED_TOKEN));
-    };
-
+        return confirmationToken.orElseThrow(() -> new CustomException(USED_TOKEN));
+    }
 }

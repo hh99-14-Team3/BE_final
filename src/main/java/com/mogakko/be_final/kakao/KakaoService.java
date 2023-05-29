@@ -1,10 +1,9 @@
 package com.mogakko.be_final.kakao;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogakko.be_final.domain.members.entity.KakaoMembers;
-
-
 import com.mogakko.be_final.domain.members.repository.KakaoMembersRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.security.jwt.JwtUtil;
@@ -135,8 +134,7 @@ public class KakaoService {
                 String email = kakaoUserInfo.getEmail();
 
 
-
-                kakaoMembers = new KakaoMembers(email,encodedPassword, kakaoUserInfo.getNickname(), true);
+                kakaoMembers = new KakaoMembers(email, encodedPassword, kakaoUserInfo.getNickname(), true);
                 kakaoMembers.kakaoIdUpdate(kakaoId);
             }
 

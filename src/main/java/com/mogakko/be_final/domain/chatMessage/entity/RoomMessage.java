@@ -1,6 +1,6 @@
 package com.mogakko.be_final.domain.chatMessage.entity;
 
-import com.mogakko.be_final.domain.chatMessage.dto.request.ChatMessageRequestDto;
+import com.mogakko.be_final.domain.chatMessage.dto.ChatMessageRequestDto;
 import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

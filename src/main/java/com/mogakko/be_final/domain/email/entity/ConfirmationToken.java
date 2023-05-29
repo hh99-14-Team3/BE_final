@@ -1,17 +1,20 @@
 package com.mogakko.be_final.domain.email.entity;
 
-import javax.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class ConfirmationToken  {
+public class ConfirmationToken {
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -29,7 +32,7 @@ public class ConfirmationToken  {
     @Column(updatable = false)
     private LocalDateTime createDate;
 
-    public static ConfirmationToken createConfirmationToken(String email){
+    public static ConfirmationToken createConfirmationToken(String email) {
         ConfirmationToken confirmationToken = new ConfirmationToken();
         confirmationToken.email = email;
         confirmationToken.expired = false;
@@ -37,7 +40,7 @@ public class ConfirmationToken  {
     }
 
     //토큰 사용 만료
-    public void useToken(){
+    public void useToken() {
         expired = true;
     }
 }

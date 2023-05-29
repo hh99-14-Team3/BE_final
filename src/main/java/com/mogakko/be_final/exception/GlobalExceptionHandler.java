@@ -21,17 +21,18 @@ public class GlobalExceptionHandler {
 
     // Valid 예외 핸들러
     @ExceptionHandler(value = {BindException.class})
-    public ResponseEntity<ErrorResponse> handleBindException(BindException  ex) {
+    public ResponseEntity<ErrorResponse> handleBindException(BindException ex) {
         BindingResult bindingResult = ex.getBindingResult();
 
         StringBuilder sb = new StringBuilder();
-        for ( FieldError fieldError : bindingResult.getFieldErrors()) {
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
             sb.append(fieldError.getDefaultMessage());
         }
         return ErrorResponse.toResponseEntityValid(sb.toString(), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e){
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
         e.printStackTrace();
         return ErrorResponse.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
     }

@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.sql.Time;
 import java.time.LocalTime;
 
-
 @Entity
 @NoArgsConstructor
 public class MogakkoRoomTime {
@@ -23,12 +22,12 @@ public class MogakkoRoomTime {
     @Column
     private Time mogakkoRoomTime;
 
-    public MogakkoRoomTime (String member, Time mogakkoRoomTime){
+    public MogakkoRoomTime(String member, Time mogakkoRoomTime) {
         this.member = member;
         this.mogakkoRoomTime = mogakkoRoomTime;
     }
 
-    public void stopTime(LocalTime mogakkoRoomTime){
+    public void stopTime(LocalTime mogakkoRoomTime) {
         this.mogakkoRoomTime = TimeUtil.addTimes(this.mogakkoRoomTime, Time.valueOf(mogakkoRoomTime));
     }
 }

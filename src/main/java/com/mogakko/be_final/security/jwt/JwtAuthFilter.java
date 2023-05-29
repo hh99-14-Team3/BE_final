@@ -34,7 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String refresh_token = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
 
         // 토큰이 존재하면 유효성 검사를 수행하고, 유효하지 않은 경우 예외 처리
-        if(access_token == null){
+        if (access_token == null) {
             filterChain.doFilter(request, response);
         } else {
             if (jwtUtil.validateToken(access_token)) {

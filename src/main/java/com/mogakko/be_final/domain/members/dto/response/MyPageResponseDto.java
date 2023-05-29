@@ -16,7 +16,7 @@ public class MyPageResponseDto {
     private MogakkoRoomTime time;
     private Members member;
 
-    public MyPageResponseDto(List<MogakkoRoomMembers> mogakkoRoomList, MogakkoRoomTime time, Members member){
+    public MyPageResponseDto(List<MogakkoRoomMembers> mogakkoRoomList, MogakkoRoomTime time, Members member) {
         this.mogakkoRoomList = mogakkoRoomList;
         this.time = time;
         this.member = member;

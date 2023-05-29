@@ -60,7 +60,6 @@ public class MogakkoRoomMembers {
     private Time roomStayTime;
 
 
-
     // 방에서 나가는 경우
     public void deleteRoomMembers(LocalDateTime roomExitTime, LocalTime roomStayTime, Long roomStayDay) {
         this.isEntered = false;

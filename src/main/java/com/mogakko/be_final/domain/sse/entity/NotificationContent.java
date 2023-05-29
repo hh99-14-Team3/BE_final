@@ -13,7 +13,7 @@ public class NotificationContent {
     @Column(nullable = false)
     private String content;
 
-    public NotificationContent(String content){
+    public NotificationContent(String content) {
         this.content = content;
     }
 }

@@ -66,8 +66,6 @@ public class NotificationService {
                 .build();
     }
 
-
-
     private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
         try {
             emitter.send(SseEmitter.event()
@@ -79,7 +77,7 @@ public class NotificationService {
         }
     }
 
-    public void sendLoginNotification(Members receiver){
+    public void sendLoginNotification(Members receiver) {
         String content = receiver.getNickname() + " 님은 " + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
         String url = "/api/members/login";
         send(receiver, NotificationType.LOGIN, content, url);

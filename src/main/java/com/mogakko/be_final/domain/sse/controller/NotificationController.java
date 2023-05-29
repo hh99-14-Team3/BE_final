@@ -37,10 +37,9 @@ public class NotificationController {
 
     @Operation(summary = "SSE 알림 생성 API", description = "SSE 알림 생성을 하는 메서드입니다.")
     @GetMapping("/api/notification")
-    public ResponseEntity<List<Notification>> getAllNotification(){
+    public ResponseEntity<List<Notification>> getAllNotification() {
         List<Notification> notifications = notificationRepository.findAll();
         return ResponseEntity.ok(notifications);
 
     }
-
 }

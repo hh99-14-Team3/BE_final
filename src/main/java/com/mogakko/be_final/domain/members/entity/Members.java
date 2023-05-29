@@ -46,7 +46,7 @@ public class Members extends Timestamped {
     private String socialUid;
 
 
-    public Members( String email, String nickname, String password, Role role){
+    public Members(String email, String nickname, String password, Role role) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
@@ -60,12 +60,5 @@ public class Members extends Timestamped {
     public void changeRole(Role newRole) {
         this.role = newRole;
     }
-
-
-//    public Members kakaoIdUpdate(Long kakaoId) {
-//        this.kakaoId = kakaoId;
-//        return this;
-//    }
-
 
 }
