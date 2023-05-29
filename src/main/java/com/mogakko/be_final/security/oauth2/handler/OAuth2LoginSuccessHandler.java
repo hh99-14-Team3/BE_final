@@ -61,8 +61,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         jwtUtil.setHeaderAccessToken(response, token.getAccessToken());
         jwtUtil.setHeaderRefreshToken(response, token.getRefreshToken());
 
-        response.sendRedirect("/api/main");
-        //TODO:추후에 클라이언트랑 연결되면 위에코드 지우고 아래코드사용
-        //response.setStatus(HttpServletResponse.SC_OK);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }
