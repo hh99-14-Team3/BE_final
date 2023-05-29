@@ -49,21 +49,15 @@ public class MembersService {
     private final RedisUtil redisUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final NotificationService notificationService;
-    private final MogakkoRoomRepository mogakkoRoomRepository;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
 
 
     // 회원가입
-        public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
+    public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
-//        boolean isAgreed = Boolean.parseBoolean(signupRequestDto.getIsAgreed());
-//
-//        if (!isAgreed) {
-//            log.info("필수 항목에 동의해 주세요.");
-//            throw new CustomException(IS_NOT_AGREED);
-//        }
+
         Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
         Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
 
@@ -76,7 +70,6 @@ public class MembersService {
         MogakkoRoomTime mogakkoRoomTimes = new MogakkoRoomTime(email, Time.valueOf("00:00:00"));
         mogakkoRoomTimeRepository.save(mogakkoRoomTimes);
         return new ResponseEntity<>(new Message("회원 가입 성공", null), HttpStatus.OK);
-
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +79,6 @@ public class MembersService {
             throw new CustomException(DUPLICATE_IDENTIFIER);
         }
         return new ResponseEntity<>(new Message("중복 확인 성공", null), HttpStatus.OK);
-
     }
 
     @Transactional(readOnly = true)
