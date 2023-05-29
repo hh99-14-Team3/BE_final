@@ -5,7 +5,7 @@ import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
-import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtProvider;
 import com.mogakko.be_final.security.jwt.TokenDto;
 import com.mogakko.be_final.security.oauth2.util.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.io.IOException;
 
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final MembersRepository membersRepository;
 
 
@@ -56,10 +56,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
-        TokenDto token = jwtUtil.createAllToken(oAuth2User.getEmail());
+        TokenDto token = jwtProvider.createAllToken(oAuth2User.getEmail());
 
-        jwtUtil.setHeaderAccessToken(response, token.getAccessToken());
-        jwtUtil.setHeaderRefreshToken(response, token.getRefreshToken());
+        jwtProvider.setHeaderAccessToken(response, token.getAccessToken());
+        jwtProvider.setHeaderRefreshToken(response, token.getRefreshToken());
 
         response.sendRedirect("/api/main");
         //TODO:추후에 클라이언트랑 연결되면 위에코드 지우고 아래코드사용

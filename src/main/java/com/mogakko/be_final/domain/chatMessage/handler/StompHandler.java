@@ -1,7 +1,7 @@
 package com.mogakko.be_final.domain.chatMessage.handler;
 
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -17,7 +17,7 @@ import static com.mogakko.be_final.exception.ErrorCode.AUTHENTICATION_FAILED;
 @Component
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -28,16 +28,16 @@ public class StompHandler implements ChannelInterceptor {
             String accessToken = accessor.getFirstNativeHeader("ACCESS_KEY");
             String refreshToken = accessor.getFirstNativeHeader("REFRESH_KEY");
 
-            String jwtAccessToken = jwtUtil.socketResolveToken(accessToken);
+            String jwtAccessToken = jwtProvider.socketResolveToken(accessToken);
 
-            if (jwtAccessToken != null && jwtUtil.validateToken(jwtAccessToken)) {
+            if (jwtAccessToken != null && jwtProvider.validateToken(jwtAccessToken)) {
                 log.info("엑세스 토큰 인증 성공");
-            } else if (jwtAccessToken != null && !jwtUtil.validateToken(jwtAccessToken)) {
+            } else if (jwtAccessToken != null && !jwtProvider.validateToken(jwtAccessToken)) {
                 log.info("JWT 토큰이 만료되어, Refresh token 확인 작업을 진행합니다.");
                 /* Refresh Token 존재 여부 확인.*/
-                String jwtRefreshToken = jwtUtil.socketResolveToken(refreshToken);
+                String jwtRefreshToken = jwtProvider.socketResolveToken(refreshToken);
                 /* Refresh Token이 검증이 되며, 만료기간이 지나지 않은 경우만 */
-                if (jwtRefreshToken != null && jwtUtil.validateToken(jwtRefreshToken)) {
+                if (jwtRefreshToken != null && jwtProvider.validateToken(jwtRefreshToken)) {
                     log.info("리프레시 토큰 인증 성공");
                 } else {
                     throw new CustomException(AUTHENTICATION_FAILED);
