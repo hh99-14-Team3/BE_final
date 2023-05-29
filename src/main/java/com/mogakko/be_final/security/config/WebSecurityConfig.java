@@ -1,7 +1,7 @@
 package com.mogakko.be_final.security.config;
 
 import com.mogakko.be_final.security.jwt.JwtAuthFilter;
-import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtProvider;
 import com.mogakko.be_final.security.oauth2.handler.OAuth2LoginFailureHandler;
 import com.mogakko.be_final.security.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.mogakko.be_final.security.oauth2.service.CustomOAuth2UserService;
@@ -94,7 +94,7 @@ public class WebSecurityConfig {
 
         config.addAllowedOrigin("http://localhost:8080");
 
-        config.addExposedHeader(JwtUtil.ACCESS_KEY);
+        config.addExposedHeader(JwtProvider.ACCESS_KEY);
 
         config.addAllowedMethod("*");
 
