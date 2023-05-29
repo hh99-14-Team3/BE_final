@@ -41,15 +41,4 @@ public class MogakkoRoomMemberResponseDto {
     // 방에서 총 머문 시간
     private Time roomStayTime;
 
-    public MogakkoRoomMemberResponseDto(MogakkoRoomMembers responseDto){
-        this.mogakkoRoom = responseDto.getMogakkoRoom();
-        this.memberId = responseDto.getMemberId();
-        this.nickname = responseDto.getNickname();
-        this.profileImage = responseDto.getProfileImage();
-        this.enterRoomToken = responseDto.getEnterRoomToken();
-        this.roomEnterTime = responseDto.getRoomEnterTime();
-        this.roomExitTime = responseDto.getRoomExitTime();
-        this.roomStayDay = responseDto.getRoomStayDay();
-        this.roomStayTime = responseDto.getRoomStayTime();
-    }
 }

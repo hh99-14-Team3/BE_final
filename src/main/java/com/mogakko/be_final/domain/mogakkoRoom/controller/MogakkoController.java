@@ -1,8 +1,8 @@
 package com.mogakko.be_final.domain.mogakkoRoom.controller;
 
+import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.service.MogakkoService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
@@ -71,7 +71,7 @@ public class MogakkoController {
 
     @GetMapping("/mogakko/read")
     @Operation(summary = "인기 모각코 조회 API", description = "인기있는 모각코를 조회하는 메서드입니다.")
-    public ResponseEntity<Message> topMogakko(){
+    public ResponseEntity<Message> topMogakko() {
         return mogakkoService.topMogakko();
     }
 

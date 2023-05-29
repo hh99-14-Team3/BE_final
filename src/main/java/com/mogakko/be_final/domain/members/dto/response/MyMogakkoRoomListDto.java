@@ -12,7 +12,7 @@ public class MyMogakkoRoomListDto {
     private MogakkoRoom mogakkoRoom;
     private Members members;
 
-    public MyMogakkoRoomListDto(MogakkoRoom mogakkoRoom, Members members){
+    public MyMogakkoRoomListDto(MogakkoRoom mogakkoRoom, Members members) {
         this.mogakkoRoom = mogakkoRoom;
         this.members = members;
     }

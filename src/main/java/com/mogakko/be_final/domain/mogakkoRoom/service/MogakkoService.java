@@ -199,29 +199,30 @@ public class MogakkoService {
         LocalTime start = mogakkoRoomMembers.getRoomEnterTime().toLocalTime();
         LocalTime end = chatRoomExitTime.toLocalTime();
 
-        // 1.기존에 현재방에서 있었던 시간을 가지고 온다, 처음 입장한 유저 = 00:00:00
+        // 기존에 현재방에서 있었던 시간을 가지고 온다, 처음 입장한 유저 = 00:00:00
         LocalTime beforeChatRoomStayTime = mogakkoRoomMembers.getRoomStayTime().toLocalTime();
 
-        // 2.현재방에 들어왔던 시간 - 나가기 버튼 누른 시간 = 머문 시간
+        // 현재방에 들어왔던 시간 - 나가기 버튼 누른 시간 = 머문 시간
         long afterSeconds = ChronoUnit.SECONDS.between(start, end);
 
-        // 3. 1번의 기존 머문 시간에 + 다시 들어왔을때의 머문시간을 더한다.
+        // 기존 머문 시간에 + 다시 들어왔을때의 머문시간을 더한다.
         // 처음 들어온 유저의 경우 ex) 00:00:00 + 00:05:20
         LocalTime chatRoomStayTime = beforeChatRoomStayTime.plusSeconds(afterSeconds);
 
         // 일자 계산
         int seconds = beforeChatRoomStayTime.toSecondOfDay();
 
-        Long roomStayDay = mogakkoRoomMembers.getRoomStayDay();
         // 24시간을 넘기면 1일 추가
+        Long roomStayDay = mogakkoRoomMembers.getRoomStayDay();
         if ((seconds + afterSeconds) >= 86400) {
             roomStayDay += 1;
         }
 
-        // 4. 채팅방 유저 논리 삭제, 방에서 나간 시간 저장, 방에 머문 시간 교체
+        // 채팅방 유저 논리 삭제, 방에서 나간 시간 저장, 방에 머문 시간 교체
         mogakkoRoomMembers.deleteRoomMembers(chatRoomExitTime, chatRoomStayTime, roomStayDay);
         MogakkoRoomTime mogakkoRoomTime = mogakkoRoomTimeRepository.findByMember(members.getEmail());
         mogakkoRoomTime.stopTime(chatRoomStayTime);
+
         // 채팅방 유저 수 확인
         // 채팅방 유저가 0명이라면 방 논리삭제
         synchronized (mogakkoRoom) {

@@ -4,7 +4,10 @@ import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
-import io.openvidu.java.client.*;
+import io.openvidu.java.client.OpenVidu;
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
+import io.openvidu.java.client.Session;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +15,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import javax.annotation.PostConstruct;
 import java.sql.Timestamp;

@@ -1,5 +1,5 @@
 package com.mogakko.be_final.kakao;
-//
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

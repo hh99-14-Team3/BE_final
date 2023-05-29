@@ -13,7 +13,7 @@ public class RelatedUrl {
     @Column(nullable = false)
     private String url;
 
-    public RelatedUrl(String url){
+    public RelatedUrl(String url) {
         this.url = url;
     }
 }

@@ -18,11 +18,12 @@ import static com.mogakko.be_final.exception.ErrorCode.AUTHENTICATION_FAILED;
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
     private final JwtUtil jwtUtil;
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
-        if(accessor.getCommand() == StompCommand.CONNECT) {
+        if (accessor.getCommand() == StompCommand.CONNECT) {
             log.info("소켓 Connect JWT 확인");
             String accessToken = accessor.getFirstNativeHeader("ACCESS_KEY");
             String refreshToken = accessor.getFirstNativeHeader("REFRESH_KEY");
@@ -38,7 +39,7 @@ public class StompHandler implements ChannelInterceptor {
                 /* Refresh Token이 검증이 되며, 만료기간이 지나지 않은 경우만 */
                 if (jwtRefreshToken != null && jwtUtil.validateToken(jwtRefreshToken)) {
                     log.info("리프레시 토큰 인증 성공");
-                }else {
+                } else {
                     throw new CustomException(AUTHENTICATION_FAILED);
                 }
             } else {

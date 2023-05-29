@@ -21,7 +21,7 @@ public class RefreshToken {
 
     private String email;
 
-    public RefreshToken(String tokenDto,  String email) {
+    public RefreshToken(String tokenDto, String email) {
         this.refreshToken = tokenDto;
         this.email = email;
     }

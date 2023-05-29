@@ -14,47 +14,47 @@ import javax.persistence.*;
 @Getter
 public class Notification extends Timestamped {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @Embedded
-        private NotificationContent content;
+    @Embedded
+    private NotificationContent content;
 
-        @Embedded
-        private RelatedUrl url;
+    @Embedded
+    private RelatedUrl url;
 
-        @Column(nullable = false)
-        private Boolean isRead;
+    @Column(nullable = false)
+    private Boolean isRead;
 
-        @Enumerated(EnumType.STRING)
-        @Column(nullable = false)
-        private NotificationType notificationType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NotificationType notificationType;
 
-        @OnDelete(action = OnDeleteAction.CASCADE)
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "members_id")
-        private Members receiver;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "members_id")
+    private Members receiver;
 
-        @Builder
-        public Notification(Members receiver, NotificationType notificationType, String content, String url) {
-            this.receiver = receiver;
-            this.notificationType = notificationType;
-            this.content = new NotificationContent(content);
-            this.url = new RelatedUrl(url);
-            this.isRead = false;
-        }
+    @Builder
+    public Notification(Members receiver, NotificationType notificationType, String content, String url) {
+        this.receiver = receiver;
+        this.notificationType = notificationType;
+        this.content = new NotificationContent(content);
+        this.url = new RelatedUrl(url);
+        this.isRead = false;
+    }
 
-        public String getContent() {
-            return content.getContent();
-        }
+    public String getContent() {
+        return content.getContent();
+    }
 
-        public String getUrl() {
-            return url.getUrl();
-        }
+    public String getUrl() {
+        return url.getUrl();
+    }
 
-        public void read(){
-            isRead = true;
-        }
+    public void read() {
+        isRead = true;
+    }
 }
 

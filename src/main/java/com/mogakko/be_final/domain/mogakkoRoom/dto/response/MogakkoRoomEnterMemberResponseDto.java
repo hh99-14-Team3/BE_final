@@ -32,14 +32,14 @@ public class MogakkoRoomEnterMemberResponseDto {
     private Long stayDay;
 
     // 방장인지 확인
-    private boolean roomMaster;
+    private boolean isRoomMaster;
 
     // 방 접속시 모든 사용자의 정보를 보내기 때문에 현재 접속한 유저 구분용도
     private boolean nowMember;
 
     private String enterRoomToken;
 
-    public MogakkoRoomEnterMemberResponseDto(MogakkoRoomMembers mogakkoRoomMembers, boolean roomMaster, boolean nowMembers){
+    public MogakkoRoomEnterMemberResponseDto(MogakkoRoomMembers mogakkoRoomMembers, boolean isRoomMaster, boolean nowMembers) {
         this.mogakkoRoom = mogakkoRoomMembers.getMogakkoRoom();
         this.memberId = mogakkoRoomMembers.getMemberId();
         this.nickname = mogakkoRoomMembers.getNickname();
@@ -47,7 +47,7 @@ public class MogakkoRoomEnterMemberResponseDto {
         this.enterRoomToken = mogakkoRoomMembers.getEnterRoomToken();
         this.stayTime = mogakkoRoomMembers.getRoomStayTime();
         this.stayDay = mogakkoRoomMembers.getRoomStayDay();
-        this.roomMaster = roomMaster;
+        this.isRoomMaster = isRoomMaster;
         this.nowMember = nowMembers;
     }
 }

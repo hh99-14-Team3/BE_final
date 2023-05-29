@@ -23,12 +23,13 @@ public class OAuthAttributes {
         this.nameAttributeKey = nameAttributeKey;
         this.oauth2UserInfo = oauth2UserInfo;
     }
+
     public static OAuthAttributes of(SocialType socialType,
                                      String userNameAttributeName, Map<String, Object> attributes) {
 
         if (socialType == SocialType.KAKAO) {
             return ofKakao(userNameAttributeName, attributes);
-        }else {
+        } else {
             throw new IllegalArgumentException("지원하지 않는 소셜 로그인입니다");
         }
     }
@@ -39,6 +40,7 @@ public class OAuthAttributes {
                 .oauth2UserInfo(new KakaoOAuth2UserInfo(attributes))
                 .build();
     }
+
     public Members toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo) {
         return Members.builder()
                 .socialType(socialType)

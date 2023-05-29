@@ -2,10 +2,7 @@ package com.mogakko.be_final.domain.sse.dto;
 
 import com.mogakko.be_final.domain.sse.entity.Notification;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-
 
 import java.time.format.DateTimeFormatter;
 
@@ -19,7 +16,8 @@ public class NotificationResponseDto {
     private String createdAt;
 
 
-    public NotificationResponseDto() { }
+    public NotificationResponseDto() {
+    }
 
     public NotificationResponseDto(Notification notification) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

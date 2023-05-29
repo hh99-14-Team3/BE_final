@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.members.email;
+package com.mogakko.be_final.domain.email.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,14 +41,14 @@ public class EmailConfig {
         javaMailSender.setDefaultEncoding("UTF-8");
         return javaMailSender;
     }
-    private Properties getMailProperties()
-    {
+
+    private Properties getMailProperties() {
         Properties pt = new Properties();
         pt.put("mail.smtp.socketFactory.port", socketPort);
         pt.put("mail.smtp.auth", auth);
         pt.put("mail.smtp.starttls.enable", starttls);
         pt.put("mail.smtp.starttls.required", startlls_required);
-        pt.put("mail.smtp.socketFactory.fallback",fallback);
+        pt.put("mail.smtp.socketFactory.fallback", fallback);
         pt.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         return pt;
     }

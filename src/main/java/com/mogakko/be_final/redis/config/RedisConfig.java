@@ -2,7 +2,6 @@ package com.mogakko.be_final.redis.config;
 
 import com.mogakko.be_final.redis.util.RedisSubscriber;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
