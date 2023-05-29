@@ -221,7 +221,7 @@ public class MogakkoService {
 
         // 채팅방 유저 논리 삭제, 방에서 나간 시간 저장, 방에 머문 시간 교체
         mogakkoRoomMembers.deleteRoomMembers(chatRoomExitTime, chatRoomStayTime, roomStayDay);
-        MogakkoRoomTime mogakkoRoomTime = mogakkoRoomTimeRepository.findByMember(members.getEmail());
+        MogakkoRoomTime mogakkoRoomTime = mogakkoRoomTimeRepository.findByEmail(members.getEmail());
         mogakkoRoomTime.stopTime(chatRoomStayTime);
 
         // 채팅방 유저 수 확인

@@ -132,7 +132,7 @@ public class MembersService {
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
         List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
-        MogakkoRoomTime mogakkoTotalTime = mogakkoRoomTimeRepository.findByMember(member.getEmail());
+        Time mogakkoTotalTime = mogakkoRoomTimeRepository.findMogakkoRoomTimeByEmail(member.getEmail());
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member);
 
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);

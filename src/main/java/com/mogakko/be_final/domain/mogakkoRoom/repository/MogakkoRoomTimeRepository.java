@@ -8,5 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.sql.Time;
 
 public interface MogakkoRoomTimeRepository extends JpaRepository<MogakkoRoomTime, Long> {
-    MogakkoRoomTime findByMember(String mail);
+    @Query("select m.mogakkoRoomTime from MogakkoRoomTime m where m.email = :email")
+    Time findMogakkoRoomTimeByEmail(@Param("email") String email);
+
+    MogakkoRoomTime findByEmail(String mail);
 }
