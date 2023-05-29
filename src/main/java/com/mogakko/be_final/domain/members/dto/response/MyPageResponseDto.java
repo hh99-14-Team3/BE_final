@@ -6,6 +6,7 @@ import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.sql.Time;
 import java.util.List;
 
 @Getter
