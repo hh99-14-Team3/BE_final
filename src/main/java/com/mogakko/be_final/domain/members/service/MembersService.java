@@ -9,18 +9,16 @@ import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
-import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtProvider;
 import com.mogakko.be_final.security.jwt.TokenDto;
-import com.mogakko.be_final.security.refreshToken.RefreshToken;
-import com.mogakko.be_final.security.refreshToken.RefreshTokenRepository;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.sql.Time;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,11 +44,11 @@ public class MembersService {
     private final MembersRepository membersRepository;
     private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final RedisUtil redisUtil;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final NotificationService notificationService;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
+    private final RedisTemplate redisTemplate;
 
 
     // 회원가입
@@ -100,21 +99,15 @@ public class MembersService {
             throw new CustomException(INVALID_PASSWORD);
         }
 
-        TokenDto tokenDto = jwtUtil.createAllToken(members.getEmail());
-
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(loginRequestDto.getEmail());
-        if (refreshToken.isPresent()) {
-            refreshToken.get().updateToken(tokenDto.getRefreshToken());
-        } else { // 존재하지 않을 경우 새로 발급
-            RefreshToken newToken = new RefreshToken(tokenDto.getRefreshToken(), members.getEmail());
-            refreshTokenRepository.save(newToken);
-        }
+        TokenDto tokenDto = jwtProvider.createAllToken(members.getEmail());
+        String refreshToken = tokenDto.getRefreshToken();
+//        int time = jwtProvider.getExpirationTime(refreshToken);
+        redisUtil.set(members.getEmail(), refreshToken, Duration.ofDays(7).toMillis());
 
         notificationService.sendLoginNotification(members);
 
-        httpServletResponse.addHeader(JwtUtil.ACCESS_KEY, tokenDto.getAccessToken());
-//        httpServletResponse.addHeader(JwtUtil.REFRESH_KEY, tokenDto.getRefreshToken());
-
+        httpServletResponse.addHeader(JwtProvider.ACCESS_KEY, tokenDto.getAccessToken());
+        httpServletResponse.addHeader(JwtProvider.REFRESH_KEY, tokenDto.getRefreshToken());
 
         Message message = Message.setSuccess("로그인 성공", null);
 
@@ -122,15 +115,14 @@ public class MembersService {
     }
 
     // 로그아웃
-    public ResponseEntity<Message> logout(Members members, HttpServletRequest request) {
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(members.getEmail());
+    public ResponseEntity<Message> logout(Members member, HttpServletRequest request) {
         String accessToken = request.getHeader("ACCESS_KEY").substring(7);
-        if (refreshToken.isPresent()) {
-            Long tokenTime = jwtUtil.getExpirationTime(accessToken);
+        String refreshToken = redisUtil.get(member.getEmail());
+        if (!refreshToken.isEmpty()) {
+            long tokenTime = jwtProvider.getExpirationTime(accessToken);
             redisUtil.setBlackList(accessToken, "access_token", tokenTime);
-            refreshTokenRepository.deleteByEmail(members.getEmail());
-            Message message = Message.setSuccess("로그아웃 성공", members.getEmail());
-            return new ResponseEntity<>(message, HttpStatus.OK);
+            redisUtil.delValues(member.getEmail());
+            return new ResponseEntity<>(new Message("로그아웃 성공", member.getEmail()), HttpStatus.OK);
         }
         throw new CustomException(USER_NOT_FOUND);
     }

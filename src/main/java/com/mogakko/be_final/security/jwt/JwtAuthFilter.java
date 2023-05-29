@@ -22,7 +22,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final MembersRepository membersRepository;
 
     @Override
@@ -30,24 +30,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String access_token = jwtUtil.resolveToken(request, JwtUtil.ACCESS_KEY);
-        String refresh_token = jwtUtil.resolveToken(request, JwtUtil.REFRESH_KEY);
+        String access_token = jwtProvider.resolveToken(request, JwtProvider.ACCESS_KEY);
+        String refresh_token = jwtProvider.resolveToken(request, JwtProvider.REFRESH_KEY);
 
         // 토큰이 존재하면 유효성 검사를 수행하고, 유효하지 않은 경우 예외 처리
         if (access_token == null) {
             filterChain.doFilter(request, response);
         } else {
-            if (jwtUtil.validateToken(access_token)) {
-                setAuthentication(jwtUtil.getUserInfoFromToken(access_token));
-            } else if (refresh_token != null && jwtUtil.refreshTokenValid(refresh_token)) {
+            if (jwtProvider.validateToken(access_token)) {
+                setAuthentication(jwtProvider.getUserInfoFromToken(access_token));
+            } else if (refresh_token != null && jwtProvider.refreshTokenValid(refresh_token)) {
                 //Refresh토큰으로 유저명 가져오기
-                String email = jwtUtil.getUserInfoFromToken(refresh_token);
+                String email = jwtProvider.getUserInfoFromToken(refresh_token);
                 //유저명으로 유저 정보 가져오기
 //                Members member = memberRepository.findByEmail(email).get();
                 //새로운 ACCESS TOKEN 발급
-                String newAccessToken = jwtUtil.createToken(email, "Access");
+                String newAccessToken = jwtProvider.createToken(email, "Access");
                 //Header에 ACCESS TOKEN 추가
-                jwtUtil.setHeaderAccessToken(response, newAccessToken);
+                jwtProvider.setHeaderAccessToken(response, newAccessToken);
                 setAuthentication(email);
             } else if (refresh_token == null) {
                 jwtExceptionHandler(response, "AccessToken Expired.");
@@ -63,7 +63,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     public void setAuthentication(String email) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = jwtUtil.createAuthentication(email);
+        Authentication authentication = jwtProvider.createAuthentication(email);
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
