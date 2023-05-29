@@ -28,6 +28,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final MembersRepository membersRepository;
 
     private static final String KAKAO = "kakao";
+    private static final String GOOGLE = "google";
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -72,6 +73,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         if (KAKAO.equals(registrationId)) {
             return SocialType.KAKAO;
+        }
+        else if (GOOGLE.equals(registrationId)) {
+            return SocialType.GOOGLE;
         } else {
             throw new IllegalArgumentException("지원하지 않는 소셜 로그인입니다");
         }
