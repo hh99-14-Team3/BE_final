@@ -24,6 +24,4 @@ public class ChatMessageService {
         chatMessageResponseDto = new ChatMessageResponseDto(roomMessage);
         return chatMessageResponseDto;
     }
-
-
 }

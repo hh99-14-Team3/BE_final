@@ -46,7 +46,6 @@ public class StompHandler implements ChannelInterceptor {
                 throw new CustomException(AUTHENTICATION_FAILED);
             }
         }
-
         return message;
     }
 }
