@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.service.MembersService;
-import com.mogakko.be_final.kakao.KakaoService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +27,6 @@ import java.io.IOException;
 @Tag(name = "회원 관련 API", description = "회원 관련 API 입니다.")
 public class MembersController {
     private final MembersService membersService;
-    private final KakaoService kakaoService;
 
     @PostMapping("/signup")
     @Operation(summary = "회원 가입 API", description = "회원가입하는 메서드입니다.")
@@ -60,12 +58,6 @@ public class MembersController {
     @Operation(summary = "로그아웃 API", description = "로그아웃하는 메서드입니다.")
     public ResponseEntity<Message> logout(@AuthenticationPrincipal UserDetailsImpl userDetails, HttpServletRequest request) {
         return membersService.logout(userDetails.getMember(), request);
-    }
-
-    @GetMapping("/kakaoLogin")
-    @Operation(summary = "카카오 소셜 로그인 API", description = "카카오로 소셜 로그인을 하는 메서드입니다.")
-    public ResponseEntity<Message> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) throws JsonProcessingException {
-        return kakaoService.kakaoLogin(code, response);
     }
 
     @GetMapping("/mypage")
