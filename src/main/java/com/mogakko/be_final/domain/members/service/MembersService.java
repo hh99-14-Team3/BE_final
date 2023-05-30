@@ -62,9 +62,14 @@ public class MembersService {
 
         Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
         Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
+        String checkedEmail = (String) session.getAttribute("email");
+        String checkedNickname = (String) session.getAttribute("nickname");
 
         if (nicknameChecked == null || !nicknameChecked || emailChecked == null || !emailChecked) {
             return new ResponseEntity<>(new Message("이메일과 닉네임 중복검사를 완료해주세요", null), HttpStatus.BAD_REQUEST);
+        }
+        if (!checkedEmail.equals(signupRequestDto.getEmail()) || !checkedNickname.equals(signupRequestDto.getNickname())){
+            return new ResponseEntity<>(new Message("중복검사에 사용한 이메일과 닉네임을 사용해 주세요", null), HttpStatus.BAD_REQUEST);
         }
 
         Members members = new Members(email, nickname, password, Role.USER);
