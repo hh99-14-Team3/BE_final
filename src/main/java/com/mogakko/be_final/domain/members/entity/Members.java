@@ -38,9 +38,10 @@ public class Members extends Timestamped {
     @Column
     private SocialType socialType;
 
+    // TODO : 디폴트 프사 url 임의로 지정해놓음
     @Column
     @Lob
-    private String profileImage;        //TODO : 디폴트 프사 생기면 url 넣을 예졍
+    private String profileImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtArY0iIz1b6rGdZ6xkSegyALtWQKBjupKJQ&usqp=CAU";
 
     @Column
     private String socialUid;
@@ -59,6 +60,10 @@ public class Members extends Timestamped {
 
     public void changeRole(Role newRole) {
         this.role = newRole;
+    }
+
+    public void setProfileImage(String profileImage){
+        this.profileImage = profileImage;
     }
 
 }
