@@ -9,14 +9,17 @@ import com.mogakko.be_final.util.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -63,5 +66,10 @@ public class MembersController {
         return membersService.readMyPage(userDetails.getMember());
     }
 
+    @Operation(summary = "마이페이지 수정 API", description = "마이페이지에서 프로필 사진을 수정하는 메서드입니다.")
+    @PutMapping(value = "/mypage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Message> profileUpdate(@RequestPart("imageFile") MultipartFile image, @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        return membersService.profileUpdate(image, userDetails.getMember());
+    }
 }
 

@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.members.service;
 
+import com.mogakko.be_final.S3.S3Uploader;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
@@ -24,14 +25,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.sql.Time;
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
 
@@ -49,6 +51,7 @@ public class MembersService {
     private final NotificationService notificationService;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
     private final RedisTemplate redisTemplate;
+    private final S3Uploader s3Uploader;
 
 
     // 회원가입
@@ -136,5 +139,16 @@ public class MembersService {
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member);
 
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
+    }
+
+    // 마이페이지 - 프로필 사진 수정
+    public ResponseEntity<Message> profileUpdate(MultipartFile imageFile, Members member) throws IOException {
+        if (!imageFile.isEmpty()) {
+            s3Uploader.delete(member.getProfileImage());
+            String profileImage = s3Uploader.uploadFile(imageFile);
+            member.setProfileImage(profileImage);
+        }
+        membersRepository.save(member);
+        return new ResponseEntity<>(new Message("프로필 이미지 수정 성공", null), HttpStatus.OK);
     }
 }
