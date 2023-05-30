@@ -90,7 +90,8 @@ public class MogakkoService {
 
         // 빌드된 모각코방 저장
         mogakkoRoomRepository.save(mogakkoRoom);
-        return new ResponseEntity<>(new Message("모각코방 생성 성공", mogakkoRoom), HttpStatus.OK);
+        MogakkoRoom room = mogakkoRoomRepository.findBySessionId(mogakkoRoom.getSessionId()).get();
+        return new ResponseEntity<>(new Message("모각코방 생성 성공", room), HttpStatus.OK);
     }
 
     // 모각코 방 입장
@@ -220,7 +221,7 @@ public class MogakkoService {
 
         // 채팅방 유저 논리 삭제, 방에서 나간 시간 저장, 방에 머문 시간 교체
         mogakkoRoomMembers.deleteRoomMembers(chatRoomExitTime, chatRoomStayTime, roomStayDay);
-        MogakkoRoomTime mogakkoRoomTime = mogakkoRoomTimeRepository.findByMember(members.getEmail());
+        MogakkoRoomTime mogakkoRoomTime = mogakkoRoomTimeRepository.findByEmail(members.getEmail());
         mogakkoRoomTime.stopTime(chatRoomStayTime);
 
         // 채팅방 유저 수 확인
@@ -241,49 +242,25 @@ public class MogakkoService {
         }
     }
 
-    // 위치 기반 12km 이내 모각코 조회
+    // 위치 기반 12km 이내 모각코 조회 및 검색
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> getAllMogakkos(Mogakko12kmRequestDto requestDto) {
+    public ResponseEntity<Message> getAllMogakkosOrSearch(String searchKeyword, String language, Mogakko12kmRequestDto requestDto) {
         double lon = requestDto.getLon();
         double lat = requestDto.getLat();
-        LanguageEnum language = requestDto.getLanguage();
         List<MogakkoRoom> mogakkoList;
-        if (requestDto.getLanguage() == null) {
+        if (language == null && searchKeyword == null) {
             mogakkoList = mogakkoRoomRepository.findAllByLonAndLat(lat, lon);
+        } else if (searchKeyword == null) {
+            mogakkoList = mogakkoRoomRepository.findAllByLonAndLatAndLanguage(lat, lon, LanguageEnum.valueOf(language));
+        } else if (language == null) {
+            mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLatAndLon(searchKeyword, lat, lon);
         } else {
-            mogakkoList = mogakkoRoomRepository.findAllByLonAndLatAndLanguage(lat, lon, language);
+            mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLanguageAndLatAndLon(searchKeyword, LanguageEnum.valueOf(language), lat, lon);
         }
         if (mogakkoList.size() == 0) {
             return new ResponseEntity<>(new Message("근처에 모각코가 없습니다.", null), HttpStatus.OK);
         }
         return new ResponseEntity<>(new Message("조회 완료", mogakkoList), HttpStatus.OK);
-    }
-
-
-    // 모각코 검색
-    @Transactional(readOnly = true)
-    public ResponseEntity<Message> searchMogakko(String searchKeyword, String language) {
-        List<MogakkoRoom> searchedMogakko;
-        LanguageEnum languageEnum;
-        if (searchKeyword == null && language == null) {
-            throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
-        }
-        if (searchKeyword == null) {
-            languageEnum = LanguageEnum.valueOf(language);
-            searchedMogakko = mogakkoRoomRepository.findAllByLanguage(languageEnum);
-        } else {
-            if (language == null) {
-                searchedMogakko = mogakkoRoomRepository.findAllBySearchKeyword(searchKeyword);
-            } else {
-                languageEnum = LanguageEnum.valueOf(language);
-                searchedMogakko = mogakkoRoomRepository.findAllBySearchKeywordAndLanguage(searchKeyword, languageEnum);
-            }
-        }
-
-        if (searchedMogakko.isEmpty()) {
-            return new ResponseEntity<>(new Message("검색 결과 없음", null), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(new Message("모각코 검색 성공", searchedMogakko), HttpStatus.OK);
     }
 
     // TODO : 프론트단에서 체크 후 필요여부 파악하기

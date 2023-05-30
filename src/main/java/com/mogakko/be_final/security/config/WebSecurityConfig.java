@@ -1,7 +1,7 @@
 package com.mogakko.be_final.security.config;
 
 import com.mogakko.be_final.security.jwt.JwtAuthFilter;
-import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtProvider;
 import com.mogakko.be_final.security.oauth2.handler.OAuth2LoginFailureHandler;
 import com.mogakko.be_final.security.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.mogakko.be_final.security.oauth2.service.CustomOAuth2UserService;
@@ -58,7 +58,6 @@ public class WebSecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         // resources 접근 허용 설정
         return (web) -> web.ignoring()
-                .requestMatchers(PathRequest.toH2Console())
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
@@ -80,9 +79,6 @@ public class WebSecurityConfig {
                 .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
                 .userInfoEndpoint()
                 .userService(customOAuth2UserService);
-        ;
-
-
         return httpSecurity.build();
     }
 
@@ -90,11 +86,13 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
+        config.addAllowedOrigin("https://codingking.store");
+
         config.addAllowedOrigin("http://localhost:3000");
 
         config.addAllowedOrigin("http://localhost:8080");
 
-        config.addExposedHeader(JwtUtil.ACCESS_KEY);
+        config.addExposedHeader(JwtProvider.ACCESS_KEY);
 
         config.addAllowedMethod("*");
 

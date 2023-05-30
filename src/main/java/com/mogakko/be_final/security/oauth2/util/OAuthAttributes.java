@@ -3,6 +3,7 @@ package com.mogakko.be_final.security.oauth2.util;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.entity.SocialType;
+import com.mogakko.be_final.security.oauth2.userinfo.GoogleOAuth2UserInfo;
 import com.mogakko.be_final.security.oauth2.userinfo.KakaoOAuth2UserInfo;
 import com.mogakko.be_final.security.oauth2.userinfo.OAuth2UserInfo;
 import lombok.Builder;
@@ -29,6 +30,9 @@ public class OAuthAttributes {
 
         if (socialType == SocialType.KAKAO) {
             return ofKakao(userNameAttributeName, attributes);
+        }
+        else if (socialType == SocialType.GOOGLE) {
+            return ofGoogle(userNameAttributeName, attributes);
         } else {
             throw new IllegalArgumentException("지원하지 않는 소셜 로그인입니다");
         }
@@ -38,6 +42,13 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .nameAttributeKey(userNameAttributeName)
                 .oauth2UserInfo(new KakaoOAuth2UserInfo(attributes))
+                .build();
+    }
+
+    public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .nameAttributeKey(userNameAttributeName)
+                .oauth2UserInfo(new GoogleOAuth2UserInfo(attributes))
                 .build();
     }
 

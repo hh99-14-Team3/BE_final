@@ -17,13 +17,13 @@ public class MogakkoRoomTime {
     Long Id;
 
     @Column
-    private String member;
+    private String email;
 
     @Column
     private Time mogakkoRoomTime;
 
-    public MogakkoRoomTime(String member, Time mogakkoRoomTime) {
-        this.member = member;
+    public MogakkoRoomTime(String email, Time mogakkoRoomTime) {
+        this.email = email;
         this.mogakkoRoomTime = mogakkoRoomTime;
     }
 

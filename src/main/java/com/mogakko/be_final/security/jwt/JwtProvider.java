@@ -1,14 +1,15 @@
 package com.mogakko.be_final.security.jwt;
 
+import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.redis.util.RedisUtil;
-import com.mogakko.be_final.security.refreshToken.RefreshToken;
-import com.mogakko.be_final.security.refreshToken.RefreshTokenRepository;
 import com.mogakko.be_final.userDetails.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,12 +23,13 @@ import java.security.Key;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
+
+import static com.mogakko.be_final.exception.ErrorCode.USED_TOKEN;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtUtil {
+public class JwtProvider {
     private final RedisUtil redisUtil;
     private static final String BEARER_PREFIX = "Bearer ";
     public static final String ACCESS_KEY = "ACCESS_KEY";
@@ -40,7 +42,7 @@ public class JwtUtil {
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     private final UserDetailsServiceImpl userDetailsService;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate redisTemplate;
 
     @PostConstruct
     public void init() {
@@ -122,8 +124,14 @@ public class JwtUtil {
     //RefreshToken 검증
     public boolean refreshTokenValid(String token) {
         if (!validateToken(token)) return false;
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByEmail(getUserInfoFromToken(token));
-        return refreshToken.isPresent() && token.equals(refreshToken.get().getRefreshToken().substring(7));
+        String refreshToken = null;
+        Object redisValue = redisUtil.get(getUserInfoFromToken(token));
+        if (redisValue != null) {
+            refreshToken = redisValue.toString().substring(7);
+        } else {
+            return false;
+        }
+        return refreshToken.equals(token) && !refreshToken.isEmpty();
     }
 
     public void setHeaderAccessToken(HttpServletResponse response, String accessToken) {

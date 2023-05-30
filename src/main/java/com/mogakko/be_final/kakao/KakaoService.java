@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogakko.be_final.domain.members.entity.KakaoMembers;
 import com.mogakko.be_final.domain.members.repository.KakaoMembersRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.security.jwt.JwtUtil;
+import com.mogakko.be_final.security.jwt.JwtProvider;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class KakaoService {
     private final PasswordEncoder passwordEncoder;
     private final MembersRepository membersRepository;
     private final KakaoMembersRepository kakaoMembersRepository;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     public ResponseEntity<Message> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -40,9 +40,9 @@ public class KakaoService {
         KakaoMembers kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
         // 4. JWT 토큰 반환
-        String createToken = jwtUtil.createToken(kakaoUser.getEmail(), "Access");
+        String createToken = jwtProvider.createToken(kakaoUser.getEmail(), "Access");
 
-        response.addHeader(JwtUtil.ACCESS_KEY, createToken);
+        response.addHeader(JwtProvider.ACCESS_KEY, createToken);
 
         Message message = Message.setSuccess("로그인 성공", createToken);
 
