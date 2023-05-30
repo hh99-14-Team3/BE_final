@@ -61,4 +61,8 @@ public class Members extends Timestamped {
         this.role = newRole;
     }
 
+    public void updateNickname(String nickname){ this.nickname = nickname; };
+
+    public void updateProfileImage(String profileImage){ this.profileImage = profileImage; };
+
 }

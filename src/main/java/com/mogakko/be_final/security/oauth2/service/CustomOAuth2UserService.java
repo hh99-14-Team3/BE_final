@@ -3,6 +3,8 @@ package com.mogakko.be_final.security.oauth2.service;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.SocialType;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.security.oauth2.util.CustomOAuth2User;
 import com.mogakko.be_final.security.oauth2.util.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -77,7 +80,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         else if (GOOGLE.equals(registrationId)) {
             return SocialType.GOOGLE;
         } else {
-            throw new IllegalArgumentException("지원하지 않는 소셜 로그인입니다");
+            throw new CustomException(ErrorCode.NOT_SUPPORTED_SOCIALTYPE);
         }
     }
 
@@ -86,13 +89,26 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * 만약 찾은 회원이 있다면, 그대로 반환하고 없다면 saveUser()를 호출하여 회원을 저장한다.
      */
     private Members getMembers(OAuthAttributes attributes, SocialType socialType) {
-        Members findUser = membersRepository.findBySocialUidAndSocialType(attributes.getOauth2UserInfo().getId(), socialType)
-                .orElse(null);
+        Optional<Members> findUser = membersRepository.findBySocialUidAndSocialType(attributes.getOauth2UserInfo().getId(), socialType);
 
-        if (findUser == null) {
+        if (findUser.isPresent()) {
+            Members existUser = findUser.get();
+
+            if(!existUser.getProfileImage().equals(attributes.getOauth2UserInfo().getProfileImage())){
+                existUser.updateProfileImage(attributes.getOauth2UserInfo().getProfileImage());
+                membersRepository.save(existUser);
+            }
+
+            if(!existUser.getNickname().equals(attributes.getOauth2UserInfo().getNickname())){
+                existUser.updateNickname(attributes.getOauth2UserInfo().getNickname());
+                membersRepository.save(existUser);
+            }
+            return existUser;
+
+        }else{
             return saveMembers(attributes, socialType);
         }
-        return findUser;
+
     }
 
     /**
@@ -100,7 +116,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * 생성된 User 객체를 DB에 저장 : socialType, socialId, email, role 값만 있는 상태
      */
     private Members saveMembers(OAuthAttributes attributes, SocialType socialType) {
-        Members createdMembers = attributes.toEntity(socialType, attributes.getOauth2UserInfo());
-        return membersRepository.save(createdMembers);
+        Optional<Members> existMember = membersRepository.findByEmail(attributes.getOauth2UserInfo().getEmail());
+        if(existMember.isPresent()){
+            throw new CustomException(ErrorCode.DUPLICATE_IDENTIFIER);
+        }else{
+            Members createdMembers = attributes.toEntity(socialType, attributes.getOauth2UserInfo());
+            return membersRepository.save(createdMembers);
+        }
+
     }
 }
