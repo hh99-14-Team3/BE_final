@@ -43,8 +43,8 @@ public class NotificationService {
         return emitter;
     }
 
-    public void send(Members receiver, NotificationType notificationType, String content, String url) {
-        Notification notification = createNotification(receiver, notificationType, content, url);
+    public void send(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
+        Notification notification = createNotification(sender , receiver, notificationType, content, url);
         notificationRepository.save(notification);
         String memberId = String.valueOf(receiver.getId());
 
@@ -57,8 +57,9 @@ public class NotificationService {
         );
     }
 
-    private Notification createNotification(Members receiver, NotificationType notificationType, String content, String url) {
+    private Notification createNotification(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
         return Notification.builder()
+                .sender(sender)
                 .receiver(receiver)
                 .notificationType(notificationType)
                 .content(content)
@@ -77,10 +78,5 @@ public class NotificationService {
         }
     }
 
-    public void sendLoginNotification(Members receiver) {
-        String content = receiver.getNickname() + " 님은 " + LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-        String url = "/api/members/login";
-        send(receiver, NotificationType.LOGIN, content, url);
-    }
 }
 

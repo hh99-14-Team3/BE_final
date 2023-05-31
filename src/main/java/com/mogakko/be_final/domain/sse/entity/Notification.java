@@ -33,11 +33,17 @@ public class Notification extends Timestamped {
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "members_id")
+    @JoinColumn(name = "sende_id", referencedColumnName = "id")
+    private Members sender;
+
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private Members receiver;
 
     @Builder
-    public Notification(Members receiver, NotificationType notificationType, String content, String url) {
+    public Notification(Members sender,Members receiver, NotificationType notificationType, String content, String url) {
+        this.sender = sender;
         this.receiver = receiver;
         this.notificationType = notificationType;
         this.content = new NotificationContent(content);
