@@ -5,6 +5,8 @@ import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -18,18 +20,26 @@ public class Friendship extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
-    @JoinColumn(name = "sender_id", referencedColumnName = "id")
+    @JoinColumn(name = "sender_id", referencedColumnName = "email")
     private Members sender;
 
-    @Column(nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
-    @JoinColumn(name = "receiver_id", referencedColumnName = "id")
+    @JoinColumn(name = "receiver_id", referencedColumnName = "email")
     private Members receiver;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status;
+
+    public Friendship(Members sender, Members receiver, FriendshipStatus status) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.status = status;
+    }
+
+    public void changeStatus(FriendshipStatus friendshipStatus){ this.status = friendshipStatus; }
 
 }
