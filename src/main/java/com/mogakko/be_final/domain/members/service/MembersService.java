@@ -112,7 +112,6 @@ public class MembersService {
 //        int time = jwtProvider.getExpirationTime(refreshToken);
         redisUtil.set(members.getEmail(), refreshToken, Duration.ofDays(7).toMillis());
 
-        notificationService.sendLoginNotification(members);
 
         httpServletResponse.addHeader(JwtProvider.ACCESS_KEY, tokenDto.getAccessToken());
         httpServletResponse.addHeader(JwtProvider.REFRESH_KEY, tokenDto.getRefreshToken());
