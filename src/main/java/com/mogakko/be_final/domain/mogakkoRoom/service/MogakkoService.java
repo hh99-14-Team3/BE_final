@@ -136,15 +136,16 @@ public class MogakkoService {
         String enterRoomToken = enterRoomCreateSession(member, mogakkoRoom.getSessionId());
         log.info("생성된 토큰 확인 : {}", enterRoomToken);
 
+        MogakkoRoomMembers mogakkoRoomMembers;
         // 재입장 유저의 경우
         if (reEnterChatRoomMembers.isPresent()) {
-            MogakkoRoomMembers mogakkoRoomMembers = reEnterChatRoomMembers.get();
+            mogakkoRoomMembers = reEnterChatRoomMembers.get();
             mogakkoRoomMembers.reEnterRoomMembers(enterRoomToken, member.getNickname());
             mogakkoRoom.setDeleted(false);
             log.info("재입장 유저 stayTime : {}", mogakkoRoomMembers.getRoomStayTime());
         } else {
             // 처음 입장하는 유저
-            MogakkoRoomMembers mogakkoRoomMembers = MogakkoRoomMembers.builder()
+            mogakkoRoomMembers = MogakkoRoomMembers.builder()
                     .mogakkoRoom(mogakkoRoom)
                     .memberId(member.getId())
                     .profileImage(member.getProfileImage())
@@ -159,11 +160,12 @@ public class MogakkoService {
         }
         // 모각코 방 정보 저장
         mogakkoRoomRepository.save(mogakkoRoom);
-        String isMaster = null;
-        if (mogakkoRoom.getMasterMemberId().equals(member.getId())) {
-            isMaster = member.getNickname() + "님은 방장입니다.";
-        }
-        return new ResponseEntity<>(new Message("모각코방 입장 성공", isMaster), HttpStatus.OK);
+//        String isMaster = null;
+//        if (mogakkoRoom.getMasterMemberId().equals(member.getId())) {
+//            isMaster = member.getNickname() + "님은 방장입니다.";
+//        }
+        String token = mogakkoRoomMembers.getEnterRoomToken();
+        return new ResponseEntity<>(new Message("모각코방 입장 성공", token), HttpStatus.OK);
     }
 
 
@@ -340,8 +342,10 @@ public class MogakkoService {
         String serverData = members.getNickname();
 
         // serverData을 사용하여 connectionProperties 객체 빌드
-        ConnectionProperties connectionProperties
-                = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).build();
+        ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
+                .type(ConnectionType.WEBRTC)
+                .data(serverData)
+                .build();
 
         openvidu.fetch();
 
@@ -357,6 +361,7 @@ public class MogakkoService {
 
 
         // 해당 채팅방에 프로퍼티스를 설정하면서 커넥션을 만들고, 방에 접속할 수 있는 토큰을 발급한다
+        System.out.println(session.createConnection(connectionProperties).getToken());
         return session.createConnection(connectionProperties).getToken();
     }
 }
