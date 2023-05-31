@@ -54,7 +54,8 @@ public class MogakkoRoom extends Timestamped {
     private Long cntMembers;
 
     // 방 삭제 여부
-    private boolean isDeleted = Boolean.FALSE;
+    @Builder.Default
+    private boolean isDeleted = false;
 
     // 방이 삭제된 시간
     @Column
