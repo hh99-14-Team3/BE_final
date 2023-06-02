@@ -5,6 +5,7 @@ import com.mogakko.be_final.security.jwt.JwtProvider;
 import com.mogakko.be_final.security.oauth2.handler.OAuth2LoginFailureHandler;
 import com.mogakko.be_final.security.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.mogakko.be_final.security.oauth2.service.CustomOAuth2UserService;
+import io.netty.handler.codec.http.HttpMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -21,12 +22,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
@@ -64,13 +67,14 @@ public class WebSecurityConfig {
     @Bean
     protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
 
+        httpSecurity.cors();
+
         httpSecurity
-                .cors().and()
                 .csrf().disable()
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/**//**").permitAll()
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -82,28 +86,34 @@ public class WebSecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration config = new CorsConfiguration();
 
-        config.addAllowedOrigin("https://codingking.store");
+//        config.addAllowedOrigin("https://test-repo-five-flame.vercel.app/");
 
-        config.addAllowedOrigin("http://localhost:3000");
+//        config.addAllowedOrigin("http://localhost:3000/");
 
-        config.addAllowedOrigin("http://localhost:8080");
+//        config.addExposedHeader(JwtProvider.ACCESS_KEY);
 
-        config.addExposedHeader(JwtProvider.ACCESS_KEY);
+//        config.addAllowedHeader("*");
 
-        config.addAllowedMethod("*");
+//        config.setAllowCredentials(true);
 
-        config.addAllowedHeader("*");
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        config.setAllowCredentials(true);
+//        source.registerCorsConfiguration("/**", config);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        return source;
+//    }
 
-        source.registerCorsConfiguration("/**", config);
-
-        return source;
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("https://test-repo-five-flame.vercel.app", "http://localhost:3000", "https://mogakko.store")
+                .allowCredentials(true)
+                .allowedHeaders("*")
+                .allowedMethods(HttpMethod.GET.name(),HttpMethod.POST.name(),HttpMethod.OPTIONS.name())
+                .exposedHeaders(JwtProvider.ACCESS_KEY);
     }
 }

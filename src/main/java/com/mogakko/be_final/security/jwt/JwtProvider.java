@@ -1,7 +1,5 @@
 package com.mogakko.be_final.security.jwt;
 
-import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.userDetails.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
@@ -23,8 +21,6 @@ import java.security.Key;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
-
-import static com.mogakko.be_final.exception.ErrorCode.USED_TOKEN;
 
 @Slf4j
 @Component
