@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.members.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.service.MembersService;
@@ -68,10 +67,12 @@ public class MembersController {
         return membersService.readMyPage(userDetails.getMember());
     }
 
-    @Operation(summary = "마이페이지 수정 API", description = "마이페이지에서 프로필 사진을 수정하는 메서드입니다.")
+    @Operation(summary = "마이페이지 수정 API", description = "마이페이지에서 정보(프로필 사진, 닉네임)를 변경하는 메서드입니다.")
     @PutMapping(value = "/mypage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Message> profileUpdate(@RequestPart("imageFile") MultipartFile image, @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        return membersService.profileUpdate(image, userDetails.getMember());
+    public ResponseEntity<Message> profileUpdate(@RequestPart(value = "imageFile", required = false) MultipartFile image,
+                                                 @RequestPart(value = "nickname", required = false) String nickname,
+                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        return membersService.profileUpdate(image, nickname, userDetails.getMember());
     }
 }
 
