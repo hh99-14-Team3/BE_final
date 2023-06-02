@@ -155,4 +155,11 @@ public class MembersService {
         membersRepository.save(member);
         return new ResponseEntity<>(new Message("프로필 정보 변경 성공", null), HttpStatus.OK);
     }
+
+    // 마이페이지 - 프로필 사진 삭제
+    public ResponseEntity<Message> profileDelete(Members member) {
+        member.deleteProfile();
+        return new ResponseEntity<>(new Message("프로필 사진 삭제 성공", null), HttpStatus.OK);
+    }
+
 }

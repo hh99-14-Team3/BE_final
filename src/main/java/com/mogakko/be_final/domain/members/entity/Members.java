@@ -70,4 +70,7 @@ public class Members extends Timestamped {
         this.profileImage = profileImage;
     }
 
+    public void deleteProfile() {
+        this.profileImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtArY0iIz1b6rGdZ6xkSegyALtWQKBjupKJQ&usqp=CAU";
+    }
 }

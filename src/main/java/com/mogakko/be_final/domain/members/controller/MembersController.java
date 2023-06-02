@@ -74,5 +74,11 @@ public class MembersController {
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         return membersService.profileUpdate(image, nickname, userDetails.getMember());
     }
+
+    @Operation(summary = "마이페이지 프로필사진 삭제 API", description = "마이페이지에서 프로필 사진을 삭제하는 메서드입니다.")
+    @PutMapping("/mypage/delete")
+    public ResponseEntity<Message> profileDelete(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return membersService.profileDelete(userDetails.getMember());
+    }
 }
 
