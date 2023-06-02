@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-    @GetMapping("/api/main")
-    @Operation(summary = "Test API", description = "소셜로그인 후에 마땅한 엔드포인트가 없어서 간단히 만들어뒀습니다. 삭제예정.")
+    @GetMapping("/")
+    @Operation(summary = "ELB 엔드포인트 API", description = "로드밸런서 health check 위한 엔드포인트로 사용")
     public String hello() {
         return "{ \"message\" : \"Hello\" }";
     }
