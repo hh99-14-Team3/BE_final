@@ -23,6 +23,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
     MOGAKKO_NOT_FOUND(HttpStatus.NOT_FOUND, "모각코 방이 없습니다."),
     NOT_SUPPORTED_SOCIALTYPE(HttpStatus.NOT_FOUND, "지원하지 않는 소셜로그인 입니다."),
+    INVALID_NOTIFICATION_ID(HttpStatus.BAD_REQUEST,"해당 알림이 존재하지 않습니다."),
 
 
     //인증

@@ -22,12 +22,12 @@ public class Friendship extends Timestamped {
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
-    @JoinColumn(name = "sender_id", referencedColumnName = "email")
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private Members sender;
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
-    @JoinColumn(name = "receiver_id", referencedColumnName = "email")
+    @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private Members receiver;
 
     @Column(nullable = false)
@@ -40,6 +40,12 @@ public class Friendship extends Timestamped {
         this.status = status;
     }
 
-    public void changeStatus(FriendshipStatus friendshipStatus){ this.status = friendshipStatus; }
+    public void accept() {
+        this.status = FriendshipStatus.ACCEPT;
+    }
+
+    public void refuse() {
+        this.status = FriendshipStatus.REFUSE;
+    }
 
 }
