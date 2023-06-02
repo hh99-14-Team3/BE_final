@@ -30,7 +30,7 @@ public class FriendshipSearchService {
 
         List<Friendship> findList = friendshipRepository.findAllBySenderOrReceiverAndStatus(member, member, FriendshipStatus.ACCEPT);
         if (findList==null){
-            return new ResponseEntity<>(new Message("친구가 없습니다.", null), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("친구가 없습니다.", null), HttpStatus.NOT_FOUND);
         }
         for (Friendship friendship : findList) {
 
