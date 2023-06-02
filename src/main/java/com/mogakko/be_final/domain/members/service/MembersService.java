@@ -11,6 +11,7 @@ import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
+import com.mogakko.be_final.domain.sse.service.NotificationSendService;
 import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
@@ -48,7 +49,7 @@ public class MembersService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final RedisUtil redisUtil;
-    private final NotificationService notificationService;
+    private final NotificationSendService notificationSendService;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
     private final RedisTemplate redisTemplate;
     private final S3Uploader s3Uploader;

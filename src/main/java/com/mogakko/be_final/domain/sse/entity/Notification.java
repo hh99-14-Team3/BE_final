@@ -33,7 +33,7 @@ public class Notification extends Timestamped {
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sende_id", referencedColumnName = "id")
+    @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private Members sender;
 
     @OnDelete(action = OnDeleteAction.CASCADE)
