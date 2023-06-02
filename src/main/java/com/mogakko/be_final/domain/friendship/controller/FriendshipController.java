@@ -1,8 +1,8 @@
 package com.mogakko.be_final.domain.friendship.controller;
 
-
 import com.mogakko.be_final.domain.friendship.dto.DetermineRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.FriendRequestDto;
+import com.mogakko.be_final.domain.friendship.service.FriendshipSearchService;
 import com.mogakko.be_final.domain.friendship.service.FriendshipService;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class FriendshipController {
     private final FriendshipService friendshipService;
+    private final FriendshipSearchService friendshipSearchService;
 
     @PostMapping("/friendship/request")
     public ResponseEntity<Message> friendRequest(@RequestBody FriendRequestDto friendRequestDto){
@@ -23,9 +24,10 @@ public class FriendshipController {
         return friendshipService.determineRequest(determineRequestDto);
     }
 
-    @GetMapping("/friendship/myFriend")
-    public ResponseEntity<Message> getMyFriend(){
-        return null;
+    @GetMapping("/friendship/myFriend/{memberId}")
+    public ResponseEntity<Message> getMyFriend(@PathVariable Long memberId){
+
+        return friendshipSearchService.getMyFriend(memberId);
     }
 
 
