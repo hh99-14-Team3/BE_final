@@ -13,5 +13,4 @@ public class TestController {
     public String hello() {
         return "{ \"message\" : \"Hello\" }";
     }
-
 }
