@@ -100,25 +100,20 @@ public class MembersService {
 
     // 로그인
     public ResponseEntity<Message> login(LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse) {
-        Members members = membersRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(
+        Members member = membersRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
 
-        if (!passwordEncoder.matches(loginRequestDto.getPassword(), members.getPassword())) {
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())) {
             throw new CustomException(INVALID_PASSWORD);
         }
 
-        TokenDto tokenDto = jwtProvider.createAllToken(members.getEmail());
+        TokenDto tokenDto = jwtProvider.createAllToken(member.getEmail());
         String refreshToken = tokenDto.getRefreshToken();
-//        int time = jwtProvider.getExpirationTime(refreshToken);
-        redisUtil.set(members.getEmail(), refreshToken, Duration.ofDays(7).toMillis());
-
-
+        redisUtil.set(member.getEmail(), refreshToken, Duration.ofDays(7).toMillis());
         httpServletResponse.addHeader(JwtProvider.ACCESS_KEY, tokenDto.getAccessToken());
-        httpServletResponse.addHeader(JwtProvider.REFRESH_KEY, tokenDto.getRefreshToken());
 
-        Message message = Message.setSuccess("로그인 성공", null);
-
+        Message message = Message.setSuccess("로그인 성공", member.getNickname());
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
