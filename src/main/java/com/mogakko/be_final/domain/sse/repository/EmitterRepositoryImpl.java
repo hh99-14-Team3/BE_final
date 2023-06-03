@@ -66,4 +66,10 @@ public class EmitterRepositoryImpl implements EmitterRepository {
                 }
         );
     }
+
+    @Override
+    public Map<String, SseEmitter> findAllEmitter(){
+        return emitters;
+    }
+
 }
