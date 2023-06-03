@@ -1,4 +1,4 @@
-package com.mogakko.be_final.scheduler.nogakkoRoomScheduler;
+package com.mogakko.be_final.scheduler.mogakkoRoomScheduler;
 
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
