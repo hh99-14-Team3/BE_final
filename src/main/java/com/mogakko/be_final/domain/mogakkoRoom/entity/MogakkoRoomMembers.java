@@ -41,7 +41,6 @@ public class MogakkoRoomMembers {
 
     // 입/퇴장 여부
     @Column
-    @Builder.Default
     private boolean isEntered = false;
 
     // 방에 들어온 시간
