@@ -29,23 +29,19 @@ public class MembersController {
 
     @PostMapping("/signup")
     @Operation(summary = "회원 가입 API", description = "회원가입하는 메서드입니다.")
-    public ResponseEntity<Message> signup(@Valid @RequestBody SignupRequestDto requestDto, HttpSession session) {
-        return membersService.signup(requestDto, session);
+    public ResponseEntity<Message> signup(@Valid @RequestBody SignupRequestDto requestDto) {
+        return membersService.signup(requestDto);
     }
 
     @GetMapping("/signup/checkEmail")
     @Operation(summary = "이메일 중복 체크 API", description = "이메일 중복 체크를 하는 메서드입니다.")
-    public ResponseEntity<Message> checkEmail(@RequestParam("email") String email, HttpSession session) {
-        session.setAttribute("emailChecked", true);
-        session.setAttribute("email", email);
+    public ResponseEntity<Message> checkEmail(@RequestParam("email") String email) {
         return membersService.checkEmail(email);
     }
 
     @GetMapping("/signup/checkNickname")
     @Operation(summary = "닉네임 중복 체크 API", description = "닉네임 중복 체크를 하는 메서드입니다.")
-    public ResponseEntity<Message> checkNickname(@RequestParam("nickname") String nickname, HttpSession session) {
-        session.setAttribute("nicknameChecked", true);
-        session.setAttribute("nickname", nickname);
+    public ResponseEntity<Message> checkNickname(@RequestParam("nickname") String nickname) {
         return membersService.checkNickname(nickname);
     }
 

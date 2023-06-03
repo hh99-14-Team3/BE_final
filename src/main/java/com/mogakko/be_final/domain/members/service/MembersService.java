@@ -55,7 +55,7 @@ public class MembersService {
 
 
     // 회원가입
-    public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto, HttpSession session) {
+    public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto) {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
@@ -74,6 +74,7 @@ public class MembersService {
 
         Members members = new Members(email, nickname, password, Role.USER);
         membersRepository.save(members);
+
         MogakkoRoomTime mogakkoRoomTimes = new MogakkoRoomTime(email, Time.valueOf("00:00:00"));
         mogakkoRoomTimeRepository.save(mogakkoRoomTimes);
         return new ResponseEntity<>(new Message("회원 가입 성공", null), HttpStatus.OK);
