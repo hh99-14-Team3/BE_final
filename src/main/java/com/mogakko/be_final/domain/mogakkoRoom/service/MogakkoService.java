@@ -42,7 +42,6 @@ import static com.mogakko.be_final.exception.ErrorCode.*;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class MogakkoService {
 
@@ -65,6 +64,7 @@ public class MogakkoService {
     }
 
     // 모각코 방 생성
+    @Transactional
     public ResponseEntity<Message> createMogakko(MogakkoRoomCreateRequestDto mogakkoRoomCreateRequestDto, Members member) throws Exception {
 
         // Session Id, Token 셋팅
@@ -96,6 +96,7 @@ public class MogakkoService {
     }
 
     // 모각코 방 입장
+    @Transactional
     public ResponseEntity<Message> enterMogakko(String sessionId, MogakkoRoomEnterDataRequestDto requestDto, Members member) throws OpenViduJavaClientException, OpenViduHttpException {
         // 모각코 방이 있는지 체크
         MogakkoRoom mogakkoRoom = mogakkoRoomRepository.findBySessionId(sessionId).orElseThrow(
@@ -174,6 +175,7 @@ public class MogakkoService {
 
 
     // 모각코 방 퇴장
+    @Transactional
     public ResponseEntity<Message> outMogakko(String sessionId, Members members) {
 
         // 모각코 방 존재 확인
@@ -298,11 +300,11 @@ public class MogakkoService {
         return new ResponseEntity<>(new Message("유저 정보 조회 성공", chatRoomResponseDto), HttpStatus.OK);
     }
 
-    // 인기 모각코 조회
+    // 인기 지역 모각코 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> topMogakko() {
         List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop8NeighborhoodCount();
-        return new ResponseEntity<>(new Message("인기 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 
     /**

@@ -39,7 +39,6 @@ import static com.mogakko.be_final.exception.ErrorCode.*;
 
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class MembersService {
 
@@ -55,22 +54,11 @@ public class MembersService {
 
 
     // 회원가입
+    @Transactional
     public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto) {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
-
-        Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
-        Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
-        String checkedEmail = (String) session.getAttribute("email");
-        String checkedNickname = (String) session.getAttribute("nickname");
-
-        if (nicknameChecked == null || !nicknameChecked || emailChecked == null || !emailChecked) {
-            return new ResponseEntity<>(new Message("이메일과 닉네임 중복검사를 완료해주세요", null), HttpStatus.BAD_REQUEST);
-        }
-        if (!checkedEmail.equals(signupRequestDto.getEmail()) || !checkedNickname.equals(signupRequestDto.getNickname())) {
-            return new ResponseEntity<>(new Message("중복검사에 사용한 이메일과 닉네임을 사용해 주세요", null), HttpStatus.BAD_REQUEST);
-        }
 
         Members members = new Members(email, nickname, password, Role.USER);
         membersRepository.save(members);
@@ -99,6 +87,7 @@ public class MembersService {
     }
 
     // 로그인
+    @Transactional
     public ResponseEntity<Message> login(LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse) {
         Members member = membersRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
@@ -118,6 +107,7 @@ public class MembersService {
     }
 
     // 로그아웃
+    @Transactional
     public ResponseEntity<Message> logout(Members member, HttpServletRequest request) {
         String accessToken = request.getHeader("ACCESS_KEY").substring(7);
         String refreshToken = redisUtil.get(member.getEmail());
@@ -142,6 +132,7 @@ public class MembersService {
     }
 
     // 마이페이지 - 프로필 사진, 닉네임 수정
+    @Transactional
     public ResponseEntity<Message> profileUpdate(MultipartFile imageFile, String nickname, Members member) throws IOException {
         if (imageFile != null && !imageFile.isEmpty()) {
             s3Uploader.delete(member.getProfileImage());
