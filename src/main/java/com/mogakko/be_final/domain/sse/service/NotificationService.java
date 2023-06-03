@@ -1,26 +1,34 @@
 package com.mogakko.be_final.domain.sse.service;
 
 import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.sse.dto.NotificationResponseDto;
 import com.mogakko.be_final.domain.sse.entity.Notification;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepository;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepositoryImpl;
 import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
+import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class NotificationService {
     private final EmitterRepository emitterRepository = new EmitterRepositoryImpl();
     private final NotificationRepository notificationRepository;
+    private final MembersRepository membersRepository;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -32,6 +40,16 @@ public class NotificationService {
         emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
         sendToClient(emitter, emitterId, "EventStream Created. [memberId=" + memberId + "]");
+
+        Members eventReceiver = membersRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        List<Notification> missedNotifications = notificationRepository.findAllByReceiverAndIsReadFalse(eventReceiver);
+        for (Notification missedNotification : missedNotifications) {
+            sendToClient(emitter, emitterId, missedNotification);
+            markAsRead(missedNotification.getId());
+        }
+
 
         if (!lastEventId.isEmpty()) {
             Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
@@ -74,9 +92,36 @@ public class NotificationService {
                     .data(data));
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);
-            throw new IllegalArgumentException("Unprocessable SSE Event.", exception);
+            throw new CustomException(ErrorCode.NOTIFICATION_SENDING_FAILED);
         }
     }
+
+    public void markAsRead(Long notificationId) {
+
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid notification ID: " + notificationId));
+        notification.read();
+        notificationRepository.save(notification);
+    }
+
+    @Scheduled(fixedDelay = 30000)  // every 30 seconds
+    public void sendHeartbeat() {
+        Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitter();
+        sseEmitters.forEach(
+                (key, emitter) -> {
+                    try {
+                        emitter.send(SseEmitter.event()
+                                .id(key)
+                                .name("heartbeat")
+                                .data(""));
+                    } catch (IOException exception) {
+                        emitterRepository.deleteById(key);
+                    }
+                }
+        );
+    }
+
+
 
 }
 
