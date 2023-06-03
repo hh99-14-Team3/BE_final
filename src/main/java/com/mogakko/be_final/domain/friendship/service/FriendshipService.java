@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.friendship.service;
 
+import com.mogakko.be_final.domain.friendship.dto.DeleteFriendRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.DetermineRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.FriendRequestDto;
 import com.mogakko.be_final.domain.friendship.entity.Friendship;
@@ -41,8 +42,8 @@ public class FriendshipService {
                 () -> new CustomException(ErrorCode.EMAIL_NOT_FOUND)
         );
 
-        Optional<Friendship> findRequest = friendshipRepository.findAllBySenderOrReceiver(sender, receiver);
-        Optional<Friendship> findReverseRequest = friendshipRepository.findAllBySenderOrReceiver(receiver, sender);
+        Optional<Friendship> findRequest = friendshipRepository.findAllBySenderAndReceiver(sender, receiver);
+        Optional<Friendship> findReverseRequest = friendshipRepository.findAllBySenderAndReceiver(receiver, sender);
 
         if (findRequest.isEmpty() && findReverseRequest.isEmpty()) {
             Friendship friendship = new Friendship(sender, receiver, FriendshipStatus.PENDING);
@@ -79,7 +80,7 @@ public class FriendshipService {
 
     // 친구요청 결정 하는 ( 수락할지 , 거절할지 )
     public ResponseEntity<Message> determineRequest(DetermineRequestDto determineRequestDto){
-        Notification findNotification = findNotificationAndRead(determineRequestDto.getNotificationId());
+        Notification findNotification = findNotification(determineRequestDto.getNotificationId());
 
         Members requestSender = findMember(determineRequestDto.getSenderId());
         Members requestReceiver = findMember(determineRequestDto.getReceiverId());
@@ -101,19 +102,37 @@ public class FriendshipService {
 
     }
 
+    public ResponseEntity<Message> deleteFriend(DeleteFriendRequestDto deleteFriendRequestDto){
+        Members requestSender = membersRepository.findByEmail(deleteFriendRequestDto.getSenderEmail()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        Members requestReceiver = membersRepository.findByEmail(deleteFriendRequestDto.getReceiverEmail()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        if(friendshipRepository.findAllBySenderOrReceiver(requestSender, requestReceiver).isPresent()){
+            Friendship findFriendship = friendshipRepository.findAllBySenderOrReceiver(requestSender, requestReceiver).get();
+            friendshipRepository.delete(findFriendship);
+        }else if(friendshipRepository.findAllBySenderOrReceiver(requestReceiver, requestSender).isPresent()){
+            Friendship findFriendship = friendshipRepository.findAllBySenderOrReceiver(requestReceiver, requestSender).get();
+            friendshipRepository.delete(findFriendship);
+        }else {
+            throw new CustomException(ErrorCode.FRIEND_NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(new Message("친구 삭제가 완료 되었습니다.", null), HttpStatus.OK);
+    }
+
     private Members findMember(Long memberId) {
         return membersRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
     }
 
-    private Notification findNotificationAndRead(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+    private Notification findNotification(Long notificationId) {
+        return notificationRepository.findById(notificationId).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_NOTIFICATION_ID)
         );
-        notification.read();
-        notificationRepository.save(notification);
-        return notification;
     }
 
     private Friendship findPendingFriendship(Members sender, Members receiver) {
