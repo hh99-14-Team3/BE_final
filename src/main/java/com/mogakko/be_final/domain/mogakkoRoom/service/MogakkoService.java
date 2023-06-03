@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,7 @@ public class MogakkoService {
     private final MogakkoRoomRepository mogakkoRoomRepository;
     private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
@@ -78,7 +80,7 @@ public class MogakkoService {
                 .maxMembers(mogakkoRoomCreateRequestDto.getMaxMembers())
                 .language(mogakkoRoomCreateRequestDto.getLanguage())
                 .isOpened(mogakkoRoomCreateRequestDto.getIsOpened())
-                .password(mogakkoRoomCreateRequestDto.getPassword())
+                .password(passwordEncoder.encode(mogakkoRoomCreateRequestDto.getPassword()))
                 .lon(mogakkoRoomCreateRequestDto.getLon())
                 .lat(mogakkoRoomCreateRequestDto.getLat())
                 .neighborhood(mogakkoRoomCreateRequestDto.getNeighborhood())
@@ -120,7 +122,7 @@ public class MogakkoService {
             if (password == null) {
                 throw new CustomException(PLZ_INPUT_PASSWORD);
             }
-            if (!mogakkoRoom.getPassword().equals(password)) {
+            if (!passwordEncoder.matches(password, mogakkoRoom.getPassword())) {
                 throw new CustomException(INVALID_PASSWORD);
             }
         }

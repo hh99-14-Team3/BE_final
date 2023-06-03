@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.mogakkoRoom.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,7 @@ public class MogakkoRoom extends Timestamped {
 
     // 비공개 시 사용할 패스워드
     @Column
+    @JsonIgnore
     private String password;
 
     // 주특기 언어 카테고리
