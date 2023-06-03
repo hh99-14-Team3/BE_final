@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +28,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final MembersRepository membersRepository;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public SseEmitter subscribe(Long memberId, String lastEventId) {
         String emitterId = memberId + "_" + System.currentTimeMillis();
@@ -46,7 +43,7 @@ public class NotificationService {
         );
         List<Notification> missedNotifications = notificationRepository.findAllByReceiverAndIsReadFalse(eventReceiver);
         for (Notification missedNotification : missedNotifications) {
-            sendToClient(emitter, emitterId, missedNotification);
+            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification));
             markAsRead(missedNotification.getId());
         }
 
