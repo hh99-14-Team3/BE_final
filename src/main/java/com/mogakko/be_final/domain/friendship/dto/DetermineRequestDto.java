@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DetermineRequestDto {
     private Long notificationId;
-    private Long senderId;
-    private Long receiverId;
+    private String senderNickname;
+    private String receiverNickname;
     private boolean determineRequest; // true 친구수락, false 거절
 
-    public DetermineRequestDto(Long notificationId, Long senderId, Long receiverId, boolean determineRequest) {
+    public DetermineRequestDto(Long notificationId, String senderNickname, String receiverNickname, boolean determineRequest) {
         this.notificationId = notificationId;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
+        this.senderNickname = senderNickname;
+        this.receiverNickname = receiverNickname;
         this.determineRequest = determineRequest;
     }
 
