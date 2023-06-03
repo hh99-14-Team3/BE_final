@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class FriendRequestDto {
-    private String sender;
-    private String receiver;
+    private String senderNickname;
+    private String receiverNickname;
 }

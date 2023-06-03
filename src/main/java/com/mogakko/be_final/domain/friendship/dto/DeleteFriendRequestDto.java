@@ -6,6 +6,5 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class DeleteFriendRequestDto {
-    private String senderEmail;
-    private String receiverEmail;
+    private String receiverNickname;
 }

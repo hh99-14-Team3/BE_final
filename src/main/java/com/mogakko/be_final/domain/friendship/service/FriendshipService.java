@@ -13,6 +13,7 @@ import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationSendService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
+import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,15 +31,15 @@ public class FriendshipService {
     private final NotificationSendService notificationSendService;
     private final NotificationRepository notificationRepository;
 
-    public ResponseEntity<Message> friendRequest(FriendRequestDto friendRequestDto) {
-        String senderEmail = friendRequestDto.getSender();
-        String receiverEmail = friendRequestDto.getReceiver();
+    public ResponseEntity<Message> friendRequest(FriendRequestDto friendRequestDto, UserDetailsImpl userDetails) {
+        String senderNickname = userDetails.getMember().getNickname();
+        String receiverNickname = friendRequestDto.getReceiverNickname();
 
-        Members sender = membersRepository.findByEmail(senderEmail).orElseThrow(
+        Members sender = membersRepository.findByEmail(senderNickname).orElseThrow(
                 () -> new CustomException(ErrorCode.EMAIL_NOT_FOUND)
         );
 
-        Members receiver = membersRepository.findByEmail(receiverEmail).orElseThrow(
+        Members receiver = membersRepository.findByEmail(receiverNickname).orElseThrow(
                 () -> new CustomException(ErrorCode.EMAIL_NOT_FOUND)
         );
 
@@ -57,18 +58,18 @@ public class FriendshipService {
             if(findRequest.isPresent()){
                 Friendship request = findRequest.get();
                 if (request.getStatus() == FriendshipStatus.REFUSE) {
-                    return new ResponseEntity<>(new Message("상대방이 친구요청을 거절했습니다.", null), HttpStatus.OK);
+                    return new ResponseEntity<>(new Message("상대방이 친구 요청을 거절했습니다.", null), HttpStatus.OK);
                 } else if (request.getStatus() == FriendshipStatus.PENDING) {
-                    return new ResponseEntity<>(new Message("이미 친구요청을 하셨습니다.", null), HttpStatus.OK);
+                    return new ResponseEntity<>(new Message("이미 친구 요청을 하셨습니다.", null), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
                 }
             } else {
                 Friendship reverseRequest = findReverseRequest.get();
                 if (reverseRequest.getStatus() == FriendshipStatus.REFUSE) {
-                    return new ResponseEntity<>(new Message("당신이 친구요청을 거절했습니다.", null), HttpStatus.OK);
+                    return new ResponseEntity<>(new Message("당신이 친구 요청을 거절했습니다.", null), HttpStatus.OK);
                 } else if (reverseRequest.getStatus() == FriendshipStatus.PENDING) {
-                    return new ResponseEntity<>(new Message("당신에게 이미 친구요청이 왔습니다.", null), HttpStatus.OK);
+                    return new ResponseEntity<>(new Message("당신에게 이미 친구 요청이 왔습니다.", null), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
                 }
@@ -82,8 +83,8 @@ public class FriendshipService {
     public ResponseEntity<Message> determineRequest(DetermineRequestDto determineRequestDto){
         Notification findNotification = findNotification(determineRequestDto.getNotificationId());
 
-        Members requestSender = findMember(determineRequestDto.getSenderId());
-        Members requestReceiver = findMember(determineRequestDto.getReceiverId());
+        Members requestSender = findMember(determineRequestDto.getSenderNickname());
+        Members requestReceiver = findMember(determineRequestDto.getReceiverNickname());
 
         Friendship findFriendRequest = findPendingFriendship(requestSender, requestReceiver);
 
@@ -102,11 +103,10 @@ public class FriendshipService {
 
     }
 
-    public ResponseEntity<Message> deleteFriend(DeleteFriendRequestDto deleteFriendRequestDto){
-        Members requestSender = membersRepository.findByEmail(deleteFriendRequestDto.getSenderEmail()).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
-        Members requestReceiver = membersRepository.findByEmail(deleteFriendRequestDto.getReceiverEmail()).orElseThrow(
+    public ResponseEntity<Message> deleteFriend(DeleteFriendRequestDto deleteFriendRequestDto, UserDetailsImpl userDetails){
+
+        Members requestSender = userDetails.getMember();
+        Members requestReceiver = membersRepository.findByNickname(deleteFriendRequestDto.getReceiverNickname()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
@@ -117,14 +117,15 @@ public class FriendshipService {
             Friendship findFriendship = friendshipRepository.findAllBySenderOrReceiver(requestReceiver, requestSender).get();
             friendshipRepository.delete(findFriendship);
         }else {
-            throw new CustomException(ErrorCode.FRIEND_NOT_FOUND);
+            return new ResponseEntity<>(new Message("삭제 대상이 존재하지 않습니다.",null), HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(new Message("친구 삭제가 완료 되었습니다.", null), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("친구 삭제가 완료 되었습니다.",
+                "삭제된 사용자 : " + requestReceiver.getNickname()), HttpStatus.OK);
     }
 
-    private Members findMember(Long memberId) {
-        return membersRepository.findById(memberId).orElseThrow(
+    private Members findMember(String memberNickname) {
+        return membersRepository.findByNickname(memberNickname).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
     }
