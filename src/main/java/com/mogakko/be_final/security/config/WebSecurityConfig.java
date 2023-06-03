@@ -86,6 +86,16 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         return httpSecurity.build();
     }
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedHeaders("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedOrigins("http://localhost:3000", "https://test-repo-five-flame.vercel.app")
+                .exposedHeaders(JwtProvider.ACCESS_KEY)
+                .allowCredentials(true);
+    }
+
 //    @Bean
 //    public CorsConfigurationSource corsConfigurationSource() {
 //        CorsConfiguration config = new CorsConfiguration();
@@ -107,13 +117,4 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //        return source;
 //    }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("https://test-repo-five-flame.vercel.app", "http://localhost:3000", "https://mogakko.store")
-                .allowCredentials(true)
-                .allowedHeaders("*")
-                .allowedMethods(HttpMethod.GET.name(),HttpMethod.POST.name(),HttpMethod.OPTIONS.name())
-                .exposedHeaders(JwtProvider.ACCESS_KEY);
-    }
 }

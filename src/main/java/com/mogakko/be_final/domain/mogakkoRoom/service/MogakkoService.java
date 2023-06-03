@@ -87,7 +87,6 @@ public class MogakkoService {
                 .cntMembers(0L)
                 .build();
 
-
         log.info("생성된 모각코 방 : " + mogakkoRoom.getTitle());
 
         // 빌드된 모각코방 저장
@@ -102,24 +101,29 @@ public class MogakkoService {
         MogakkoRoom mogakkoRoom = mogakkoRoomRepository.findBySessionId(sessionId).orElseThrow(
                 () -> new CustomException(MOGAKKO_NOT_FOUND));
 
+        // 이미 입장한 유저일 경우 예외 발생
+        Optional<MogakkoRoomMembers> alreadyEnterMogakkoRoomMembers = mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, false);
+        if (alreadyEnterMogakkoRoomMembers.isPresent()) {
+            log.error("===== 이미 입장한 유저임");
+            throw new CustomException(ALREADY_ENTER_MEMBER);
+        }
+
         // 방 최대 인원 초과 시 예외발생
         Long chatRoomMaxMembers = mogakkoRoom.getMaxMembers();
         synchronized (mogakkoRoom) {
             mogakkoRoom.updateCntMembers(mogakkoRoom.getCntMembers() + 1);
-
             if (mogakkoRoom.getCntMembers() > chatRoomMaxMembers) {
                 throw new CustomException(MOGAKKO_IS_FULL);
             }
         }
-
         // 비공개 방일 경우 비밀번호 체크
-        if (!mogakkoRoom.isOpened()) {
+        if (!mogakkoRoom.isOpened() && !mogakkoRoom.getMasterMemberId().equals(member.getId())) {
             if (requestDto == null) {
                 throw new CustomException(PLZ_INPUT_PASSWORD);
             }
 
             String password = requestDto.getPassword();
-            if (password == null) {
+            if (password == null || password.equals("")) {
                 throw new CustomException(PLZ_INPUT_PASSWORD);
             }
             if (!passwordEncoder.matches(password, mogakkoRoom.getPassword())) {
@@ -127,16 +131,12 @@ public class MogakkoService {
             }
         }
 
-        // 이미 입장한 유저일 경우 예외 발생
-        Optional<MogakkoRoomMembers> alreadyEnterMogakkoRoomMembers = mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, false);
-        if (alreadyEnterMogakkoRoomMembers.isPresent()) throw new CustomException(ALREADY_ENTER_MEMBER);
-
         // 해당 방에서 나간 후, 다시 '재접속' 하는 유저
         Optional<MogakkoRoomMembers> reEnterChatRoomMembers = mogakkoRoomMembersRepository.findByMogakkoRoomAndMemberId(mogakkoRoom, member.getId());
 
         // 방 입장 토큰 생성
         String enterRoomToken = enterRoomCreateSession(member, mogakkoRoom.getSessionId());
-        log.info("생성된 토큰 확인 : {}", enterRoomToken);
+        log.info("===== 생성된 토큰 확인 : {}", enterRoomToken);
 
         MogakkoRoomMembers mogakkoRoomMembers;
         // 재입장 유저의 경우
@@ -144,7 +144,7 @@ public class MogakkoService {
             mogakkoRoomMembers = reEnterChatRoomMembers.get();
             mogakkoRoomMembers.reEnterRoomMembers(enterRoomToken, member.getNickname());
             mogakkoRoom.setDeleted(false);
-            log.info("재입장 유저 stayTime : {}", mogakkoRoomMembers.getRoomStayTime());
+            log.info("===== 재입장 유저 stayTime : {}", mogakkoRoomMembers.getRoomStayTime());
         } else {
             // 처음 입장하는 유저
             mogakkoRoomMembers = MogakkoRoomMembers.builder()
@@ -159,6 +159,7 @@ public class MogakkoService {
                     .build();
             // 현재 방에 접속한 유저 저장
             mogakkoRoomMembersRepository.save(mogakkoRoomMembers);
+            log.info("===== {} 님은 모각코 방 [{}]에 처음으로 입장함", mogakkoRoomMembers.getNickname(), mogakkoRoom.getSessionId());
         }
         // 모각코 방 정보 저장
         mogakkoRoomRepository.save(mogakkoRoom);
@@ -167,26 +168,18 @@ public class MogakkoService {
 //            isMaster = member.getNickname() + "님은 방장입니다.";
 //        }
         String token = mogakkoRoomMembers.getEnterRoomToken();
+        log.info("===== {} 님 입장 완료", member.getNickname());
         return new ResponseEntity<>(new Message("모각코방 입장 성공", token), HttpStatus.OK);
     }
 
 
     // 모각코 방 퇴장
-    public ResponseEntity<Message> outMogakko(String sessionId, Members members, boolean prev) {
+    public ResponseEntity<Message> outMogakko(String sessionId, Members members) {
 
         // 모각코 방 존재 확인
         MogakkoRoom mogakkoRoom = mogakkoRoomRepository.findBySessionId(sessionId).orElseThrow(
                 () -> new CustomException(MOGAKKO_NOT_FOUND)
         );
-
-        // 방장이 방을 만들고 입장 안함 (뒤로가기) -> 모각코 삭제
-        if (prev) {
-            synchronized (mogakkoRoom) {
-                LocalDateTime roomDeleteTime = LocalDateTime.now();
-                mogakkoRoom.deleteRoom(roomDeleteTime);
-                return new ResponseEntity<>(new Message("모각코 삭제 성공", null), HttpStatus.OK);
-            }
-        }
 
         // 방에 멤버가 존재하는지 확인
         MogakkoRoomMembers mogakkoRoomMembers = mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(members.getId(), mogakkoRoom, true).orElseThrow(
@@ -248,14 +241,14 @@ public class MogakkoService {
 
     // 위치 기반 12km 이내 모각코 조회 및 검색
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> getAllMogakkosOrSearch(String searchKeyword, String language, Mogakko12kmRequestDto requestDto) {
-        double lon = requestDto.getLon();
-        double lat = requestDto.getLat();
+    public ResponseEntity<Message> getAllMogakkosOrSearch(String searchKeyword, String language, Mogakko12kmRequestDto mogakko12KmRequestDto) {
+        double lat = mogakko12KmRequestDto.getLat();
+        double lon = mogakko12KmRequestDto.getLon();
         List<MogakkoRoom> mogakkoList;
         if (language == null && searchKeyword == null) {
-            mogakkoList = mogakkoRoomRepository.findAllByLonAndLat(lat, lon);
+            mogakkoList = mogakkoRoomRepository.findAllByLatAndLon(lat, lon);
         } else if (searchKeyword == null) {
-            mogakkoList = mogakkoRoomRepository.findAllByLonAndLatAndLanguage(lat, lon, LanguageEnum.valueOf(language));
+            mogakkoList = mogakkoRoomRepository.findAllByLatAndLonAndLanguage(lat, lon, LanguageEnum.valueOf(language));
         } else if (language == null) {
             mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLatAndLon(searchKeyword, lat, lon);
         } else {
