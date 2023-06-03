@@ -12,7 +12,6 @@ import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationSendService;
-import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.security.jwt.JwtProvider;
@@ -60,6 +59,18 @@ public class MembersService {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String nickname = signupRequestDto.getNickname();
+
+        Boolean emailChecked = (Boolean) session.getAttribute("emailChecked");
+        Boolean nicknameChecked = (Boolean) session.getAttribute("nicknameChecked");
+        String checkedEmail = (String) session.getAttribute("email");
+        String checkedNickname = (String) session.getAttribute("nickname");
+
+        if (nicknameChecked == null || !nicknameChecked || emailChecked == null || !emailChecked) {
+            return new ResponseEntity<>(new Message("이메일과 닉네임 중복검사를 완료해주세요", null), HttpStatus.BAD_REQUEST);
+        }
+        if (!checkedEmail.equals(signupRequestDto.getEmail()) || !checkedNickname.equals(signupRequestDto.getNickname())) {
+            return new ResponseEntity<>(new Message("중복검사에 사용한 이메일과 닉네임을 사용해 주세요", null), HttpStatus.BAD_REQUEST);
+        }
 
         Members members = new Members(email, nickname, password, Role.USER);
         membersRepository.save(members);
@@ -130,14 +141,26 @@ public class MembersService {
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
     }
 
-    // 마이페이지 - 프로필 사진 수정
-    public ResponseEntity<Message> profileUpdate(MultipartFile imageFile, Members member) throws IOException {
-        if (!imageFile.isEmpty()) {
+    // 마이페이지 - 프로필 사진, 닉네임 수정
+    public ResponseEntity<Message> profileUpdate(MultipartFile imageFile, String nickname, Members member) throws IOException {
+        if (imageFile != null && !imageFile.isEmpty()) {
             s3Uploader.delete(member.getProfileImage());
             String profileImage = s3Uploader.uploadFile(imageFile);
-            member.setProfileImage(profileImage);
+            member.updateProfileImage(profileImage);
         }
+
+        if (nickname != null && !nickname.isEmpty()) {
+            member.updateNickname(nickname);
+        }
+
         membersRepository.save(member);
-        return new ResponseEntity<>(new Message("프로필 이미지 수정 성공", null), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("프로필 정보 변경 성공", null), HttpStatus.OK);
     }
+
+    // 마이페이지 - 프로필 사진 삭제
+    public ResponseEntity<Message> profileDelete(Members member) {
+        member.deleteProfile();
+        return new ResponseEntity<>(new Message("프로필 사진 삭제 성공", null), HttpStatus.OK);
+    }
+
 }

@@ -77,14 +77,4 @@ public class MogakkoController {
         return mogakkoService.getMogakkoMembersData(sessionId, userDetails.getMember());
     }
 
-
-//    @GetMapping("/rooms/{sessionid}/openvidu")
-//    public ResponseEntity<PrivateResponseBody> getAllOpenviduUsers(@PathVariable(name = "sessionid") String sessionId,
-//                                                           @Authenticated OAuth2UserInfoAuthentication authentication) {
-//
-//        User user = (User) authentication.getPrincipal();
-//
-//        return new ResponseUtil<>().forSuccess(chatRoomService.getRoomUserData(sessionId, user));
-//    }
-
 }
