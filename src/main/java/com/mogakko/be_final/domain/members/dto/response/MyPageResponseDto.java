@@ -2,7 +2,6 @@ package com.mogakko.be_final.domain.members.dto.response;
 
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

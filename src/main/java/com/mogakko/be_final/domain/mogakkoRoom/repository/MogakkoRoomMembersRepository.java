@@ -18,6 +18,8 @@ public interface MogakkoRoomMembersRepository extends JpaRepository<MogakkoRoomM
 
     Optional<MogakkoRoomMembers> findByMemberIdAndMogakkoRoomAndIsEntered(Long userId, MogakkoRoom mogakkoRoom, boolean isEntered);
 
+//    MogakkoRoomMembers findByMemberIdAndMogakkoRoom
+
     List<MogakkoRoomMembers> findAllByMogakkoRoomAndIsEntered(MogakkoRoom mogakkoRoom, boolean isEntered);
 
     @Query("SELECT SEC_TO_TIME(sum(TIME_TO_SEC(m.roomStayTime))) from MogakkoRoomMembers m where m.memberId = :memberId and m.mogakkoRoom.isDeleted = false")
