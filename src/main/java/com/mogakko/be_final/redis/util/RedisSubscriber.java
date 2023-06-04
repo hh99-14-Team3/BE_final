@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogakko.be_final.domain.chatMessage.dto.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 public class RedisSubscriber {
 
     private final ObjectMapper objectMapper;
-    private final RedisTemplate redisTemplate;
     private final SimpMessagingTemplate messagingTemplate;
 
     public void sendMessage(String publishMessage) {
