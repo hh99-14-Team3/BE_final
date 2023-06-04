@@ -8,8 +8,7 @@ public enum LanguageEnum {
 
     JAVA("JAVA"), C("C"), CPLPL("C++"), CSHARP("C#"),
     PYTHON("PYTHON"), RUBY("RUBY"), KOTLIN("KOTLIN"),
-    SWIFT("SWIFT"), JAVASCRIPT("JAVASCRIPT"), GO("GO"),
-    PHP("PHP"), RUST("RUST"), LUA("LUA");
+    SWIFT("SWIFT"), JAVASCRIPT("JAVASCRIPT"), ETC("ETC");
 
 
     private final String language;

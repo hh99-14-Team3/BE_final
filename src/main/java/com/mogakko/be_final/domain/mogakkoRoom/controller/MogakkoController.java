@@ -42,19 +42,11 @@ public class MogakkoController {
         return mogakkoService.enterMogakko(sessionId, requestData, userDetails.getMember());
     }
 
-    @DeleteMapping("/mogakko/{sessionId}/delete")
-    @Operation(summary = "모각코 방 퇴장 API", description = "브라우저 종료 시 모각코 방이 퇴장되는 메서드입니다.")
-    public ResponseEntity<Message> outMogakko(@PathVariable(name = "sessionId") String sessionId,
-                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return mogakkoService.outMogakko(sessionId, userDetails.getMember(), false);
-    }
-
     @DeleteMapping("/mogakko/{sessionId}")
     @Operation(summary = "모각코 방 퇴장 API", description = "퇴장하기 버튼 눌렀을때 모각코 방이 퇴장되는 메서드입니다.")
     public ResponseEntity<Message> outClickMogakko(@PathVariable(name = "sessionId") String sessionId,
-                                                   @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                   @RequestParam boolean prev) {
-        return mogakkoService.outMogakko(sessionId, userDetails.getMember(), prev);
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return mogakkoService.outMogakko(sessionId, userDetails.getMember());
     }
 
     @PostMapping("/mogakkos")
