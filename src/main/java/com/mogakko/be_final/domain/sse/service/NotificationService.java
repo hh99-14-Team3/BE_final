@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class NotificationService {
     private final EmitterRepository emitterRepository = new EmitterRepositoryImpl();
@@ -29,6 +28,7 @@ public class NotificationService {
     private final MembersRepository membersRepository;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
+    @Transactional
     public SseEmitter subscribe(Long memberId, String lastEventId) {
         String emitterId = memberId + "_" + System.currentTimeMillis();
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
@@ -58,6 +58,7 @@ public class NotificationService {
         return emitter;
     }
 
+    @Transactional
     public void send(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
         Notification notification = createNotification(sender , receiver, notificationType, content, url);
         notificationRepository.save(notification);
@@ -82,7 +83,8 @@ public class NotificationService {
                 .build();
     }
 
-    private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
+    @Transactional
+    void sendToClient(SseEmitter emitter, String emitterId, Object data) {
         try {
             emitter.send(SseEmitter.event()
                     .id(emitterId)
@@ -93,14 +95,15 @@ public class NotificationService {
         }
     }
 
+    @Transactional
     public void markAsRead(Long notificationId) {
-
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid notification ID: " + notificationId));
         notification.read();
         notificationRepository.save(notification);
     }
 
+    @Transactional
     @Scheduled(fixedDelay = 30000)  // every 30 seconds
     public void sendHeartbeat() {
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitter();
@@ -117,8 +120,5 @@ public class NotificationService {
                 }
         );
     }
-
-
-
 }
 
