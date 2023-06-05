@@ -30,8 +30,9 @@ public class FriendshipController {
     }
     @PostMapping("/determine")
     @Operation(summary = "친구요청의 수락 또는 거절 API", description = "determineRequest 의 값이 true면 수락, false면 거절 입니다.")
-    public ResponseEntity<Message> determineRequest(@RequestBody DetermineRequestDto determineRequestDto){
-        return friendshipService.determineRequest(determineRequestDto);
+    public ResponseEntity<Message> determineRequest(@RequestBody DetermineRequestDto determineRequestDto,
+                                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendshipService.determineRequest(determineRequestDto, userDetails);
     }
 
     @GetMapping("/accepted")

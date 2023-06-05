@@ -35,12 +35,12 @@ public class FriendshipService {
         String senderNickname = userDetails.getMember().getNickname();
         String receiverNickname = friendRequestDto.getReceiverNickname();
 
-        Members sender = membersRepository.findByEmail(senderNickname).orElseThrow(
-                () -> new CustomException(ErrorCode.EMAIL_NOT_FOUND)
+        Members sender = membersRepository.findByNickname(senderNickname).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
-        Members receiver = membersRepository.findByEmail(receiverNickname).orElseThrow(
-                () -> new CustomException(ErrorCode.EMAIL_NOT_FOUND)
+        Members receiver = membersRepository.findByNickname(receiverNickname).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
         Optional<Friendship> findRequest = friendshipRepository.findAllBySenderAndReceiver(sender, receiver);
@@ -80,17 +80,16 @@ public class FriendshipService {
     }
 
     // 친구요청 결정 하는 ( 수락할지 , 거절할지 )
-    public ResponseEntity<Message> determineRequest(DetermineRequestDto determineRequestDto){
-        Notification findNotification = findNotification(determineRequestDto.getNotificationId());
-
-        Members requestSender = findMember(determineRequestDto.getSenderNickname());
-        Members requestReceiver = findMember(determineRequestDto.getReceiverNickname());
+    public ResponseEntity<Message> determineRequest(DetermineRequestDto determineRequestDto, UserDetailsImpl userDetails){
+        //요청을 수신 받은 사용자가 수락 혹은 거절을 결정하는 것
+        Members requestSender = findMember(determineRequestDto.getRequestSenderNickname());
+        Members requestReceiver = userDetails.getMember();
 
         Friendship findFriendRequest = findPendingFriendship(requestSender, requestReceiver);
 
         if(determineRequestDto.isDetermineRequest()){
             findFriendRequest.accept();
-            // requestReceiver 가 알림을 받아야 하므로 자리가 바뀌어야함 다시말해 requestReceiver 가 SSE sender 가 되어야한다는 의미
+            // requestSender 가 알림을 받아야 하므로 자리가 바뀌어야함 다시말해 requestReceiver 가 SSE sender 가 되어야한다는 의미
             notificationSendService.sendAcceptNotification(requestReceiver, requestSender);
             friendshipRepository.save(findFriendRequest);
             return new ResponseEntity<>(new Message("친구요청이 수락 되었습니다.",null), HttpStatus.OK);

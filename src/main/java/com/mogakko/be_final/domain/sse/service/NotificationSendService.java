@@ -12,23 +12,30 @@ public class NotificationSendService {
 
     public void sendFriendRequestNotification(Members sender, Members receiver){
         String content = sender.getNickname() + "님이 친구요청을 보냈습니다.";
-        String url = "/friend/request/determine";
+        String url = "https://api.abc123poi.com/friendship/requests/pending";
        
       notificationService.send(sender, receiver, NotificationType.FRIEND_REQUEST, content, url);
     }
 
     public void sendAcceptNotification(Members sender, Members receiver){
-        String content = receiver.getNickname() + "님이 친구요청을 수락하셨습니다.";
-        String url = "/friend/request/determine";
+        String content = sender.getNickname() + "님이 친구요청을 수락하셨습니다.";
+        String url = "https://api.abc123poi.com/friendship/requests/accepted";
 
         notificationService.send(sender, receiver, NotificationType.FRIEND_REQUEST, content, url);
     }
 
     public void sendRefuseNotification(Members sender, Members receiver){
-        String content = receiver.getNickname() + "님이 친구요청을 거절하셨습니다.";
+        String content = sender.getNickname() + "님이 친구요청을 거절하셨습니다.";
         String url = "/friend/request/determine";
 
         notificationService.send(sender, receiver, NotificationType.FRIEND_REQUEST, content, url);
+    }
+
+    public void sendMessageReceivedNotification(Members sender, Members receiver) {
+        String content = sender.getNickname() + "님으로부터 쪽지가 도착했습니다.";
+        String url = "https://api.abc123poi.com/direckMessage/received";
+
+        notificationService.send(sender, receiver, NotificationType.MESSAGE, content, url);
     }
   
 

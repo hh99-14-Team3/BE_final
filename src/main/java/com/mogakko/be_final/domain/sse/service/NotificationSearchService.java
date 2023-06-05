@@ -1,6 +1,7 @@
 package com.mogakko.be_final.domain.sse.service;
 
 import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.domain.sse.dto.NotificationResponseDto;
 import com.mogakko.be_final.domain.sse.entity.Notification;
 import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,10 +20,16 @@ public class NotificationSearchService {
     private final NotificationRepository notificationRepository;
     public ResponseEntity<Message> getMyNotification(UserDetailsImpl userDetails){
         Members receiver = userDetails.getMember();
+
         List<Notification> notificationList = notificationRepository.findAllByReceiver(receiver);
+        List<NotificationResponseDto> receivedNotificationList = new ArrayList<>();
+        for (Notification notification : notificationList) {
+            NotificationResponseDto receivedNotification = new NotificationResponseDto(notification);
+            receivedNotificationList.add(receivedNotification);
+        }
 
         if(!notificationList.isEmpty()){
-            return new ResponseEntity<>(new Message("알림 조회 완료", notificationList), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("알림 조회 완료", receivedNotificationList), HttpStatus.OK);
         }else {
             return new ResponseEntity<>(new Message("알림이 없습니다.", null), HttpStatus.OK);
         }
