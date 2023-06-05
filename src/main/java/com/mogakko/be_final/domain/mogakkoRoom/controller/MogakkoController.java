@@ -57,7 +57,7 @@ public class MogakkoController {
     }
 
     @GetMapping("/mogakko/read")
-    @Operation(summary = "인기 모각코 조회 API", description = "인기있는 모각코를 조회하는 메서드입니다.")
+    @Operation(summary = "인기 지역 모각코 조회 API", description = "인기있는 지역의 모각코를 조회하는 메서드입니다.")
     public ResponseEntity<Message> topMogakko() {
         return mogakkoService.topMogakko();
     }

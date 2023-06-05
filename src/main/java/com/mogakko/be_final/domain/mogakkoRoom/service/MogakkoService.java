@@ -303,7 +303,7 @@ public class MogakkoService {
     // 인기 지역 모각코 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> topMogakko() {
-        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop8NeighborhoodCount();
+        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop5NeighborhoodCount();
         return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 
