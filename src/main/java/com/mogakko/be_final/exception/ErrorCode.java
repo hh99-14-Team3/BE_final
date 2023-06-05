@@ -27,6 +27,7 @@ public enum ErrorCode {
     INVALID_NOTIFICATION_ID(HttpStatus.BAD_REQUEST,"해당 알림이 존재하지 않습니다."),
     FRIEND_NOT_FOUND(HttpStatus.BAD_REQUEST, "이미 친구가 아닙니다"),
     NOTIFICATION_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "알림 발송에 실패했습니다"),
+    MESSAGE_NOT_FOUND(HttpStatus.OK, "해당 메세지가 존재하지 않습니다."),
 
 
     //인증
