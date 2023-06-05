@@ -7,10 +7,13 @@ import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoTimerResponseDto;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
+import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoTimerRepository;
+import com.mogakko.be_final.domain.mogakkoRoom.service.MogakkoService;
 import com.mogakko.be_final.domain.sse.service.NotificationSendService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
@@ -33,6 +36,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Time;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
@@ -47,10 +51,10 @@ public class MembersService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final RedisUtil redisUtil;
-    private final NotificationSendService notificationSendService;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
-    private final RedisTemplate redisTemplate;
     private final S3Uploader s3Uploader;
+    private final MogakkoService mogakkoService;
+    private final MogakkoTimerRepository mogakkoTimerRepository;
 
 
     // 회원가입
@@ -130,7 +134,15 @@ public class MembersService {
     public ResponseEntity<Message> readMyPage(Members member) {
         List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
         Time mogakkoTotalTime = mogakkoRoomTimeRepository.findMogakkoRoomTimeByEmail(member.getEmail());
-        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(member, mogakkoRoomList, mogakkoTotalTime);
+        String nickname = member.getNickname();
+        List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
+        List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname, LocalDateTime.now().minusDays(7));
+        Long totalTime = 0L;
+        String mogakkoTimes = changeSecToTime(totalTime, mogakkoTotalTimer);
+        String mogakkoTimesWeek = changeSecToTime(totalTime, mogakkoTotalTimerWeek);
+
+        MogakkoTimerResponseDto mogakkoTime = new MogakkoTimerResponseDto(mogakkoTimes, mogakkoTimesWeek);
+        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member, mogakkoTime);
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
     }
 
@@ -155,5 +167,22 @@ public class MembersService {
     public ResponseEntity<Message> profileDelete(Members member) {
         member.deleteProfile();
         return new ResponseEntity<>(new Message("프로필 사진 삭제 성공", null), HttpStatus.OK);
+    }
+
+    public String changeSecToTime (Long totalTime, List<Long> mogakkoTotalTimer) {
+        synchronized (totalTime) {
+            for (int i = 0; i < mogakkoTotalTimer.size(); i++) {
+                totalTime = totalTime + mogakkoTotalTimer.get(i);
+            }
+
+            Long hour, min, sec;
+
+            sec = totalTime % 60;
+            min = totalTime / 60 % 60;
+            hour = totalTime / 3600;
+
+            String timerBuffer = String.format("%02d:%02d:%02d", hour, min, sec);
+            return timerBuffer;
+        }
     }
 }

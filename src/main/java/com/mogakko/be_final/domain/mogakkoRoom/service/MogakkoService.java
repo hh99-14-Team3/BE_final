@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -313,14 +314,7 @@ public class MogakkoService {
         MogakkoTimer mogakkoTime = new MogakkoTimer(mogakkoTimer, nickname);
         mogakkoTimerRepository.save(mogakkoTime);
 
-        List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
-//        List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimerAndCreatedAt(nickname);
-        Long totalTime = 0L;
-        String mogakkoTimes = changeSecToTime(totalTime, mogakkoTotalTimer);
-//        String mogakkoTimesWeek = changeSecToTime(totalTime, mogakkoTotalTimerWeek);
-
-        MogakkoTimerResponseDto mogakkoTimerResponseDto = new MogakkoTimerResponseDto(mogakkoTimes, "mogakkoTimesWeek");
-        return new ResponseEntity<>(new Message("저장 성공", mogakkoTimerResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("저장 성공", mogakkoTimer), HttpStatus.OK);
 
     }
 
@@ -379,20 +373,4 @@ public class MogakkoService {
         return session.createConnection(connectionProperties).getToken();
     }
 
-    private String changeSecToTime (Long totalTime, List<Long> mogakkoTotalTimer) {
-        synchronized (totalTime) {
-            for (int i = 0; i < mogakkoTotalTimer.size(); i++) {
-                totalTime = totalTime + mogakkoTotalTimer.get(i);
-            }
-
-            Long hour, min, sec;
-
-            sec = totalTime % 60;
-            min = totalTime / 60 % 60;
-            hour = totalTime / 3600;
-
-            String timerBuffer = String.format("%02d:%02d:%02d", hour, min, sec);
-            return timerBuffer;
-        }
-    }
 }
