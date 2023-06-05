@@ -305,6 +305,25 @@ public class MogakkoService {
         return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 
+    // 타이머
+    @Transactional
+    public ResponseEntity<Message> mogakkoTimer(MogakkoTimerRequestDto mogakkoTimerRequestDto, Members member) {
+        Time mogakkoTimer = Time.valueOf((mogakkoTimerRequestDto.getMogakkoTimer()));
+        String nickname = member.getNickname();
+        MogakkoTimer mogakkoTime = new MogakkoTimer(mogakkoTimer, nickname);
+        mogakkoTimerRepository.save(mogakkoTime);
+
+        List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
+//        List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimerAndCreatedAt(nickname);
+        Long totalTime = 0L;
+        String mogakkoTimes = changeSecToTime(totalTime, mogakkoTotalTimer);
+//        String mogakkoTimesWeek = changeSecToTime(totalTime, mogakkoTotalTimerWeek);
+
+        MogakkoTimerResponseDto mogakkoTimerResponseDto = new MogakkoTimerResponseDto(mogakkoTimes, "mogakkoTimesWeek");
+        return new ResponseEntity<>(new Message("저장 성공", mogakkoTimerResponseDto), HttpStatus.OK);
+
+    }
+
     /**
      * Method
      */
