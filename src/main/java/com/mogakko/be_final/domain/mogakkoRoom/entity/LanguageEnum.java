@@ -7,8 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum LanguageEnum {
 
     JAVA("JAVA"), C("C"), CPLPL("C++"), CSHARP("C#"),
-    PYTHON("PYTHON"), RUBY("RUBY"), KOTLIN("KOTLIN"),
-    SWIFT("SWIFT"), JAVASCRIPT("JAVASCRIPT"), ETC("ETC");
+    PYTHON("PYTHON"), KOTLIN("KOTLIN"), JAVASCRIPT("JAVASCRIPT"), ETC("ETC");
 
 
     private final String language;
