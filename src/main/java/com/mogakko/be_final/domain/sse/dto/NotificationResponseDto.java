@@ -13,8 +13,8 @@ public class NotificationResponseDto {
     private String content;
     private String url;
     private Boolean isRead;
-    private Long senderId;
-    private Long receiverId;
+    private String senderNickname;
+    private String receiverNickname;
     private String createdAt;
 
 
@@ -27,8 +27,8 @@ public class NotificationResponseDto {
         this.content = notification.getContent();
         this.url = notification.getUrl();
         this.isRead = notification.getIsRead();
-        this.senderId = notification.getSender().getId();
-        this.receiverId = notification.getReceiver().getId();
+        this.senderNickname = notification.getSender().getNickname();
+        this.receiverNickname = notification.getReceiver().getNickname();
         this.createdAt = notification.getCreatedAt() != null
                 ? notification.getCreatedAt().format(formatter)
                 : null;

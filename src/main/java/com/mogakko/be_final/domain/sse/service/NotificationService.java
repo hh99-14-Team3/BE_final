@@ -84,7 +84,7 @@ public class NotificationService {
     }
 
     @Transactional
-    void sendToClient(SseEmitter emitter, String emitterId, Object data) {
+    public void sendToClient(SseEmitter emitter, String emitterId, Object data) {
         try {
             emitter.send(SseEmitter.event()
                     .id(emitterId)
