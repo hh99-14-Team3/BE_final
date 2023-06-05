@@ -56,11 +56,12 @@ public class MogakkoController {
         return mogakkoService.getAllMogakkosOrSearch(searchKeyword, language, mogakko12KmRequestDto);
     }
 
-    @GetMapping("/mogakko/read")
+    @GetMapping("/mogakkos/top")
     @Operation(summary = "인기 지역 모각코 조회 API", description = "인기있는 지역의 모각코를 조회하는 메서드입니다.")
     public ResponseEntity<Message> topMogakko() {
         return mogakkoService.topMogakko();
     }
+
 
     @GetMapping("/mogakko/{sessionId}/members")
     @Operation(summary = "모각코 유저 조회 API", description = "모각코에 있는 유저의 정보를 조회하는 메서드입니다.")
