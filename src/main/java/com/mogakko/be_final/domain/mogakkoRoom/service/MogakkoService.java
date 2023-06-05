@@ -5,22 +5,19 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomCreateResponseDto;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomEnterMemberResponseDto;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomEnterMembersResponseDto;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponseDto;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoTimerRequestDto;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.response.*;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.*;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
+import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoTimerRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.Instant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +46,7 @@ public class MogakkoService {
     private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MogakkoTimerRepository mogakkoTimerRepository;
 
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
@@ -303,7 +301,7 @@ public class MogakkoService {
     // 인기 지역 모각코 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> topMogakko() {
-        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop8NeighborhoodCount();
+        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop5NeighborhoodCount();
         return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 
@@ -360,5 +358,22 @@ public class MogakkoService {
         // 해당 채팅방에 프로퍼티스를 설정하면서 커넥션을 만들고, 방에 접속할 수 있는 토큰을 발급한다
         System.out.println(session.createConnection(connectionProperties).getToken());
         return session.createConnection(connectionProperties).getToken();
+    }
+
+    private String changeSecToTime (Long totalTime, List<Long> mogakkoTotalTimer) {
+        synchronized (totalTime) {
+            for (int i = 0; i < mogakkoTotalTimer.size(); i++) {
+                totalTime = totalTime + mogakkoTotalTimer.get(i);
+            }
+
+            Long hour, min, sec;
+
+            sec = totalTime % 60;
+            min = totalTime / 60 % 60;
+            hour = totalTime / 3600;
+
+            String timerBuffer = String.format("%02d:%02d:%02d", hour, min, sec);
+            return timerBuffer;
+        }
     }
 }

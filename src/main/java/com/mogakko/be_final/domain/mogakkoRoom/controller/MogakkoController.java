@@ -3,6 +3,7 @@ package com.mogakko.be_final.domain.mogakkoRoom.controller;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoTimerRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.service.MogakkoService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
@@ -69,4 +70,10 @@ public class MogakkoController {
         return mogakkoService.getMogakkoMembersData(sessionId, userDetails.getMember());
     }
 
+    @PostMapping("/mogakko/timer")
+    @Operation(summary = "모각코 타이머 API", description = "모각코 시간을 측정하는 메서드입니다.")
+    public ResponseEntity<Message> mogakkoTimer(@RequestBody MogakkoTimerRequestDto mogakkoTimerRequestDto,
+                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return mogakkoService.mogakkoTimer(mogakkoTimerRequestDto, userDetails.getMember());
+    }
 }
