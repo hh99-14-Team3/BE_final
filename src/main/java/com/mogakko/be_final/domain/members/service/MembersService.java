@@ -4,6 +4,7 @@ import com.mogakko.be_final.S3.S3Uploader;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
+import com.mogakko.be_final.domain.members.dto.response.UserPageResponseDto;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
@@ -169,7 +170,19 @@ public class MembersService {
         return new ResponseEntity<>(new Message("프로필 사진 삭제 성공", null), HttpStatus.OK);
     }
 
-    public String changeSecToTime (Long totalTime, List<Long> mogakkoTotalTimer) {
+    // 다른 유저 프로필 조회
+    @Transactional(readOnly = true)
+    public ResponseEntity<Message> getMemberProfile(Long memberId) {
+        Members member = membersRepository.findById(memberId).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+        Time mogakkoTotalTime = mogakkoRoomTimeRepository.findMogakkoRoomTimeByEmail(member.getEmail());
+        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(member, mogakkoTotalTime);
+        return new ResponseEntity<>(new Message("프로필 조회 성공", userPageResponseDto), HttpStatus.OK);
+    }
+
+
+    public String changeSecToTime(Long totalTime, List<Long> mogakkoTotalTimer) {
         synchronized (totalTime) {
             for (int i = 0; i < mogakkoTotalTimer.size(); i++) {
                 totalTime = totalTime + mogakkoTotalTimer.get(i);

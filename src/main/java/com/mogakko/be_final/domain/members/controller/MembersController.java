@@ -76,5 +76,11 @@ public class MembersController {
     public ResponseEntity<Message> profileDelete(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.profileDelete(userDetails.getMember());
     }
+
+    @Operation(summary = "다른 유저 프로필 조회 API", description = "다른 유저의 프로필을 조회하는 메서드입니다.")
+    @GetMapping("/{memberId}")
+    public ResponseEntity<Message> getMemberProfile(@PathVariable Long memberId) {
+        return membersService.getMemberProfile(memberId);
+    }
 }
 
