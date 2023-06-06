@@ -14,14 +14,12 @@ import java.util.List;
 public class MyPageResponseDto {
 
     private List<MogakkoRoomMembers> mogakkoRoomList;
-    private Time mogakkoTotalTime;
     private Members member;
     private String totalTimer;
     private String totalTimerWeek;
 
-    public MyPageResponseDto(List<MogakkoRoomMembers> mogakkoRoomList, Time mogakkoTotalTime, Members member, String totalTimer, String totalTimerWeek) {
+    public MyPageResponseDto(List<MogakkoRoomMembers> mogakkoRoomList, Members member, String totalTimer, String totalTimerWeek) {
         this.mogakkoRoomList = mogakkoRoomList;
-        this.mogakkoTotalTime = mogakkoTotalTime;
         this.member = member;
         this.totalTimer = totalTimer;
         this.totalTimerWeek = totalTimerWeek;
