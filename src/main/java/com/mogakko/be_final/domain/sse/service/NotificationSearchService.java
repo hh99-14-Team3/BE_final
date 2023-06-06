@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +19,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationSearchService {
     private final NotificationRepository notificationRepository;
+    @Transactional(readOnly = true)
     public ResponseEntity<Message> getMyNotification(UserDetailsImpl userDetails){
         Members receiver = userDetails.getMember();
 
-        List<Notification> notificationList = notificationRepository.findAllByReceiver(receiver);
+        List<Notification> notificationList = notificationRepository.findAllByKeyReceiverId(receiver.getId());
         List<NotificationResponseDto> receivedNotificationList = new ArrayList<>();
         for (Notification notification : notificationList) {
             NotificationResponseDto receivedNotification = new NotificationResponseDto(notification);
             receivedNotificationList.add(receivedNotification);
         }
+
 
         if(!notificationList.isEmpty()){
             return new ResponseEntity<>(new Message("알림 조회 완료", receivedNotificationList), HttpStatus.OK);

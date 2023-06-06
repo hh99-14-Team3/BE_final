@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -18,6 +19,11 @@ public class EmitterRepositoryImpl implements EmitterRepository {
     @Override
     public SseEmitter save(String emitterId, SseEmitter sseEmitter) {
         emitters.put(emitterId, sseEmitter);
+
+        // Handle client disconnects.
+        sseEmitter.onTimeout(() -> emitters.remove(emitterId));
+        sseEmitter.onCompletion(() -> emitters.remove(emitterId));
+
         return sseEmitter;
     }
 
@@ -47,29 +53,16 @@ public class EmitterRepositoryImpl implements EmitterRepository {
 
     @Override
     public void deleteAllEmitterStartWithId(String memberId) {
-        emitters.forEach(
-                (key, emitter) -> {
-                    if (key.startsWith(memberId)) {
-                        emitters.remove(key);
-                    }
-                }
-        );
+        emitters.entrySet().removeIf(entry -> entry.getKey().startsWith(memberId));
     }
 
     @Override
     public void deleteAllEventCacheStartWithId(String memberId) {
-        eventCache.forEach(
-                (key, emitter) -> {
-                    if (key.startsWith(memberId)) {
-                        eventCache.remove(key);
-                    }
-                }
-        );
+        eventCache.entrySet().removeIf(entry -> entry.getKey().startsWith(memberId));
     }
 
     @Override
-    public Map<String, SseEmitter> findAllEmitter(){
-        return emitters;
+    public Map<String, SseEmitter> findAllEmitter() {
+        return new HashMap<>(emitters);
     }
-
 }

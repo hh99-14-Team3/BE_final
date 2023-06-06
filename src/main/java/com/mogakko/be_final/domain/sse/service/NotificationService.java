@@ -1,9 +1,12 @@
 package com.mogakko.be_final.domain.sse.service;
 
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.select.SelectFrom;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.sse.dto.NotificationResponseDto;
 import com.mogakko.be_final.domain.sse.entity.Notification;
+import com.mogakko.be_final.domain.sse.entity.NotificationKey;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepository;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepositoryImpl;
@@ -11,24 +14,32 @@ import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.sql.Select;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-    private final EmitterRepository emitterRepository = new EmitterRepositoryImpl();
+    //= new EmitterRepositoryImpl()
+    private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
     private final MembersRepository membersRepository;
+    private final KeyComposite keyComposite;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
-    @Transactional
+
     public SseEmitter subscribe(Long memberId, String lastEventId) {
         String emitterId = memberId + "_" + System.currentTimeMillis();
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
@@ -41,11 +52,11 @@ public class NotificationService {
         Members eventReceiver = membersRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-        List<Notification> missedNotifications = notificationRepository.findAllByReceiverAndIsReadFalse(eventReceiver);
-        for (Notification missedNotification : missedNotifications) {
-            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification));
-            markAsRead(missedNotification.getId());
-        }
+//        List<Notification> missedNotifications = notificationRepository.findByKeyReceiverId(eventReceiver.getId());
+//        for (Notification missedNotification : missedNotifications) {
+//            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification));
+//            markAsRead(missedNotification.getKey());
+//        }
 
 
         if (!lastEventId.isEmpty()) {
@@ -58,7 +69,7 @@ public class NotificationService {
         return emitter;
     }
 
-    @Transactional
+
     public void send(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
         Notification notification = createNotification(sender , receiver, notificationType, content, url);
         notificationRepository.save(notification);
@@ -74,16 +85,17 @@ public class NotificationService {
     }
 
     private Notification createNotification(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
+        NotificationKey primaryKey = new NotificationKey(receiver.getId(), Instant.now(), notificationType);
         return Notification.builder()
-                .sender(sender)
-                .receiver(receiver)
-                .notificationType(notificationType)
+                .key(primaryKey)
+                .senderNickname(sender.getNickname())
+                .receiverNickname(receiver.getNickname())
                 .content(content)
                 .url(url)
                 .build();
     }
 
-    @Transactional
+
     public void sendToClient(SseEmitter emitter, String emitterId, Object data) {
         try {
             emitter.send(SseEmitter.event()
@@ -95,15 +107,16 @@ public class NotificationService {
         }
     }
 
-    @Transactional
-    public void markAsRead(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid notification ID: " + notificationId));
-        notification.read();
-        notificationRepository.save(notification);
-    }
+//    @Transactional
+//    public void markAsRead(NotificationKey key) {
+//        Notification notification = notificationRepository.findByKey(key)
+//                .orElseThrow(() -> new IllegalArgumentException("Invalid receiver ID: " + key.getReceiverId()));
+//        NotificationKey newKey = new NotificationKey(key.getReceiverId(),key.getCreatedAt(), notification.getKey().getNotificationType());
+//        Notification newNotification = new Notification(newKey, notification.getSenderNickname(), notification.getReceiverNickname(),notification.getContent(), notification.getUrl());
+//        notificationRepository.save(newNotification);
+//    }
 
-    @Transactional
+
     @Scheduled(fixedDelay = 30000)  // every 30 seconds
     public void sendHeartbeat() {
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitter();
@@ -120,5 +133,6 @@ public class NotificationService {
                 }
         );
     }
+
 }
 

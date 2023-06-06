@@ -1,6 +1,7 @@
 package com.mogakko.be_final.domain.sse.controller;
 
 import com.mogakko.be_final.domain.sse.entity.Notification;
+import com.mogakko.be_final.domain.sse.repository.EmitterRepositoryImpl;
 import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationSearchService;
 import com.mogakko.be_final.domain.sse.service.NotificationService;
@@ -27,12 +28,12 @@ public class NotificationController {
     private final NotificationRepository notificationRepository;
     private final NotificationSearchService notificationSearchService;
 
-
     @Operation(summary = "SSE 구독 API", description = "SSE 구독하는 메서드입니다. 해당 주소로 get 요청시 연결됩니다.")
     @GetMapping(value = "/subscribe", produces = "text/event-stream")
     @ResponseStatus(HttpStatus.OK)
     public SseEmitter subscribe(@AuthenticationPrincipal UserDetailsImpl membersDetails,
                                 @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
+
         return notificationService.subscribe(membersDetails.getMember().getId(), lastEventId);
     }
 

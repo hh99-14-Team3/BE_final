@@ -23,7 +23,7 @@ public class DirectMessageController{
 
     @PostMapping("/send")
     public ResponseEntity<Message> sendDirectMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                     DirectMessageSendRequestDto directMessageSendRequestDto){
+                                                     @RequestBody DirectMessageSendRequestDto directMessageSendRequestDto){
         return directMessageSendService.sendDirectMessage(userDetails, directMessageSendRequestDto);
     }
 

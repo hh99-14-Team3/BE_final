@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class FriendshipService {
 
     public ResponseEntity<Message> friendRequest(FriendRequestDto friendRequestDto, UserDetailsImpl userDetails) {
         String senderNickname = userDetails.getMember().getNickname();
-        String receiverNickname = friendRequestDto.getReceiverNickname();
+        String receiverNickname = friendRequestDto.getRequestReceiverNickname();
 
         Members sender = membersRepository.findByNickname(senderNickname).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -126,12 +127,6 @@ public class FriendshipService {
     private Members findMember(String memberNickname) {
         return membersRepository.findByNickname(memberNickname).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
-    }
-
-    private Notification findNotification(Long notificationId) {
-        return notificationRepository.findById(notificationId).orElseThrow(
-                () -> new CustomException(ErrorCode.INVALID_NOTIFICATION_ID)
         );
     }
 
