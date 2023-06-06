@@ -10,7 +10,6 @@ import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoTimerResponseDto;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
@@ -36,7 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Time;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
@@ -109,6 +107,12 @@ public class MembersService {
         String refreshToken = tokenDto.getRefreshToken();
         redisUtil.set(member.getEmail(), refreshToken, Duration.ofDays(7).toMillis());
         httpServletResponse.addHeader(JwtProvider.ACCESS_KEY, tokenDto.getAccessToken());
+        String nickname = member.getNickname();
+
+        //로그인시 최근 1주일 모각코 순공 시간 동기화
+        Long totalTimerWeek = mogakkoService.totalTimer(nickname, "week");
+        member.setTime(totalTimerWeek);
+        membersRepository.save(member);
 
         Message message = Message.setSuccess("로그인 성공", member);
         return new ResponseEntity<>(message, HttpStatus.OK);
@@ -135,14 +139,12 @@ public class MembersService {
         List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
         Time mogakkoTotalTime = mogakkoRoomTimeRepository.findMogakkoRoomTimeByEmail(member.getEmail());
         String nickname = member.getNickname();
-        List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
-        List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname, LocalDateTime.now().minusDays(7));
-        Long totalTime = 0L;
-        String mogakkoTimes = changeSecToTime(totalTime, mogakkoTotalTimer, member);
-        String mogakkoTimesWeek = changeSecToTime(totalTime, mogakkoTotalTimerWeek, member);
+        Long totalTimerSec = mogakkoService.totalTimer(nickname, "total");
+        Long totalTimerWeekSec = mogakkoService.totalTimer(nickname, "week");
+        String totalTimer = mogakkoService.changeSecToTime(totalTimerSec);
+        String totalTimerWeek = mogakkoService.changeSecToTime(totalTimerWeekSec);
 
-        MogakkoTimerResponseDto mogakkoTime = new MogakkoTimerResponseDto(mogakkoTimes, mogakkoTimesWeek);
-        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member, mogakkoTime);
+        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member, totalTimer, totalTimerWeek);
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
     }
 
@@ -199,26 +201,6 @@ public class MembersService {
     /**
      * Method
      */
-    public String changeSecToTime(Long totalTime, List<Long> mogakkoTotalTimer, Members member) {
-        synchronized (totalTime) {
-            if(totalTime >= 4140 && totalTime < 14886) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_DOG);
-            if(totalTime >= 14886 && totalTime < 36240) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVE);
-            if(totalTime >= 36240 && totalTime < 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_ANGEL);
-            if(totalTime >= 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVELOVE);
-            membersRepository.save(member);
 
-            for (int i = 0; i < mogakkoTotalTimer.size(); i++) {
-                totalTime = totalTime + mogakkoTotalTimer.get(i);
-            }
 
-            Long hour, min, sec;
-
-            sec = totalTime % 60;
-            min = totalTime / 60 % 60;
-            hour = totalTime / 3600;
-
-            String timerBuffer = String.format("%02d:%02d:%02d", hour, min, sec);
-            return timerBuffer;
-        }
-    }
 }
