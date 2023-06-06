@@ -54,6 +54,15 @@ public class Members extends Timestamped {
     @Column
     private MemberStatusCode memberStatusCode; // 상태코드
 
+    @JsonIgnore
+    @Column
+    private Long mogakkoTotalTime = 0L;
+
+    @JsonIgnore
+    @Column
+    private Long mogakkoWeekTime = 0L;
+
+
 
     public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode) {
         this.email = email;
@@ -89,5 +98,13 @@ public class Members extends Timestamped {
 
     public void changeMemberStatusCode (MemberStatusCode memberStatusCode){
         this.memberStatusCode = memberStatusCode;
+    }
+
+    public void setTime(Long mogakkoTotalTime, Long mogakkoWeekTime){
+        this.mogakkoTotalTime = mogakkoTotalTime;
+        this.mogakkoWeekTime = mogakkoWeekTime;
+    }
+    public void setTime(Long mogakkoWeekTime){
+        this.mogakkoWeekTime = mogakkoWeekTime;
     }
 }

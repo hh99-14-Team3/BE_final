@@ -16,12 +16,14 @@ public class MyPageResponseDto {
     private List<MogakkoRoomMembers> mogakkoRoomList;
     private Time mogakkoTotalTime;
     private Members member;
-    private MogakkoTimerResponseDto mogakkoTime;
+    private String totalTimer;
+    private String totalTimerWeek;
 
-    public MyPageResponseDto(List<MogakkoRoomMembers> mogakkoRoomList, Time mogakkoTotalTime, Members member, MogakkoTimerResponseDto mogakkoTime) {
+    public MyPageResponseDto(List<MogakkoRoomMembers> mogakkoRoomList, Time mogakkoTotalTime, Members member, String totalTimer, String totalTimerWeek) {
         this.mogakkoRoomList = mogakkoRoomList;
         this.mogakkoTotalTime = mogakkoTotalTime;
         this.member = member;
-        this.mogakkoTime = mogakkoTime;
+        this.totalTimer = totalTimer;
+        this.totalTimerWeek = totalTimerWeek;
     }
 }

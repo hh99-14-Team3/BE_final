@@ -1,7 +1,9 @@
 package com.mogakko.be_final.domain.mogakkoRoom.service;
 
 
+import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
@@ -48,6 +50,7 @@ public class MogakkoService {
     private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
     private final PasswordEncoder passwordEncoder;
     private final MogakkoTimerRepository mogakkoTimerRepository;
+    private final MembersRepository membersRepository;
 
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
@@ -314,9 +317,18 @@ public class MogakkoService {
         String nickname = member.getNickname();
         MogakkoTimer mogakkoTime = new MogakkoTimer(mogakkoTimer, nickname);
         mogakkoTimerRepository.save(mogakkoTime);
+        Long totalTimer = totalTimer(nickname, "total");
+        Long totalTimerWeek = totalTimer(nickname, "week");
+
+        if (totalTimer >= 4140 && totalTimer < 14886) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_DOG);
+        if (totalTimer >= 14886 && totalTimer < 36240) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVE);
+        if (totalTimer >= 36240 && totalTimer < 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_ANGEL);
+        if (totalTimer >= 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVELOVE);
+
+        member.setTime(totalTimer, totalTimerWeek);
+        membersRepository.save(member);
 
         return new ResponseEntity<>(new Message("저장 성공", mogakkoTimer), HttpStatus.OK);
-
     }
 
     /**
@@ -372,6 +384,38 @@ public class MogakkoService {
         // 해당 채팅방에 프로퍼티스를 설정하면서 커넥션을 만들고, 방에 접속할 수 있는 토큰을 발급한다
         System.out.println(session.createConnection(connectionProperties).getToken());
         return session.createConnection(connectionProperties).getToken();
+    }
+
+    @Transactional(readOnly = true)
+    public Long totalTimer(String nickname, String type) {
+        Long totalTime = 0L;
+        Long totalTimer;
+        if (type.equals("total")) {
+            List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
+            totalTimer = totalTimeTypeLong(totalTime, mogakkoTotalTimer);
+        } else {
+            List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname, LocalDateTime.now().minusDays(7));
+            totalTimer = totalTimeTypeLong(totalTime, mogakkoTotalTimerWeek);
+        }
+        return totalTimer;
+    }
+
+    public Long totalTimeTypeLong(Long totalTime, List<Long> mogakkoTotalTimer) {
+        for (int i = 0; i < mogakkoTotalTimer.size(); i++) {
+            totalTime = totalTime + mogakkoTotalTimer.get(i);
+        }
+        return totalTime;
+    }
+
+    public String changeSecToTime(Long totalTime) {
+        Long hour, min, sec;
+
+        sec = totalTime % 60;
+        min = totalTime / 60 % 60;
+        hour = totalTime / 3600;
+
+        String timerBuffer = String.format("%02d:%02d:%02d", hour, min, sec);
+        return timerBuffer;
     }
 
 }

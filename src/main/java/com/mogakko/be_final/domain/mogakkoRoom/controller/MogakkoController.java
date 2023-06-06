@@ -71,7 +71,7 @@ public class MogakkoController {
         return mogakkoService.getMogakkoMembersData(sessionId, userDetails.getMember());
     }
 
-    @PostMapping("/mogakko/timer")
+    @PutMapping("/mogakko/timer")
     @Operation(summary = "모각코 타이머 API", description = "모각코 시간을 측정하는 메서드입니다.")
     public ResponseEntity<Message> mogakkoTimer(@RequestBody MogakkoTimerRequestDto mogakkoTimerRequestDto,
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
