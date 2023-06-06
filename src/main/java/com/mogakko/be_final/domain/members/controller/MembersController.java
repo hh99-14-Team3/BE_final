@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.members.controller;
 
+import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.service.MembersService;
@@ -16,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -61,6 +61,12 @@ public class MembersController {
     @Operation(summary = "마이페이지 API", description = "마이페이지에서 '참여중인 모각코방', '총 참여 시간'을 보여주는 메서드입니다.")
     public ResponseEntity<Message> myPage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.readMyPage(userDetails.getMember());
+    }
+
+    @PostMapping("/github")
+    @Operation(summary = "GitHub id 등록 API", description = "마이페이지에서 깃허브 아이디를 등록하는 메서드입니다.")
+    public ResponseEntity<Message> addGithub(GithubIdRequestDto githubIdRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return membersService.addGithub(githubIdRequestDto, userDetails.getMember());
     }
 
     @Operation(summary = "마이페이지 수정 API", description = "마이페이지에서 정보(프로필 사진, 닉네임)를 변경하는 메서드입니다.")

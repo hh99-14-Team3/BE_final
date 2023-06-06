@@ -1,6 +1,7 @@
 package com.mogakko.be_final.domain.members.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,9 @@ public class Members extends Timestamped {
     @Column(nullable = false)
     private Role role;
 
+    @Column
+    private String githubId;
+
     @Enumerated(EnumType.STRING)
     @Column
     private SocialType socialType;
@@ -46,12 +50,17 @@ public class Members extends Timestamped {
     @Column
     private String socialUid;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private MemberStatusCode memberStatusCode; // 상태코드
 
-    public Members(String email, String nickname, String password, Role role) {
+
+    public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.role = role;
+        this.memberStatusCode = memberStatusCode;
     }
 
     public void changePassword(String password) {
@@ -72,5 +81,13 @@ public class Members extends Timestamped {
 
     public void deleteProfile() {
         this.profileImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtArY0iIz1b6rGdZ6xkSegyALtWQKBjupKJQ&usqp=CAU";
+    }
+
+    public void setGithubId(String githubId) {
+        this.githubId = githubId;
+    }
+
+    public void changeMemberStatusCode (MemberStatusCode memberStatusCode){
+        this.memberStatusCode = memberStatusCode;
     }
 }
