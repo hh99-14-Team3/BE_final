@@ -102,7 +102,7 @@ public class MogakkoService {
                 () -> new CustomException(MOGAKKO_NOT_FOUND));
 
         // 이미 입장한 유저일 경우 예외 발생
-        Optional<MogakkoRoomMembers> alreadyEnterMogakkoRoomMembers = mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, false);
+        Optional<MogakkoRoomMembers> alreadyEnterMogakkoRoomMembers = mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, true);
         if (alreadyEnterMogakkoRoomMembers.isPresent()) {
             log.error("===== 이미 입장한 유저임");
             throw new CustomException(ALREADY_ENTER_MEMBER);
@@ -150,6 +150,7 @@ public class MogakkoService {
             mogakkoRoomMembers = MogakkoRoomMembers.builder()
                     .mogakkoRoom(mogakkoRoom)
                     .memberId(member.getId())
+                    .nickname(member.getNickname())
                     .profileImage(member.getProfileImage())
                     .enterRoomToken(enterRoomToken)
                     .roomEnterTime(Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime())
