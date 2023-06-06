@@ -88,5 +88,11 @@ public class MembersController {
     public ResponseEntity<Message> getMemberProfile(@PathVariable Long memberId) {
         return membersService.getMemberProfile(memberId);
     }
+
+    @Operation(summary = "최고의 유저 조회 API", description = "순공 시간이 가장 높은 모각코인을 조회하는 메서드입니다.")
+    @GetMapping("/best")
+    public ResponseEntity<Message> readBestMembers() {
+        return membersService.readBestMembers();
+    }
 }
 
