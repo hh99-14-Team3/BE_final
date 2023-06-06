@@ -114,7 +114,7 @@ public class MembersService {
         member.setTime(totalTimerWeek);
         membersRepository.save(member);
 
-        Message message = Message.setSuccess("로그인 성공", member);
+        Message message = Message.setSuccess("로그인 성공", member.getNickname());
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -196,6 +196,13 @@ public class MembersService {
         }
         member.setGithubId(githubId);
         return new ResponseEntity<>(new Message("깃허브 아이디 등록 성공", githubId), HttpStatus.OK);
+    }
+
+    // 최고의 ON:s 조회
+    @Transactional
+    public ResponseEntity<Message> readBestMembers() {
+        List<Members> topMembers = membersRepository.findTop8MogakkoWeekTime();
+        return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMembers), HttpStatus.OK);
     }
 
     /**
