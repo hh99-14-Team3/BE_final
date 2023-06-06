@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
 public class FriendshipSearchService {
     private final FriendshipRepository friendshipRepository;
     private final MembersRepository membersRepository;
-
+    @Transactional(readOnly = true)
     public ResponseEntity<Message> getMyFriend(UserDetailsImpl userDetails){
         Members member = userDetails.getMember();
         Long memberId = member.getId();
@@ -54,7 +55,7 @@ public class FriendshipSearchService {
 
     }
 
-
+    @Transactional(readOnly = true)
     public ResponseEntity<Message> getMyFriendRequest(UserDetailsImpl userDetails){
         Members receiver = userDetails.getMember();
 
