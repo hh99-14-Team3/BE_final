@@ -137,14 +137,13 @@ public class MembersService {
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
         List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
-        Time mogakkoTotalTime = mogakkoRoomTimeRepository.findMogakkoRoomTimeByEmail(member.getEmail());
         String nickname = member.getNickname();
         Long totalTimerSec = mogakkoService.totalTimer(nickname, "total");
         Long totalTimerWeekSec = mogakkoService.totalTimer(nickname, "week");
         String totalTimer = mogakkoService.changeSecToTime(totalTimerSec);
         String totalTimerWeek = mogakkoService.changeSecToTime(totalTimerWeekSec);
 
-        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member, totalTimer, totalTimerWeek);
+        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, member, totalTimer, totalTimerWeek);
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
     }
 
