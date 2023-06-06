@@ -1,10 +1,12 @@
 package com.mogakko.be_final.domain.members.service;
 
 import com.mogakko.be_final.S3.S3Uploader;
+import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.UserPageResponseDto;
+import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
@@ -15,7 +17,6 @@ import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepo
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoTimerRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.service.MogakkoService;
-import com.mogakko.be_final.domain.sse.service.NotificationSendService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.security.jwt.JwtProvider;
@@ -23,7 +24,6 @@ import com.mogakko.be_final.security.jwt.TokenDto;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Time;
 import java.time.Duration;
@@ -69,7 +68,7 @@ public class MembersService {
             throw new CustomException(ALREADY_JOIN_USER);
         }
 
-        Members members = new Members(email, nickname, password, Role.USER);
+        Members members = new Members(email, nickname, password, Role.USER, MemberStatusCode.BASIC);
         membersRepository.save(members);
 
         MogakkoRoomTime mogakkoRoomTimes = new MogakkoRoomTime(email, Time.valueOf("00:00:00"));
@@ -111,7 +110,7 @@ public class MembersService {
         redisUtil.set(member.getEmail(), refreshToken, Duration.ofDays(7).toMillis());
         httpServletResponse.addHeader(JwtProvider.ACCESS_KEY, tokenDto.getAccessToken());
 
-        Message message = Message.setSuccess("로그인 성공", member.getNickname());
+        Message message = Message.setSuccess("로그인 성공", member);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -139,8 +138,8 @@ public class MembersService {
         List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
         List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname, LocalDateTime.now().minusDays(7));
         Long totalTime = 0L;
-        String mogakkoTimes = changeSecToTime(totalTime, mogakkoTotalTimer);
-        String mogakkoTimesWeek = changeSecToTime(totalTime, mogakkoTotalTimerWeek);
+        String mogakkoTimes = changeSecToTime(totalTime, mogakkoTotalTimer, member);
+        String mogakkoTimesWeek = changeSecToTime(totalTime, mogakkoTotalTimerWeek, member);
 
         MogakkoTimerResponseDto mogakkoTime = new MogakkoTimerResponseDto(mogakkoTimes, mogakkoTimesWeek);
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, mogakkoTotalTime, member, mogakkoTime);
@@ -150,6 +149,10 @@ public class MembersService {
     // 마이페이지 - 프로필 사진, 닉네임 수정
     @Transactional
     public ResponseEntity<Message> profileUpdate(MultipartFile imageFile, String nickname, Members member) throws IOException {
+        if (member.getMemberStatusCode().equals(MemberStatusCode.BASIC)) {
+            member.changeMemberStatusCode(MemberStatusCode.NORMAL);
+        }
+
         if (imageFile != null && !imageFile.isEmpty()) {
             s3Uploader.delete(member.getProfileImage());
             String profileImage = s3Uploader.uploadFile(imageFile);
@@ -181,9 +184,29 @@ public class MembersService {
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPageResponseDto), HttpStatus.OK);
     }
 
+    // 깃허브 아이디 등록
+    @Transactional
+    public ResponseEntity<Message> addGithub(GithubIdRequestDto githubIdRequestDto, Members member) {
+        String githubId = githubIdRequestDto.getGithubId();
+        if (membersRepository.findByGithubId(githubId).isPresent()) {
+            log.info("중복된 깃허브 아이디 입니다.");
+            throw new CustomException(DUPLICATE_IDENTIFIER);
+        }
+        member.setGithubId(githubId);
+        return new ResponseEntity<>(new Message("깃허브 아이디 등록 성공", githubId), HttpStatus.OK);
+    }
 
-    public String changeSecToTime(Long totalTime, List<Long> mogakkoTotalTimer) {
+    /**
+     * Method
+     */
+    public String changeSecToTime(Long totalTime, List<Long> mogakkoTotalTimer, Members member) {
         synchronized (totalTime) {
+            if(totalTime >= 4140 && totalTime < 14886) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_DOG);
+            if(totalTime >= 14886 && totalTime < 36240) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVE);
+            if(totalTime >= 36240 && totalTime < 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_ANGEL);
+            if(totalTime >= 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVELOVE);
+            membersRepository.save(member);
+
             for (int i = 0; i < mogakkoTotalTimer.size(); i++) {
                 totalTime = totalTime + mogakkoTotalTimer.get(i);
             }
