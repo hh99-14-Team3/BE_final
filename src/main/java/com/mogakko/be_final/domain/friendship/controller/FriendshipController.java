@@ -47,7 +47,7 @@ public class FriendshipController {
         return friendshipSearchService.getMyFriendRequest(userDetails);
     }
 
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     @Operation(summary = "친구 삭제 API", description = "친구 삭제 API입니다. 요청 보내면 삭제 됩니다.")
     public ResponseEntity<Message> deleteFriend(@RequestBody DeleteFriendRequestDto deleteFriendRequestDto,
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
