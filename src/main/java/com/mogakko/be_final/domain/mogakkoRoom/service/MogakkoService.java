@@ -118,12 +118,12 @@ public class MogakkoService {
                 throw new CustomException(MOGAKKO_IS_FULL);
             }
         }
+
         // 비공개 방일 경우 비밀번호 체크
         if (!mogakkoRoom.isOpened() && !mogakkoRoom.getMasterMemberId().equals(member.getId())) {
             if (requestDto == null) {
                 throw new CustomException(PLZ_INPUT_PASSWORD);
             }
-
             String password = requestDto.getPassword();
             if (password == null || password.equals("")) {
                 throw new CustomException(PLZ_INPUT_PASSWORD);
@@ -305,7 +305,7 @@ public class MogakkoService {
     // 인기 지역 모각코 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> topMogakko() {
-        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop5ByOrderByNeighborhoodCountDesc();
+        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop4ByOrderByNeighborhoodCountDesc();
         return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 

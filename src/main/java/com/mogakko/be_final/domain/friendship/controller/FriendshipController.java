@@ -23,34 +23,34 @@ public class FriendshipController {
     private final FriendshipSearchService friendshipSearchService;
 
     @PostMapping
-    @Operation(summary = "친구 요청 API", description = " receiver 의 nickname 을 보내주시면 요청이 완료됩니다.")
+    @Operation(summary = "친구 요청 API", description = "친구 요청을 보내는 메서드입니다. 수신자의 nickname을 보내주시면 요청이 완료됩니다.")
     public ResponseEntity<Message> friendRequest(@RequestBody FriendRequestDto friendRequestDto,
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return friendshipService.friendRequest(friendRequestDto, userDetails);
+        return friendshipService.friendRequest(friendRequestDto, userDetails.getMember());
     }
     @PostMapping("/determine")
-    @Operation(summary = "친구요청의 수락 또는 거절 API", description = "determineRequest 의 값이 true면 수락, false면 거절 입니다.")
+    @Operation(summary = "친구 요청 결정 API", description = "친구 요청을 결정하는 메서드입니다. determineRequest 의 값이 true면 수락, false면 거절 입니다.")
     public ResponseEntity<Message> determineRequest(@RequestBody DetermineRequestDto determineRequestDto,
                                                     @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return friendshipService.determineRequest(determineRequestDto, userDetails);
-    }
-
-    @GetMapping("/accepted")
-    @Operation(summary = "사용자의 친구목록 조회 API", description = "해당주소에 토큰을 보내면 친구 목록이 조회됩니다.")
-    public ResponseEntity<Message> getMyFriend(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return friendshipSearchService.getMyFriend(userDetails);
-    }
-
-    @GetMapping("/pending")
-    @Operation(summary = "사용자가 수신한 친구요청 조회 API", description = "해당주소에 토큰을 보내면 친구 요청 목록이 조회됩니다.")
-    public ResponseEntity<Message> getMyFriendRequest(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return friendshipSearchService.getMyFriendRequest(userDetails);
+        return friendshipService.determineRequest(determineRequestDto, userDetails.getMember());
     }
 
     @PostMapping("/delete")
-    @Operation(summary = "친구 삭제 API", description = "친구 삭제 API입니다. 요청 보내면 삭제 됩니다.")
+    @Operation(summary = "친구 삭제 API", description = "사용자의 친구를 삭제하는 메서드입니다.")
     public ResponseEntity<Message> deleteFriend(@RequestBody DeleteFriendRequestDto deleteFriendRequestDto,
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return friendshipService.deleteFriend(deleteFriendRequestDto, userDetails);
+        return friendshipService.deleteFriend(deleteFriendRequestDto, userDetails.getMember());
+    }
+
+    @GetMapping("/accepted")
+    @Operation(summary = "친구목록 조회 API", description = "사용자의 친구 목록을 조회하는 메서드입니다.")
+    public ResponseEntity<Message> getMyFriend(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendshipSearchService.getMyFriend(userDetails.getMember());
+    }
+
+    @GetMapping("/pending")
+    @Operation(summary = "받은 친구요청 조회 API", description = "사용자의 친구 요청 목록을 조회하는 메서드입니다.")
+    public ResponseEntity<Message> getMyFriendRequest(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendshipSearchService.getMyFriendRequest(userDetails.getMember());
     }
 }
