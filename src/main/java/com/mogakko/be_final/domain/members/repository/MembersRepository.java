@@ -17,8 +17,8 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     Optional<Object> findByGithubId(String githubId);
 
-    @Query("SELECT m FROM Members m ORDER BY m.mogakkoWeekTime DESC")
-    List<Members> findTop8MogakkoWeekTime();
+//    @Query("SELECT m FROM Members m ORDER BY m.mogakkoWeekTime DESC")
+    List<Members> findTop8ByOrderByMogakkoWeekTimeDesc();
 
 }
 

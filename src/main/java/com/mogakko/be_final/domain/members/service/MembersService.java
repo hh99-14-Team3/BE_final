@@ -4,6 +4,7 @@ import com.mogakko.be_final.S3.S3Uploader;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
+import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.UserPageResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Time;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
@@ -200,8 +202,16 @@ public class MembersService {
     // 최고의 ON:s 조회
     @Transactional
     public ResponseEntity<Message> readBestMembers() {
-        List<Members> topMembers = membersRepository.findTop8MogakkoWeekTime();
-        return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMembers), HttpStatus.OK);
+        List<Members> topMembers = membersRepository.findTop8ByOrderByMogakkoWeekTimeDesc();
+        List<BestMembersResponseDto> topMemberList = new ArrayList<>();
+        for (int i = 0; i < topMembers.size(); i++) {
+            Members member = topMembers.get(i);
+            BestMembersResponseDto responseMember = new BestMembersResponseDto(member,
+                    mogakkoService.changeSecToTime(member.getMogakkoTotalTime()),
+                    mogakkoService.changeSecToTime(member.getMogakkoWeekTime()));
+            topMemberList.add(responseMember);
+        }
+        return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMemberList), HttpStatus.OK);
     }
 
     /**
