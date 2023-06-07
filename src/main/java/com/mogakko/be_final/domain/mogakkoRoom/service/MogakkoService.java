@@ -93,8 +93,7 @@ public class MogakkoService {
 
         // 빌드된 모각코방 저장
         mogakkoRoomRepository.save(mogakkoRoom);
-        MogakkoRoom room = mogakkoRoomRepository.findBySessionId(mogakkoRoom.getSessionId()).get();
-        return new ResponseEntity<>(new Message("모각코방 생성 성공", room), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("모각코방 생성 성공", mogakkoRoom), HttpStatus.OK);
     }
 
     // 모각코 방 입장
@@ -306,7 +305,7 @@ public class MogakkoService {
     // 인기 지역 모각코 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> topMogakko() {
-        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop5NeighborhoodCount();
+        List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findByTop4NeighborhoodCount();
         return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 
