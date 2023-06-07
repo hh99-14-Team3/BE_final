@@ -28,7 +28,13 @@ public class FriendshipSearchService {
 
         List<Long> friendsID = new ArrayList<>();
 
-        List<Friendship> findList = friendshipRepository.findAllBySenderOrReceiverAndStatus(member, member, FriendshipStatus.ACCEPT);
+        List<Friendship> list1 = friendshipRepository.findAllByReceiverAndStatus(member, FriendshipStatus.ACCEPT);
+        List<Friendship> list2 = friendshipRepository.findAllBySenderAndStatus(member, FriendshipStatus.ACCEPT);
+        List<Friendship> findList = new ArrayList<>();
+        findList.addAll(list1);
+        findList.addAll(list2);
+//
+//        List<Friendship> findList = friendshipRepository.findAllBySenderOrReceiverAndStatus(member, member, FriendshipStatus.ACCEPT);
         if (findList==null){
             return new ResponseEntity<>(new Message("조회된 친구가 없습니다.", null), HttpStatus.NOT_FOUND);
         }

@@ -44,6 +44,10 @@ public class FriendshipService {
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
+        if(sender==receiver){
+            return new ResponseEntity<>(new Message("자신에게는 친구 요청 할 수 없음", null), HttpStatus.BAD_REQUEST);
+        }
+
         Optional<Friendship> findRequest = friendshipRepository.findAllBySenderAndReceiver(sender, receiver);
         Optional<Friendship> findReverseRequest = friendshipRepository.findAllBySenderAndReceiver(receiver, sender);
 
