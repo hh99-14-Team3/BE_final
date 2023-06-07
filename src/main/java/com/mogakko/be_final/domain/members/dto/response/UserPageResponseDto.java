@@ -14,7 +14,6 @@ public class UserPageResponseDto {
 
     private Time mogakkoTotalTime;
     private Members member;
-    private double memberStatusCode;
 
     public UserPageResponseDto(Members member, Time mogakkoTotalTime) {
         this.member = member;

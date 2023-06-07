@@ -93,8 +93,7 @@ public class MogakkoService {
 
         // 빌드된 모각코방 저장
         mogakkoRoomRepository.save(mogakkoRoom);
-        MogakkoRoom room = mogakkoRoomRepository.findBySessionId(mogakkoRoom.getSessionId()).get();
-        return new ResponseEntity<>(new Message("모각코방 생성 성공", room), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("모각코방 생성 성공", mogakkoRoom), HttpStatus.OK);
     }
 
     // 모각코 방 입장

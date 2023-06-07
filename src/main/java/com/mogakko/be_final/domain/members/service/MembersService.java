@@ -5,6 +5,7 @@ import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
+import com.mogakko.be_final.domain.members.dto.response.LoginResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.UserPageResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
@@ -110,14 +111,14 @@ public class MembersService {
         redisUtil.set(member.getEmail(), refreshToken, Duration.ofDays(7).toMillis());
         httpServletResponse.addHeader(JwtProvider.ACCESS_KEY, tokenDto.getAccessToken());
         String nickname = member.getNickname();
+        String profileImage = member.getProfileImage();
 
         //로그인시 최근 1주일 모각코 순공 시간 동기화
         Long totalTimerWeek = mogakkoService.totalTimer(nickname, "week");
         member.setTime(totalTimerWeek);
         membersRepository.save(member);
 
-        Message message = Message.setSuccess("로그인 성공", member.getNickname());
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        return new ResponseEntity<>(new Message("로그인 성공", new LoginResponseDto(nickname, profileImage)), HttpStatus.OK);
     }
 
     // 로그아웃
@@ -213,10 +214,4 @@ public class MembersService {
         }
         return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMemberList), HttpStatus.OK);
     }
-
-    /**
-     * Method
-     */
-
-
 }
