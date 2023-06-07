@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class DetermineRequestDto {
-    private String requestSenderNickname;//알림 기준으로 sender
+    private String requestSenderNickname; //알림 기준으로 sender
     private boolean determineRequest; // true 친구수락, false 거절
 
 }
