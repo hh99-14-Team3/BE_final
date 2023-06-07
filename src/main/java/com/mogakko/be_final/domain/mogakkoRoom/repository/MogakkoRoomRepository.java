@@ -47,6 +47,6 @@ public interface MogakkoRoomRepository extends JpaRepository<MogakkoRoom, String
     List<MogakkoRoom> findAllBySearchKeywordAndLanguageAndLatAndLon(@Param("searchKeyword") String searchKeyword, @Param("languageEnum") LanguageEnum languageEnum, @Param("lat") double lat, @Param("lon") double lon);
 
     @Query("SELECT NEW com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponseDto(COUNT(m), m.neighborhood) FROM MogakkoRoom m GROUP BY m.neighborhood ORDER BY COUNT(m) DESC")
-    List<NeighborhoodResponseDto> findByTop5ByOrderByNeighborhoodCountDesc();
+    List<NeighborhoodResponseDto> findByTop4ByOrderByNeighborhoodCountDesc();
 
 }
