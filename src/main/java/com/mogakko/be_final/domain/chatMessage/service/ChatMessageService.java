@@ -22,12 +22,14 @@ public class ChatMessageService {
     // 메세지 발송
     public void sendChatMessage(ChatMessage chatMessage) {
         log.info("sendChatMessage 확인");
+        String msg = chatMessage.getNickname() + "님이 입장했습니다.";
         if (ChatMessage.MessageType.ENTER.equals(chatMessage.getType())) {
-            ChatMessage.builder()
+            chatMessage = ChatMessage.builder()
                     .type(ChatMessage.MessageType.ENTER)
                     .sessionId(chatMessage.getSessionId())
                     .nickname(chatMessage.getNickname())
-                    .message(chatMessage.getNickname() + "님이 입장했습니다.");
+                    .message(msg)
+                    .build();
         }
         redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
         String messageData = chatMessage.getType() + "/" + chatMessage.getSessionId() + "/" + chatMessage.getNickname() + "/" + chatMessage.getMessage();
