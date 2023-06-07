@@ -336,7 +336,7 @@ public class MogakkoService {
      */
 
     // 채팅방 생성 시 세션 발급
-    private MogakkoRoomCreateResponseDto createNewToken(Members member) throws OpenViduJavaClientException, OpenViduHttpException {
+    public MogakkoRoomCreateResponseDto createNewToken(Members member) throws OpenViduJavaClientException, OpenViduHttpException {
 
         // 사용자 연결 시 닉네임 전달
         String serverData = member.getNickname();
@@ -408,13 +408,12 @@ public class MogakkoService {
     }
 
     public String changeSecToTime(Long totalTime) {
-        Long hour, min, sec;
+        Long hour, min;
 
-        sec = totalTime % 60;
         min = totalTime / 60 % 60;
         hour = totalTime / 3600;
 
-        String timerBuffer = String.format("%02d:%02d:%02d", hour, min, sec);
+        String timerBuffer = String.format("%02dH%02dM", hour, min);
         return timerBuffer;
     }
 
