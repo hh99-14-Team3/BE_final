@@ -54,6 +54,9 @@ public class Members extends Timestamped {
     @Column
     private MemberStatusCode memberStatusCode; // 상태코드
 
+    @Column
+    private Double codingTem = 36.5;
+
     @JsonIgnore
     @Column
     private Long mogakkoTotalTime = 0L;
@@ -106,5 +109,9 @@ public class Members extends Timestamped {
     }
     public void setTime(Long mogakkoWeekTime){
         this.mogakkoWeekTime = mogakkoWeekTime;
+    }
+
+    public void addCodingTem(Double codingTem){
+        this.codingTem = 36.5 + codingTem;
     }
 }

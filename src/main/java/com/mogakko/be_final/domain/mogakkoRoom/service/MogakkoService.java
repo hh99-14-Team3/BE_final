@@ -319,10 +319,20 @@ public class MogakkoService {
         Long totalTimer = totalTimer(nickname, "total");
         Long totalTimerWeek = totalTimer(nickname, "week");
 
+        if(member.getCodingTem() <= 100){
+            long num = totalTimer / 600;
+            double numCnt =  num * 0.01;
+            member.addCodingTem(numCnt);
+        }
+
         if (totalTimer >= 4140 && totalTimer < 14886) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_DOG);
         if (totalTimer >= 14886 && totalTimer < 36240) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVE);
         if (totalTimer >= 36240 && totalTimer < 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_ANGEL);
-        if (totalTimer >= 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVELOVE);
+        if (totalTimer >= 90840 && totalTimer < 3810000) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVELOVE);
+        if (totalTimer >= 3810000){
+            member.changeMemberStatusCode(MemberStatusCode.EMOTICON);
+            member.addCodingTem(63.5);
+        }
 
         member.setTime(totalTimer, totalTimerWeek);
         membersRepository.save(member);
