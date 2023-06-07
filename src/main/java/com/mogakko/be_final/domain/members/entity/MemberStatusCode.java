@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum MemberStatusCode {
     BASIC("102"), NORMAL("200"), BAD_REQUEST("400"), BAD_GATE_WAY("502"), BAD3("401"), BYE("20000"),
-    SPECIAL_ANGEL("1004"), SPECIAL_DOG("109"), SPECIAL_LOVE("486"), SPECIAL_LOVELOVE("2514");
+    SPECIAL_ANGEL("1004"), SPECIAL_DOG("109"), SPECIAL_LOVE("486"), SPECIAL_LOVELOVE("2514"), EMOTICON("10000");
 
     private final String memberStatusCode;
 
