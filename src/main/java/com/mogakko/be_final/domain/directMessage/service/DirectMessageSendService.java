@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DirectMessageSendService {
-    private MembersRepository membersRepository;
-    private DirectMessageRepository directMessageRepository;
-    private NotificationSendService notificationSendService;
+    private final MembersRepository membersRepository;
+    private final DirectMessageRepository directMessageRepository;
+    private final NotificationSendService notificationSendService;
 
     public ResponseEntity<Message> sendDirectMessage(UserDetailsImpl userDetails, DirectMessageSendRequestDto directMessageSendRequestDto){
         Members messageSender = userDetails.getMember();
