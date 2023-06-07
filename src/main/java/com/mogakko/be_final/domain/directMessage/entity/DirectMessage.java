@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DirectMessage  extends Timestamped {
+public class DirectMessage extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,5 +43,7 @@ public class DirectMessage  extends Timestamped {
         this.isRead = isRead;
     }
 
-    public void markRead(){ this.isRead=true; }
+    public void markRead() {
+        this.isRead = true;
+    }
 }

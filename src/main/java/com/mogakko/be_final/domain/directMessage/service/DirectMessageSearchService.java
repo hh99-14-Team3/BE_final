@@ -6,7 +6,6 @@ import com.mogakko.be_final.domain.directMessage.repository.DirectMessageReposit
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
-import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,9 +22,7 @@ public class DirectMessageSearchService {
     private final DirectMessageRepository directMessageRepository;
 
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> searchReceivedMessage(UserDetailsImpl userDetails){
-        Members member = userDetails.getMember();
-
+    public ResponseEntity<Message> searchReceivedMessage(Members member) {
         List<DirectMessageSearchResponseDto> messageList = new ArrayList<>();
 
         List<DirectMessage> list = directMessageRepository.findAllByReceiver(member);
@@ -36,17 +33,15 @@ public class DirectMessageSearchService {
         }
 
 
-        if(messageList.isEmpty()){
+        if (messageList.isEmpty()) {
             return new ResponseEntity<>(new Message("도착한 쪽지가 없습니다.", null), HttpStatus.NOT_FOUND);
-        }else {
+        } else {
             return new ResponseEntity<>(new Message("쪽지 목록 조회 완료", messageList), HttpStatus.OK);
         }
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> searchSentMessage(UserDetailsImpl userDetails){
-        Members member = userDetails.getMember();
-
+    public ResponseEntity<Message> searchSentMessage(Members member) {
         List<DirectMessageSearchResponseDto> messageList = new ArrayList<>();
 
         List<DirectMessage> list = directMessageRepository.findAllBySender(member);
@@ -56,22 +51,22 @@ public class DirectMessageSearchService {
             messageList.add(message);
         }
 
-        if(messageList.isEmpty()){
+        if (messageList.isEmpty()) {
             return new ResponseEntity<>(new Message("보낸 쪽지가 없습니다.", null), HttpStatus.OK);
-        }else {
+        } else {
             return new ResponseEntity<>(new Message("쪽지 목록 조회 완료", messageList), HttpStatus.OK);
         }
     }
+
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> readDirectMessage(UserDetailsImpl userDetails, Long messageId){
-        Members member = userDetails.getMember();
+    public ResponseEntity<Message> readDirectMessage(Members member, Long messageId) {
         DirectMessage findMessage = directMessageRepository.findById(messageId).orElseThrow(
                 () -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND)
         );
-        if(member==findMessage.getReceiver()){
+        if (member == findMessage.getReceiver()) {
             findMessage.markRead();
-            return new ResponseEntity<>(new Message("쪽지 목록 조회 완료", findMessage), HttpStatus.OK);
-        }else{
+            return new ResponseEntity<>(new Message("쪽지 조회 완료", findMessage), HttpStatus.OK);
+        } else {
             throw new CustomException(ErrorCode.INTERNAL_SERER_ERROR);
         }
     }
