@@ -20,31 +20,20 @@ public class NotificationResponseDto {
     private String receiverNickname;
     private NotificationType notificationType;
     private String createdAt;
+    private boolean readStatus;
 
-
-    public NotificationResponseDto(Notification notification, String eventId) {
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = time.format(formatter);
-        this.receiverId = notification.getReceiverId();
-        this.content = notification.getContent();
-        this.url = notification.getUrl();
-        this.receiverNickname = notification.getReceiverNickname();
-        this.notificationType = notification.getType();
-        this.eventId = eventId;
-        this.createdAt = formattedNow;
-    }
+    LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    String formattedNow = time.format(formatter);
 
     public NotificationResponseDto(Notification notification) {
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = time.format(formatter);
         this.receiverId = notification.getReceiverId();
         this.content = notification.getContent();
         this.url = notification.getUrl();
         this.receiverNickname = notification.getReceiverNickname();
         this.notificationType = notification.getType();
         this.createdAt = formattedNow;
+        this.readStatus = notification.isReadStatus();
     }
 
 }

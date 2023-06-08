@@ -51,16 +51,16 @@ public class NotificationService {
         }
 
 
-        if (!lastEventId.isEmpty()) {
-            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
-            events.entrySet().stream()
-                    .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-                    .forEach(entry ->{
-                        NotificationResponseDto responseDto = new NotificationResponseDto((Notification)entry.getValue(), entry.getKey());
-                        sendToClient(emitter, entry.getKey(), responseDto);
-                            });
-
-        }
+//        if (!lastEventId.isEmpty()) {
+//            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
+//            events.entrySet().stream()
+//                    .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
+//                    .forEach(entry ->{
+//                        NotificationResponseDto responseDto = new NotificationResponseDto((Notification)entry.getValue(), entry.getKey());
+//                        sendToClient(emitter, entry.getKey(), responseDto);
+//                            });
+//
+//        }
 
         return emitter;
     }
@@ -77,7 +77,7 @@ public class NotificationService {
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithByMemberId(memberId);
         sseEmitters.forEach(
                 (key, emitter) -> {
-                    sendToClient(emitter, key, new NotificationResponseDto(notification, key) );
+                    sendToClient(emitter, key, new NotificationResponseDto(notification) );
                 }
         );
     }
