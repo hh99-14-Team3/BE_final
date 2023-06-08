@@ -4,6 +4,7 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.SocialType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     Optional<Members> findByNickname(String nickname);
 
-    Optional<Object> findByGithubId(String githubId);
+    Optional<String> findByGithubId(String githubId);
 
 //    @Query("SELECT m FROM Members m ORDER BY m.mogakkoWeekTime DESC")
     List<Members> findTop8ByOrderByMogakkoWeekTimeDesc();

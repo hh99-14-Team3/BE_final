@@ -65,7 +65,7 @@ public class MembersController {
 
     @PostMapping("/github")
     @Operation(summary = "GitHub id 등록 API", description = "마이페이지에서 깃허브 아이디를 등록하는 메서드입니다.")
-    public ResponseEntity<Message> addGithub(GithubIdRequestDto githubIdRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<Message> addGithub(@RequestBody GithubIdRequestDto githubIdRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.addGithub(githubIdRequestDto, userDetails.getMember());
     }
 
