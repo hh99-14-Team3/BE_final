@@ -14,7 +14,11 @@ public class DirectMessageSearchResponseDto {
     private Boolean isRead;
     private String senderNickname;
     private String receiverNickname;
-    private LocalDateTime createdAt;
+    private String createdAt;
+
+    LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    String formattedNow = time.format(formatter);
 
     public DirectMessageSearchResponseDto(DirectMessage directMessage) {
         this.id = directMessage.getId();
@@ -22,6 +26,6 @@ public class DirectMessageSearchResponseDto {
         this.isRead = directMessage.isRead();
         this.senderNickname = directMessage.getSender().getNickname();
         this.receiverNickname = directMessage.getReceiver().getNickname();
-        this.createdAt = directMessage.getCreatedAt();
+        this.createdAt = formattedNow;
     }
 }
