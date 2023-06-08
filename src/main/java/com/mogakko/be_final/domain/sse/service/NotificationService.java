@@ -1,33 +1,25 @@
 package com.mogakko.be_final.domain.sse.service;
 
-import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.datastax.oss.driver.api.querybuilder.select.SelectFrom;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.sse.dto.NotificationResponseDto;
 import com.mogakko.be_final.domain.sse.entity.Notification;
-import com.mogakko.be_final.domain.sse.entity.NotificationKey;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepository;
-import com.mogakko.be_final.domain.sse.repository.EmitterRepositoryImpl;
 import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.sql.Select;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,12 +28,12 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
     private final MembersRepository membersRepository;
-    private final KeyComposite keyComposite;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
 
     public SseEmitter subscribe(Long memberId, String lastEventId) {
         String emitterId = memberId + "_" + System.currentTimeMillis();
+        System.out.println(emitterId);
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
         emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
@@ -52,19 +44,23 @@ public class NotificationService {
         Members eventReceiver = membersRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-//        List<Notification> missedNotifications = notificationRepository.findByKeyReceiverId(eventReceiver.getId());
-//        for (Notification missedNotification : missedNotifications) {
-//            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification));
-//            markAsRead(missedNotification.getKey());
-//        }
-
-
-        if (!lastEventId.isEmpty()) {
-            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
-            events.entrySet().stream()
-                    .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-                    .forEach(entry -> sendToClient(emitter, entry.getKey(), entry.getValue()));
+        List<Notification> missedNotifications = findUnreadNotificationList(eventReceiver.getId());
+        for (Notification missedNotification : missedNotifications) {
+            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification));
+            markAsRead(missedNotification);
         }
+
+
+//        if (!lastEventId.isEmpty()) {
+//            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
+//            events.entrySet().stream()
+//                    .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
+//                    .forEach(entry ->{
+//                        NotificationResponseDto responseDto = new NotificationResponseDto((Notification)entry.getValue(), entry.getKey());
+//                        sendToClient(emitter, entry.getKey(), responseDto);
+//                            });
+//
+//        }
 
         return emitter;
     }
@@ -75,23 +71,28 @@ public class NotificationService {
         notificationRepository.save(notification);
         String memberId = String.valueOf(receiver.getId());
 
+
+        emitterRepository.saveEventCache(memberId, notification);
+
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithByMemberId(memberId);
         sseEmitters.forEach(
                 (key, emitter) -> {
-                    emitterRepository.saveEventCache(key, notification);
-                    sendToClient(emitter, key, new NotificationResponseDto(notification));
+                    sendToClient(emitter, key, new NotificationResponseDto(notification) );
                 }
         );
     }
 
     private Notification createNotification(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
-        NotificationKey primaryKey = new NotificationKey(receiver.getId(), Instant.now(), notificationType);
+//        NotificationKey primaryKey = new NotificationKey(receiver.getId(), false, Instant.now());
         return Notification.builder()
-                .key(primaryKey)
+                .receiverId(receiver.getId())
+                .readStatus(false)
+                .createdAt(Instant.now())
                 .senderNickname(sender.getNickname())
                 .receiverNickname(receiver.getNickname())
                 .content(content)
                 .url(url)
+                .type(notificationType)
                 .build();
     }
 
@@ -107,14 +108,12 @@ public class NotificationService {
         }
     }
 
-//    @Transactional
-//    public void markAsRead(NotificationKey key) {
-//        Notification notification = notificationRepository.findByKey(key)
-//                .orElseThrow(() -> new IllegalArgumentException("Invalid receiver ID: " + key.getReceiverId()));
-//        NotificationKey newKey = new NotificationKey(key.getReceiverId(),key.getCreatedAt(), notification.getKey().getNotificationType());
-//        Notification newNotification = new Notification(newKey, notification.getSenderNickname(), notification.getReceiverNickname(),notification.getContent(), notification.getUrl());
-//        notificationRepository.save(newNotification);
-//    }
+
+    public void markAsRead(Notification notification) {
+        notificationRepository.delete(notification);
+        notification.changeReadStatus();
+        notificationRepository.save(notification);
+    }
 
 
     @Scheduled(fixedDelay = 30000)  // every 30 seconds
@@ -132,6 +131,11 @@ public class NotificationService {
                     }
                 }
         );
+    }
+
+    public List<Notification> findUnreadNotificationList(Long memberId){
+        return notificationRepository.findAllByReceiverIdAndReadStatusAndCreatedAtLessThan(
+                memberId, false, Instant.now(Clock.system(ZoneId.of("Asia/Seoul"))));
     }
 
 }
