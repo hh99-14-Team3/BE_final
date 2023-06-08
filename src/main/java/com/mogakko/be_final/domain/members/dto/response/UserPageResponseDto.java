@@ -12,11 +12,13 @@ import java.util.List;
 @NoArgsConstructor
 public class UserPageResponseDto {
 
-    private Time mogakkoTotalTime;
     private Members member;
+    private String totalTimer;
+    private String totalTimerWeek;
 
-    public UserPageResponseDto(Members member, Time mogakkoTotalTime) {
+    public UserPageResponseDto(Members member, String totalTimer, String totalTimerWeek) {
         this.member = member;
-        this.mogakkoTotalTime = mogakkoTotalTime;
+        this.totalTimer = totalTimer;
+        this.totalTimerWeek = totalTimerWeek;
     }
 }

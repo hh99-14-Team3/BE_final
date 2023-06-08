@@ -6,13 +6,11 @@ import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.LoginResponseDto;
-import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.UserPageResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
@@ -139,15 +137,13 @@ public class MembersService {
     // 마이페이지 조회 - 내가 참여중인 모각코 방, 총 참여 시간, 매너 ON:도 등 개인 정보
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
-        List<MogakkoRoomMembers> mogakkoRoomList = mogakkoRoomMembersRepository.findAllByMemberIdAndMogakkoRoomIsDeletedFalse(member.getId());
         String nickname = member.getNickname();
         Long totalTimerSec = mogakkoService.totalTimer(nickname, "total");
         Long totalTimerWeekSec = mogakkoService.totalTimer(nickname, "week");
         String totalTimer = mogakkoService.changeSecToTime(totalTimerSec);
         String totalTimerWeek = mogakkoService.changeSecToTime(totalTimerWeekSec);
-
-        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(mogakkoRoomList, member, totalTimer, totalTimerWeek);
-        return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
+        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(member, totalTimer, totalTimerWeek);
+        return new ResponseEntity<>(new Message("마이페이지 조회 성공", userPageResponseDto), HttpStatus.OK);
     }
 
     // 마이페이지 - 프로필 사진, 닉네임 수정
@@ -183,8 +179,12 @@ public class MembersService {
         Members member = membersRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-        Time mogakkoTotalTime = mogakkoRoomTimeRepository.findMogakkoRoomTimeByEmail(member.getEmail());
-        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(member, mogakkoTotalTime);
+        String nickname = member.getNickname();
+        Long totalTimerSec = mogakkoService.totalTimer(nickname, "total");
+        Long totalTimerWeekSec = mogakkoService.totalTimer(nickname, "week");
+        String totalTimer = mogakkoService.changeSecToTime(totalTimerSec);
+        String totalTimerWeek = mogakkoService.changeSecToTime(totalTimerWeekSec);
+        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(member, totalTimer, totalTimerWeek);
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPageResponseDto), HttpStatus.OK);
     }
 
