@@ -20,6 +20,7 @@ import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -261,45 +262,15 @@ public class MogakkoService {
         if (mogakkoList.size() == 0) {
             return new ResponseEntity<>(new Message("근처에 모각코가 없습니다.", null), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new Message("조회 완료", mogakkoList), HttpStatus.OK);
-    }
-
-    // TODO : 프론트단에서 체크 후 필요여부 파악하기
-    // 모각코에 있는 유저 정보 조회
-    @Transactional(readOnly = true)
-    public ResponseEntity<Message> getMogakkoMembersData(String sessionId, Members members) {
-        // 모각코 유무 확인
-        MogakkoRoom mogakkoRoom = mogakkoRoomRepository.findBySessionId(sessionId).orElseThrow(
-                () -> new CustomException(MOGAKKO_NOT_FOUND));
-        // 유저가 모각코에 있는지 확인
-        mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(members.getId(), mogakkoRoom, true).orElseThrow(
-                () -> new CustomException(NOT_MOGAKKO_MEMBER)
-        );
-
-        boolean mogakkoRoomMaster = false;
-        boolean mogakkoRoomNowMembers = false;
-
-        // 모각코 유저들 Entity
-        List<MogakkoRoomMembers> mogakkoRoomMembersList = mogakkoRoomMembersRepository.findAllByMogakkoRoomAndIsEntered(mogakkoRoom, false);
-
-        // 모각코 유저들 Dto
-        List<MogakkoRoomEnterMemberResponseDto> mogakkoRoomMemberListResponseDto = new ArrayList<>();
-
-        // 모각코 유저들 Entity -> DTO
-        // 방장 정보 및 현재 접속한 유저 설정
-        for (MogakkoRoomMembers mogakkoRoomMember : mogakkoRoomMembersList) {
-            // 모각코 방장 체크
-            if (members != null && mogakkoRoom.getMasterMemberId().equals(mogakkoRoomMember.getMemberId())) {
-                mogakkoRoomMaster = true;
-            }
-            // 모각코에 있는 멤버 체크
-            if (members != null && mogakkoRoomMember.getMemberId().equals((members.getId()))) {
-                mogakkoRoomNowMembers = true;
-            }
-            mogakkoRoomMemberListResponseDto.add(new MogakkoRoomEnterMemberResponseDto(mogakkoRoomMember, mogakkoRoomMaster, mogakkoRoomNowMembers));
+        // 모각코 방 생성으로부터 경과시간 나타내기 위한 코드
+        List<MogakkoRoomReadResponseDto> responseDtoList = new ArrayList<>();
+        for (MogakkoRoom mr : mogakkoList) {
+            long afterSeconds = ChronoUnit.SECONDS.between(mr.getCreatedAt(), LocalDateTime.now());
+            String time = changeSecToTime(afterSeconds);
+            MogakkoRoomReadResponseDto responseDto = new MogakkoRoomReadResponseDto(mr, time);
+            responseDtoList.add(responseDto);
         }
-        MogakkoRoomEnterMembersResponseDto chatRoomResponseDto = new MogakkoRoomEnterMembersResponseDto(mogakkoRoom, mogakkoRoomMemberListResponseDto);
-        return new ResponseEntity<>(new Message("유저 정보 조회 성공", chatRoomResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("조회 완료", responseDtoList), HttpStatus.OK);
     }
 
     // 인기 지역 모각코 조회
