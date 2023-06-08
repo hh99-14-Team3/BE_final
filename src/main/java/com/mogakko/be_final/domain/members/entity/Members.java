@@ -35,7 +35,7 @@ public class Members extends Timestamped {
     @Column(nullable = false)
     private Role role;
 
-    @Column
+    @Column(unique = true)
     private String githubId;
 
     @Enumerated(EnumType.STRING)

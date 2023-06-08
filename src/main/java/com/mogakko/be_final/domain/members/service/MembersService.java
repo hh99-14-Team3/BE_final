@@ -194,9 +194,12 @@ public class MembersService {
         String githubId = githubIdRequestDto.getGithubId();
         if (membersRepository.findByGithubId(githubId).isPresent()) {
             log.info("중복된 깃허브 아이디 입니다.");
-            throw new CustomException(DUPLICATE_IDENTIFIER);
+            throw new CustomException(DUPLICATE_GITHUB_ID);
         }
         member.setGithubId(githubId);
+
+        // TODO : OSIV 설정으로 필요한 코드임 (리팩토링 후 삭제 예정)
+        membersRepository.save(member);
         return new ResponseEntity<>(new Message("깃허브 아이디 등록 성공", githubId), HttpStatus.OK);
     }
 
