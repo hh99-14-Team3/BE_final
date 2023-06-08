@@ -64,13 +64,6 @@ public class MogakkoController {
     }
 
 
-    @GetMapping("/mogakko/{sessionId}/members")
-    @Operation(summary = "모각코 유저 조회 API", description = "모각코에 있는 유저의 정보를 조회하는 메서드입니다.")
-    public ResponseEntity<Message> getMogakkoMembersData(@PathVariable(name = "sessionId") String sessionId,
-                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return mogakkoService.getMogakkoMembersData(sessionId, userDetails.getMember());
-    }
-
     @PutMapping("/mogakko/timer")
     @Operation(summary = "모각코 타이머 API", description = "모각코 시간을 측정하는 메서드입니다.")
     public ResponseEntity<Message> mogakkoTimer(@RequestBody MogakkoTimerRequestDto mogakkoTimerRequestDto,
