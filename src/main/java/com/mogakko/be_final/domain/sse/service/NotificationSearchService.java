@@ -23,7 +23,7 @@ public class NotificationSearchService {
     public ResponseEntity<Message> getMyNotification(UserDetailsImpl userDetails){
         Members receiver = userDetails.getMember();
 
-        List<Notification> notificationList = notificationRepository.findAllByKeyReceiverId(receiver.getId());
+        List<Notification> notificationList = notificationRepository.findAllByReceiverId(receiver.getId());
         List<NotificationResponseDto> receivedNotificationList = new ArrayList<>();
         for (Notification notification : notificationList) {
             NotificationResponseDto receivedNotification = new NotificationResponseDto(notification);

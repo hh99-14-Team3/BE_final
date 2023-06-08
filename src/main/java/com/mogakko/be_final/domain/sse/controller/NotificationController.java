@@ -25,7 +25,7 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService notificationService;
-    private final NotificationRepository notificationRepository;
+    private final EmitterRepositoryImpl emitterRepository;
     private final NotificationSearchService notificationSearchService;
 
     @Operation(summary = "SSE 구독 API", description = "SSE 구독하는 메서드입니다. 해당 주소로 get 요청시 연결됩니다.")

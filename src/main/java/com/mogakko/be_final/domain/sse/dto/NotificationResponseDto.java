@@ -26,11 +26,11 @@ public class NotificationResponseDto {
         LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedNow = time.format(formatter);
-        this.receiverId = notification.getKey().getReceiverId();
+        this.receiverId = notification.getReceiverId();
         this.content = notification.getContent();
         this.url = notification.getUrl();
         this.receiverNickname = notification.getReceiverNickname();
-        this.notificationType = notification.getKey().getNotificationType();
+        this.notificationType = notification.getType();
         this.eventId = eventId;
         this.createdAt = formattedNow;
     }
@@ -39,11 +39,11 @@ public class NotificationResponseDto {
         LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedNow = time.format(formatter);
-        this.receiverId = notification.getKey().getReceiverId();
+        this.receiverId = notification.getReceiverId();
         this.content = notification.getContent();
         this.url = notification.getUrl();
         this.receiverNickname = notification.getReceiverNickname();
-        this.notificationType = notification.getKey().getNotificationType();
+        this.notificationType = notification.getType();
         this.createdAt = formattedNow;
     }
 

@@ -20,10 +20,6 @@ public class EmitterRepositoryImpl implements EmitterRepository {
     public SseEmitter save(String emitterId, SseEmitter sseEmitter) {
         emitters.put(emitterId, sseEmitter);
 
-        // Handle client disconnects.
-        sseEmitter.onTimeout(() -> emitters.remove(emitterId));
-        sseEmitter.onCompletion(() -> emitters.remove(emitterId));
-
         return sseEmitter;
     }
 
