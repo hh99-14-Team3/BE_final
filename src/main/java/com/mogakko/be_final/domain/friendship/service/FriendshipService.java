@@ -113,8 +113,8 @@ public class FriendshipService {
          * 여기 로직은 db를 두번씩 터치하는게 안좋게 느껴져서 똑같이 돌아가게 리펙토링만 해놓았습니다.
          */
         for (Members requestReceiver : deleteMemberList){
-            Optional<Friendship> friendship = friendshipRepository.findBySenderOrReceiver(member, requestReceiver).or(
-                    () -> friendshipRepository.findBySenderOrReceiver(requestReceiver, member)
+            Optional<Friendship> friendship = friendshipRepository.findBySenderAndReceiver(member, requestReceiver).or(
+                    () -> friendshipRepository.findBySenderAndReceiver(requestReceiver, member)
             );
             if (friendship.isPresent()) {
                 Friendship findFriendship = friendship.get();
