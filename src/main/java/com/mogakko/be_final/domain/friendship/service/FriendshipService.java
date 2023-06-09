@@ -126,6 +126,6 @@ public class FriendshipService {
     }
 
     private Friendship findPendingFriendship(Members sender, Members receiver) {
-        return friendshipRepository.findBySenderAndReceiverAndStatus(sender, receiver, FriendshipStatus.PENDING);
+        return friendshipRepository.findBySenderAndReceiverAndStatus(sender, receiver, FriendshipStatus.PENDING).get();
     }
 }

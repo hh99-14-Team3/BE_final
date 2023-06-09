@@ -15,10 +15,17 @@ public class UserPageResponseDto {
     private Members member;
     private String totalTimer;
     private String totalTimerWeek;
+    private Boolean isFriend;
 
     public UserPageResponseDto(Members member, String totalTimer, String totalTimerWeek) {
         this.member = member;
         this.totalTimer = totalTimer;
         this.totalTimerWeek = totalTimerWeek;
+    }
+    public UserPageResponseDto(Members member, String totalTimer, String totalTimerWeek, boolean isFriend) {
+        this.member = member;
+        this.totalTimer = totalTimer;
+        this.totalTimerWeek = totalTimerWeek;
+        this.isFriend = isFriend;
     }
 }
