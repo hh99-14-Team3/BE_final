@@ -85,8 +85,8 @@ public class MembersController {
 
     @Operation(summary = "다른 유저 프로필 조회 API", description = "다른 유저의 프로필을 조회하는 메서드입니다.")
     @GetMapping("/{memberId}")
-    public ResponseEntity<Message> getMemberProfile(@PathVariable Long memberId) {
-        return membersService.getMemberProfile(memberId);
+    public ResponseEntity<Message> getMemberProfile(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long memberId) {
+        return membersService.getMemberProfile(userDetails.getMember(), memberId);
     }
 
     @Operation(summary = "최고의 유저 조회 API", description = "순공 시간이 가장 높은 모각코인을 조회하는 메서드입니다.")
