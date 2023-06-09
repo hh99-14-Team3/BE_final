@@ -45,8 +45,12 @@ public class NotificationService {
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         List<Notification> missedNotifications = findUnreadNotificationList(eventReceiver.getId());
+
         for (Notification missedNotification : missedNotifications) {
-            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification));
+            String senderNickname = missedNotification.getSenderNickname();
+            Members sender = membersRepository.findByNickname(senderNickname).orElseThrow( () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            String senderProfileUrl = sender.getProfileImage();
+                    sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification, senderProfileUrl));
             markAsRead(missedNotification);
         }
 
@@ -77,7 +81,7 @@ public class NotificationService {
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithByMemberId(memberId);
         sseEmitters.forEach(
                 (key, emitter) -> {
-                    sendToClient(emitter, key, new NotificationResponseDto(notification) );
+                    sendToClient(emitter, key, new NotificationResponseDto(notification, sender.getProfileImage()) );
                 }
         );
     }
@@ -110,7 +114,6 @@ public class NotificationService {
 
 
     public void markAsRead(Notification notification) {
-        notificationRepository.delete(notification);
         notification.changeReadStatus();
         notificationRepository.save(notification);
     }

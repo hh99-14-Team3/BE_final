@@ -33,7 +33,7 @@ public class NotificationSendService {
 
     public void sendMessageReceivedNotification(Members sender, Members receiver) {
         String content = sender.getNickname() + "님으로부터 쪽지가 도착했습니다.";
-        String url = "https://api.abc123poi.com/direckMessage/received";
+        String url = "https://api.abc123poi.com/directMessage/received";
 
         notificationService.send(sender, receiver, NotificationType.MESSAGE, content, url);
     }
