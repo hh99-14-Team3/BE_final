@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
@@ -98,21 +100,31 @@ public class FriendshipService {
 
     // 친구 삭제
     public ResponseEntity<Message> deleteFriend(DeleteFriendRequestDto deleteFriendRequestDto, Members member) {
-        Members requestReceiver = findMember(deleteFriendRequestDto.getReceiverNickname());
+        List<String> receiverNicknameList = deleteFriendRequestDto.getReceiverNickname();
+        List<Members> deleteMemberList = new ArrayList<>();
+        for (String receiverNickname : receiverNicknameList) {
+            Members deleteMember = membersRepository.findByNickname(receiverNickname).orElseThrow(
+                    () -> new CustomException(USER_NOT_FOUND)
+            );
+            deleteMemberList.add(deleteMember);
+        }
 
         /**
          * 여기 로직은 db를 두번씩 터치하는게 안좋게 느껴져서 똑같이 돌아가게 리펙토링만 해놓았습니다.
          */
-        Optional<Friendship> friendship = friendshipRepository.findBySenderOrReceiver(member, requestReceiver).or(
-                () -> friendshipRepository.findBySenderOrReceiver(requestReceiver, member)
-        );
-        if (friendship.isPresent()) {
-            Friendship findFriendship = friendship.get();
-            friendshipRepository.delete(findFriendship);
-        } else {
-            return new ResponseEntity<>(new Message("삭제 대상이 존재하지 않습니다.", null), HttpStatus.NOT_FOUND);
+        for (Members requestReceiver : deleteMemberList){
+            Optional<Friendship> friendship = friendshipRepository.findBySenderOrReceiver(member, requestReceiver).or(
+                    () -> friendshipRepository.findBySenderOrReceiver(requestReceiver, member)
+            );
+            if (friendship.isPresent()) {
+                Friendship findFriendship = friendship.get();
+                friendshipRepository.delete(findFriendship);
+            } else {
+                return new ResponseEntity<>(new Message("삭제 대상이 존재하지 않습니다.", null), HttpStatus.NOT_FOUND);
+            }
         }
-        return new ResponseEntity<>(new Message("친구 삭제가 완료 되었습니다.", "삭제된 사용자 : " + requestReceiver.getNickname()), HttpStatus.OK);
+
+        return new ResponseEntity<>(new Message("친구 삭제가 완료 되었습니다.", "삭제된 사용자 : " + receiverNicknameList), HttpStatus.OK);
     }
 
     /**
