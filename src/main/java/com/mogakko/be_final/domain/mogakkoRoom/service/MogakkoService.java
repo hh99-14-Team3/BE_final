@@ -8,7 +8,9 @@ import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoTimerRequestDto;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.response.*;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomCreateResponseDto;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomReadResponseDto;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponseDto;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.*;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
@@ -19,8 +21,6 @@ import com.mogakko.be_final.util.Message;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -278,14 +275,15 @@ public class MogakkoService {
         if (mogakkoRoomList.size() > 4) {
             mogakkoRoomList = mogakkoRoomList.subList(0, 4);
         }
-        return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공",  mogakkoRoomList), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 
     // 타이머
     @Transactional
     public ResponseEntity<Message> mogakkoTimer(MogakkoTimerRequestDto mogakkoTimerRequestDto, Members member) {
         Time mogakkoTimer;
-        if(Long.parseLong(mogakkoTimerRequestDto.getMogakkoTimer().substring(0,2)) > 23) mogakkoTimer = new Time(20, 0, 0);
+        if (Long.parseLong(mogakkoTimerRequestDto.getMogakkoTimer().substring(0, 2)) > 23)
+            mogakkoTimer = new Time(20, 0, 0);
         else mogakkoTimer = Time.valueOf(mogakkoTimerRequestDto.getMogakkoTimer());
         String nickname = member.getNickname();
         MogakkoTimer mogakkoTime = new MogakkoTimer(mogakkoTimer, nickname);
@@ -293,9 +291,9 @@ public class MogakkoService {
         Long totalTimer = totalTimer(nickname, "total");
         Long totalTimerWeek = totalTimer(nickname, "week");
 
-        if(member.getCodingTem() <= 100){
+        if (member.getCodingTem() <= 100) {
             long num = totalTimer / 600;
-            double numCnt =  num * 0.01;
+            double numCnt = num * 0.01;
             member.addCodingTem(numCnt);
         }
 
@@ -365,7 +363,6 @@ public class MogakkoService {
 
 
         // 해당 채팅방에 프로퍼티스를 설정하면서 커넥션을 만들고, 방에 접속할 수 있는 토큰을 발급한다
-        System.out.println(session.createConnection(connectionProperties).getToken());
         return session.createConnection(connectionProperties).getToken();
     }
 
@@ -376,7 +373,7 @@ public class MogakkoService {
         if (type.equals("total")) {
             List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
             totalTimer = totalTimeTypeLong(totalTime, mogakkoTotalTimer);
-        } else if (type.equals("week")){
+        } else if (type.equals("week")) {
             List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname, LocalDateTime.now().minusDays(7));
             totalTimer = totalTimeTypeLong(totalTime, mogakkoTotalTimerWeek);
         } else {
