@@ -1,6 +1,8 @@
 package com.mogakko.be_final.domain.members.service;
 
 import com.mogakko.be_final.S3.S3Uploader;
+import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
+import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
@@ -44,17 +46,14 @@ import static com.mogakko.be_final.exception.ErrorCode.*;
 @Service
 @RequiredArgsConstructor
 public class MembersService {
-
-    private final MembersRepository membersRepository;
-    private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final RedisUtil redisUtil;
-    private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
     private final S3Uploader s3Uploader;
+    private final PasswordEncoder passwordEncoder;
+    private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
+    private final FriendshipRepository friendshipRepository;
+    private final MembersRepository membersRepository;
     private final MogakkoService mogakkoService;
-    private final MogakkoTimerRepository mogakkoTimerRepository;
-
 
     // 회원가입
     @Transactional
@@ -175,16 +174,19 @@ public class MembersService {
 
     // 다른 유저 프로필 조회
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> getMemberProfile(Long memberId) {
-        Members member = membersRepository.findById(memberId).orElseThrow(
+    public ResponseEntity<Message> getMemberProfile(Members member, Long memberId) {
+        Members findmember = membersRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-        String nickname = member.getNickname();
+        String nickname = findmember.getNickname();
         Long totalTimerSec = mogakkoService.totalTimer(nickname, "total");
         Long totalTimerWeekSec = mogakkoService.totalTimer(nickname, "week");
         String totalTimer = mogakkoService.changeSecToTime(totalTimerSec);
         String totalTimerWeek = mogakkoService.changeSecToTime(totalTimerWeekSec);
-        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(member, totalTimer, totalTimerWeek);
+        boolean isFriend = false;
+        if(friendshipRepository.findBySenderAndReceiverAndStatus(findmember, member, FriendshipStatus.ACCEPT).isPresent()) isFriend = !isFriend;
+        else if(friendshipRepository.findBySenderAndReceiverAndStatus(member, findmember, FriendshipStatus.ACCEPT).isPresent()) isFriend = !isFriend;
+        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(findmember, totalTimer, totalTimerWeek, isFriend);
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPageResponseDto), HttpStatus.OK);
     }
 
