@@ -284,7 +284,9 @@ public class MogakkoService {
     // 타이머
     @Transactional
     public ResponseEntity<Message> mogakkoTimer(MogakkoTimerRequestDto mogakkoTimerRequestDto, Members member) {
-        Time mogakkoTimer = Time.valueOf((mogakkoTimerRequestDto.getMogakkoTimer()));
+        Time mogakkoTimer;
+        if(Long.parseLong(mogakkoTimerRequestDto.getMogakkoTimer().substring(0,2)) > 23) mogakkoTimer = new Time(20, 0, 0);
+        else mogakkoTimer = Time.valueOf(mogakkoTimerRequestDto.getMogakkoTimer());
         String nickname = member.getNickname();
         MogakkoTimer mogakkoTime = new MogakkoTimer(mogakkoTimer, nickname);
         mogakkoTimerRepository.save(mogakkoTime);
