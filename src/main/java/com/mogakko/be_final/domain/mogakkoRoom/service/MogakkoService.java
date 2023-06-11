@@ -29,8 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -167,10 +169,6 @@ public class MogakkoService {
         }
         // 모각코 방 정보 저장
         mogakkoRoomRepository.save(mogakkoRoom);
-//        String isMaster = null;
-//        if (mogakkoRoom.getMasterMemberId().equals(member.getId())) {
-//            isMaster = member.getNickname() + "님은 방장입니다.";
-//        }
         String token = mogakkoRoomMembers.getEnterRoomToken();
         log.info("===== {} 님 입장 완료", member.getNickname());
         return new ResponseEntity<>(new Message("모각코방 입장 성공", token), HttpStatus.OK);
@@ -376,9 +374,12 @@ public class MogakkoService {
         if (type.equals("total")) {
             List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
             totalTimer = totalTimeTypeLong(totalTime, mogakkoTotalTimer);
-        } else {
+        } else if (type.equals("week")){
             List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname, LocalDateTime.now().minusDays(7));
             totalTimer = totalTimeTypeLong(totalTime, mogakkoTotalTimerWeek);
+        } else {
+            //nickname이나 type이 지정값이 아닌 경우 0을 리턴
+            return 0L;
         }
         return totalTimer;
     }
