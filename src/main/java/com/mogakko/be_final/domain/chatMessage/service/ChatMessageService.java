@@ -32,6 +32,7 @@ public class ChatMessageService {
                     .build();
         }
         redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
+        //TODO : 이거 꼭 저장해야 할까요? 저장하면 쓸 일이 있을까 해서 적어놓긴 했는데 딱히 쓸만한 곳이 없네요 쩝..
         String messageData = chatMessage.getType() + "/" + chatMessage.getSessionId() + "/" + chatMessage.getNickname() + "/" + chatMessage.getMessage();
         redisUtil.set(UUID.randomUUID().toString(), messageData, 60 * 24 * 1000 * 10);
     }
