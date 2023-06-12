@@ -64,13 +64,18 @@ public class Members extends Timestamped {
     @Column
     private Long mogakkoWeekTime = 0L;
 
+    @Column
+    private Integer friendCode;
 
-    public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode) {
+
+
+    public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode, Integer friendCode) {
         this.email = email;
         this.nickname = nickname;
         this.password = password;
         this.role = role;
         this.memberStatusCode = memberStatusCode;
+        this.friendCode = friendCode;
     }
 
     public void changePassword(String password) {

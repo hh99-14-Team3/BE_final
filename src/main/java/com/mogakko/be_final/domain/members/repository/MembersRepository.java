@@ -21,5 +21,9 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 //    @Query("SELECT m FROM Members m ORDER BY m.mogakkoWeekTime DESC")
     List<Members> findTop8ByOrderByMogakkoWeekTimeDesc();
 
+    Optional<Members> findByFriendCode(Integer friendCode);
+
+    Boolean existsByFriendCode(Integer friendCode);
+
 }
 

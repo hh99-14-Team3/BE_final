@@ -23,11 +23,12 @@ public class NotificationResponseDto {
     private boolean readStatus;
     private String senderProfileUrl;
 
-    LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    String formattedNow = time.format(formatter);
+
 
     public NotificationResponseDto(Notification notification, String senderProfileUrl) {
+        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = time.format(formatter);
         this.receiverId = notification.getReceiverId();
         this.content = notification.getContent();
         this.url = notification.getUrl();
@@ -40,6 +41,9 @@ public class NotificationResponseDto {
     }
 
     public NotificationResponseDto(Notification notification) {
+        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = time.format(formatter);
         this.receiverId = notification.getReceiverId();
         this.content = notification.getContent();
         this.url = notification.getUrl();

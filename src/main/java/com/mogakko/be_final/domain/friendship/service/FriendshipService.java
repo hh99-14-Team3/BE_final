@@ -31,8 +31,7 @@ public class FriendshipService {
     private final NotificationSendService notificationSendService;
 
     // 친구 요청
-    public ResponseEntity<Message> friendRequest(FriendRequestDto friendRequestDto, Members member) {
-        String receiverNickname = friendRequestDto.getRequestReceiverNickname();
+    public ResponseEntity<Message> friendRequest(String receiverNickname, Members member) {
 
         Members receiver = membersRepository.findByNickname(receiverNickname).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
@@ -126,6 +125,14 @@ public class FriendshipService {
 
         return new ResponseEntity<>(new Message("친구 삭제가 완료 되었습니다.", "삭제된 사용자 : " + receiverNicknameList), HttpStatus.OK);
     }
+
+    public ResponseEntity<Message> friendRequestByCode(Integer code, Members requestSender){
+        Members requestReceiver = membersRepository.findByFriendCode(code).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+        return friendRequest(requestReceiver.getNickname(), requestSender);
+    }
+
 
     /**
      * Method
