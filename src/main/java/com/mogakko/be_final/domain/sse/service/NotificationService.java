@@ -50,8 +50,7 @@ public class NotificationService {
             String senderNickname = missedNotification.getSenderNickname();
             Members sender = membersRepository.findByNickname(senderNickname).orElseThrow( () -> new CustomException(ErrorCode.USER_NOT_FOUND));
             String senderProfileUrl = sender.getProfileImage();
-                    sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification, senderProfileUrl));
-            markAsRead(missedNotification);
+                    sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification, senderProfileUrl),missedNotification);
         }
 
 
@@ -81,13 +80,12 @@ public class NotificationService {
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithByMemberId(memberId);
         sseEmitters.forEach(
                 (key, emitter) -> {
-                    sendToClient(emitter, key, new NotificationResponseDto(notification, sender.getProfileImage()) );
+                    sendToClient(emitter, key, new NotificationResponseDto(notification, sender.getProfileImage()),notification );
                 }
         );
     }
 
     private Notification createNotification(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
-//        NotificationKey primaryKey = new NotificationKey(receiver.getId(), false, Instant.now());
         return Notification.builder()
                 .receiverId(receiver.getId())
                 .readStatus(false)
@@ -100,6 +98,20 @@ public class NotificationService {
                 .build();
     }
 
+
+    public void sendToClient(SseEmitter emitter, String emitterId, Object data, Notification notification) {
+        try {
+            emitter.send(SseEmitter.event()
+                    .id(emitterId)
+                    .data(data));
+            if(data instanceof NotificationResponseDto){
+                markAsRead(notification);
+            }
+        } catch (IOException exception) {
+            emitterRepository.deleteById(emitterId);
+            throw new CustomException(ErrorCode.NOTIFICATION_SENDING_FAILED);
+        }
+    }
 
     public void sendToClient(SseEmitter emitter, String emitterId, Object data) {
         try {
@@ -114,6 +126,7 @@ public class NotificationService {
 
 
     public void markAsRead(Notification notification) {
+        notificationRepository.delete(notification);
         notification.changeReadStatus();
         notificationRepository.save(notification);
     }
