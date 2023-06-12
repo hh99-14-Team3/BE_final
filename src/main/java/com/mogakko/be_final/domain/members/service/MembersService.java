@@ -6,21 +6,22 @@ import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
-import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.LoginResponseDto;
+import com.mogakko.be_final.domain.members.dto.response.MyPageResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.UserPageResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
+import com.mogakko.be_final.domain.members.entity.MemberWeekStatistics;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
+import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
-import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.service.MogakkoService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.security.jwt.JwtProvider;
 import com.mogakko.be_final.security.jwt.TokenDto;
 import com.mogakko.be_final.util.Message;
+import com.mogakko.be_final.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,10 +34,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Time;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
 
@@ -48,9 +48,9 @@ public class MembersService {
     private final RedisUtil redisUtil;
     private final S3Uploader s3Uploader;
     private final PasswordEncoder passwordEncoder;
-    private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
     private final FriendshipRepository friendshipRepository;
     private final MembersRepository membersRepository;
+    private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
     private final MogakkoService mogakkoService;
 
     // 회원가입
@@ -82,8 +82,9 @@ public class MembersService {
 
         membersRepository.save(member);
 
-        MogakkoRoomTime mogakkoRoomTimes = new MogakkoRoomTime(email, Time.valueOf("00:00:00"));
-        mogakkoRoomTimeRepository.save(mogakkoRoomTimes);
+        // 회원가입 시 주간 통계 기본 설정
+        memberWeekStatisticsRepository.save(MemberWeekStatistics.builder().email(member.getEmail()).build());
+
         return new ResponseEntity<>(new Message("회원 가입 성공", null), HttpStatus.OK);
     }
 
@@ -142,12 +143,34 @@ public class MembersService {
     }
 
 
-    // 마이페이지 조회 - 총 참여 시간, 매너 ON:도 등 개인 정보
+    // 마이페이지 조회 - 모각코 총 참여시간, 요일별 통계, 언어 선택 통계, 나의 On도, 개인정보
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
-        String totalTimer = mogakkoService.changeSecToTime(member.getMogakkoTotalTime());
-        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(member, totalTimer);
-        return new ResponseEntity<>(new Message("마이페이지 조회 성공", userPageResponseDto), HttpStatus.OK);
+        // 모각코 참여시간 통계 (전체 총합 + 요일별)
+        String allTimeTotal = TimeUtil.changeSecToTime(member.getMogakkoTotalTime());
+        MemberWeekStatistics memberWeekStatistics = findMemberWeekStatistics(member.getEmail());
+        long sunday = memberWeekStatistics.getSun();
+        long monday = memberWeekStatistics.getMon();
+        long tuesday = memberWeekStatistics.getTue();
+        long wednesday = memberWeekStatistics.getWed();
+        long thursday = memberWeekStatistics.getThu();
+        long friday = memberWeekStatistics.getFri();
+        long saturday = memberWeekStatistics.getSat();
+
+        Map<String, String> timeOfWeek = new HashMap<>();
+        timeOfWeek.put("Sunday", TimeUtil.changeSecToTime(sunday));
+        timeOfWeek.put("Monday", TimeUtil.changeSecToTime(monday));
+        timeOfWeek.put("Tuesday", TimeUtil.changeSecToTime(tuesday));
+        timeOfWeek.put("Wednesday", TimeUtil.changeSecToTime(wednesday));
+        timeOfWeek.put("Thursday", TimeUtil.changeSecToTime(thursday));
+        timeOfWeek.put("Friday", TimeUtil.changeSecToTime(friday));
+        timeOfWeek.put("Saturday", TimeUtil.changeSecToTime(saturday));
+        timeOfWeek.put("weekTotal", TimeUtil.changeSecToTime(sunday + monday + tuesday + wednesday + thursday + friday + saturday));
+
+        // 언어 선택 통계
+
+        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(member, allTimeTotal, timeOfWeek);
+        return new ResponseEntity<>(new Message("마이페이지 조회 성공", myPageResponseDto), HttpStatus.OK);
     }
 
     // 마이페이지 - 프로필 사진, 닉네임 수정
@@ -185,7 +208,7 @@ public class MembersService {
         Members findMember = membersRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-        String totalTimer = mogakkoService.changeSecToTime(member.getMogakkoTotalTime());
+        String totalTimer = TimeUtil.changeSecToTime(member.getMogakkoTotalTime());
         boolean isFriend = false;
         if (friendshipRepository.findBySenderAndReceiverAndStatus(findMember, member, FriendshipStatus.ACCEPT).isPresent())
             isFriend = !isFriend;
@@ -214,14 +237,22 @@ public class MembersService {
     // 최고의 ON:s 조회
     @Transactional
     public ResponseEntity<Message> readBestMembers() {
-        List<Members> topMembers = membersRepository.findTop8ByOrderByMogakkoWeekTimeDesc();
-        List<BestMembersResponseDto> topMemberList = new ArrayList<>();
-        for (int i = 0; i < topMembers.size(); i++) {
-            Members member = topMembers.get(i);
-            BestMembersResponseDto responseMember = new BestMembersResponseDto(member,
-                    mogakkoService.changeSecToTime(member.getMogakkoTotalTime()));
-            topMemberList.add(responseMember);
-        }
-        return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMemberList), HttpStatus.OK);
+//        List<Members> topMembers = membersRepository.findTop8ByOrderByMogakkoWeekTimeDesc();
+//        List<BestMembersResponseDto> topMemberList = new ArrayList<>();
+//        for (int i = 0; i < topMembers.size(); i++) {
+//            Members member = topMembers.get(i);
+//            BestMembersResponseDto responseMember = new BestMembersResponseDto(member,
+//                    mogakkoService.changeSecToTime(member.getMogakkoTotalTime()));
+//            topMemberList.add(responseMember);
+//        }
+//        return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMemberList), HttpStatus.OK);
+        return null;
+    }
+
+    public MemberWeekStatistics findMemberWeekStatistics(String email) {
+        MemberWeekStatistics memberWeekStatistic = memberWeekStatisticsRepository.findById(email).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+        return memberWeekStatistic;
     }
 }
