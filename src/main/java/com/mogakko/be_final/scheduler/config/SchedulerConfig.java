@@ -6,6 +6,9 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.concurrent.Executor;
 
 @Configuration
@@ -16,6 +19,7 @@ public class SchedulerConfig implements AsyncConfigurer, SchedulingConfigurer {
         scheduler.setPoolSize(Runtime.getRuntime().availableProcessors() * 2);
         scheduler.setThreadNamePrefix("OPENVIDU-SCHEDULER-");
         scheduler.initialize();
+        Instant.now(Clock.system(ZoneId.of("Asia/Seoul")));
         return scheduler;
     }
 
