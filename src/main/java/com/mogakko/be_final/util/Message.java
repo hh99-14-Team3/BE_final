@@ -8,8 +8,4 @@ import lombok.Getter;
 public class Message {
     private String message;
     private Object data;
-
-    public static Message setSuccess(String message, Object data) {
-        return new Message(message, data);
-    }
 }

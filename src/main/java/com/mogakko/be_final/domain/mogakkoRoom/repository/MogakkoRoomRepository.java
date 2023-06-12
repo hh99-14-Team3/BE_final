@@ -21,12 +21,8 @@ public interface MogakkoRoomRepository extends JpaRepository<MogakkoRoom, String
 
     List<MogakkoRoom> findAllByIsDeleted(boolean isDeleted);
 
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
-//    Optional<ChatRoom> findBySessionIdAndIsDeleted(String chatRoomId, boolean isDeleted);
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<MogakkoRoom> findBySessionId(String chatRoomId);
-
 
     // 반경 12km 이내 모각코 조회
     @Query("SELECT m FROM MogakkoRoom m WHERE (6371 * acos(cos(radians(:lat)) * cos(radians(m.lat)) * cos(radians(m.lon) - radians(:lon)) + sin(radians(:lat)) * sin(radians(m.lat)))) <= 12")
