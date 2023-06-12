@@ -77,9 +77,8 @@ public class MogakkoRoom extends Timestamped {
         this.cntMembers = cntMembers;
     }
 
-    public void deleteRoom(LocalDateTime roomDeleteTime) {
+    public void deleteRoom() {
         this.isDeleted = true;
-        this.roomDeleteTime = roomDeleteTime;
     }
 
     public void setDeleted(boolean isDeleted) {

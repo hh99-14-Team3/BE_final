@@ -42,11 +42,7 @@ public class MogakkoRoomEnterMemberResponseDto {
     public MogakkoRoomEnterMemberResponseDto(MogakkoRoomMembers mogakkoRoomMembers, boolean isRoomMaster, boolean nowMembers) {
         this.mogakkoRoom = mogakkoRoomMembers.getMogakkoRoom();
         this.memberId = mogakkoRoomMembers.getMemberId();
-        this.nickname = mogakkoRoomMembers.getNickname();
-        this.ProfileImage = mogakkoRoomMembers.getProfileImage();
         this.enterRoomToken = mogakkoRoomMembers.getEnterRoomToken();
-        this.stayTime = mogakkoRoomMembers.getRoomStayTime();
-        this.stayDay = mogakkoRoomMembers.getRoomStayDay();
         this.isRoomMaster = isRoomMaster;
         this.nowMember = nowMembers;
     }

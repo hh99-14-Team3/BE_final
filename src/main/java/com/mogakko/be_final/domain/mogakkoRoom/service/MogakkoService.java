@@ -2,7 +2,9 @@ package com.mogakko.be_final.domain.mogakkoRoom.service;
 
 
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
+import com.mogakko.be_final.domain.members.entity.MemberWeekStatistics;
 import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
@@ -14,13 +16,11 @@ import com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponse
 import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoTimerRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
+import com.mogakko.be_final.util.TimeUtil;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,11 +48,9 @@ public class MogakkoService {
 
     private final MogakkoRoomRepository mogakkoRoomRepository;
     private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
-    private final MogakkoRoomTimeRepository mogakkoRoomTimeRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MogakkoTimerRepository mogakkoTimerRepository;
     private final MembersRepository membersRepository;
-
+    private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
 
@@ -146,26 +142,21 @@ public class MogakkoService {
         MogakkoRoomMembers mogakkoRoomMembers;
         // 재입장 유저의 경우
         if (reEnterChatRoomMembers.isPresent()) {
+            log.info("===== 재입장 유저 : {}", member.getNickname());
             mogakkoRoomMembers = reEnterChatRoomMembers.get();
-            mogakkoRoomMembers.reEnterRoomMembers(enterRoomToken, member.getNickname());
+            mogakkoRoomMembers.reEnterRoomMembers(enterRoomToken);
             mogakkoRoom.setDeleted(false);
-            log.info("===== 재입장 유저 stayTime : {}", mogakkoRoomMembers.getRoomStayTime());
         } else {
             // 처음 입장하는 유저
             mogakkoRoomMembers = MogakkoRoomMembers.builder()
                     .mogakkoRoom(mogakkoRoom)
                     .memberId(member.getId())
-                    .nickname(member.getNickname())
-                    .profileImage(member.getProfileImage())
                     .enterRoomToken(enterRoomToken)
-                    .roomEnterTime(Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime())
-                    .roomStayDay(0L)
-                    .roomStayTime(Time.valueOf("00:00:00"))
                     .isEntered(true)
                     .build();
+            log.info("===== 처음 입장 유저 : {}", member.getNickname());
             // 현재 방에 접속한 유저 저장
             mogakkoRoomMembersRepository.save(mogakkoRoomMembers);
-            log.info("===== {} 님은 모각코 방 [{}]에 처음으로 입장함", mogakkoRoomMembers.getNickname(), mogakkoRoom.getSessionId());
         }
         // 모각코 방 정보 저장
         mogakkoRoomRepository.save(mogakkoRoom);
@@ -194,49 +185,20 @@ public class MogakkoService {
             throw new CustomException(ALREADY_OUT_MEMBER);
         }
 
-        // 모각코 방에서 얼마나 있었는지 시간 표시
-        LocalDateTime chatRoomExitTime = Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime();
+        // 모각코 유저 퇴장 처리
+        mogakkoRoomMembers.deleteRoomMembers();
 
-        LocalTime start = mogakkoRoomMembers.getRoomEnterTime().toLocalTime();
-        LocalTime end = chatRoomExitTime.toLocalTime();
-
-        // 기존에 현재방에서 있었던 시간을 가지고 온다, 처음 입장한 유저 = 00:00:00
-        LocalTime beforeChatRoomStayTime = mogakkoRoomMembers.getRoomStayTime().toLocalTime();
-
-        // 현재방에 들어왔던 시간 - 나가기 버튼 누른 시간 = 머문 시간
-        long afterSeconds = ChronoUnit.SECONDS.between(start, end);
-
-        // 기존 머문 시간에 + 다시 들어왔을때의 머문시간을 더한다.
-        // 처음 들어온 유저의 경우 ex) 00:00:00 + 00:05:20
-        LocalTime chatRoomStayTime = beforeChatRoomStayTime.plusSeconds(afterSeconds);
-
-        // 일자 계산
-        int seconds = beforeChatRoomStayTime.toSecondOfDay();
-
-        // 24시간을 넘기면 1일 추가
-        Long roomStayDay = mogakkoRoomMembers.getRoomStayDay();
-        if ((seconds + afterSeconds) >= 86400) {
-            roomStayDay += 1;
-        }
-
-        // 채팅방 유저 논리 삭제, 방에서 나간 시간 저장, 방에 머문 시간 교체
-        mogakkoRoomMembers.deleteRoomMembers(chatRoomExitTime, chatRoomStayTime, roomStayDay);
-        MogakkoRoomTime mogakkoRoomTime = mogakkoRoomTimeRepository.findByEmail(members.getEmail());
-        mogakkoRoomTime.stopTime(chatRoomStayTime);
-
-        // 채팅방 유저 수 확인
-        // 채팅방 유저가 0명이라면 방 논리삭제
+        // 모각코 유저 수 확인
+        // 모각코 유저가 0명이라면 방 논리삭제
         synchronized (mogakkoRoom) {
             // 방 인원 카운트 - 1
             mogakkoRoom.updateCntMembers(mogakkoRoom.getCntMembers() - 1);
             mogakkoRoomMembers.isEntered();
             if (mogakkoRoom.getCntMembers() <= 0) {
-                // 방 논리 삭제 + 방 삭제된 시간 기록
-                LocalDateTime roomDeleteTime = Timestamp.valueOf(LocalDateTime.now()).toLocalDateTime();
-                mogakkoRoom.deleteRoom(roomDeleteTime);
+                // 모각코 삭제처리
+                mogakkoRoom.deleteRoom();
                 return new ResponseEntity<>(new Message("모각코 퇴장 및 방 삭제 성공", null), HttpStatus.OK);
             }
-
             // 모각코의 유저 수가 1명 이상있다면 유저 수만 변경
             return new ResponseEntity<>(new Message("모각코 퇴장 성공", null), HttpStatus.OK);
         }
@@ -264,7 +226,7 @@ public class MogakkoService {
         List<MogakkoRoomReadResponseDto> responseDtoList = new ArrayList<>();
         for (MogakkoRoom mr : mogakkoList) {
             long afterSeconds = ChronoUnit.SECONDS.between(mr.getCreatedAt(), LocalDateTime.now());
-            String time = changeSecToTime(afterSeconds);
+            String time = TimeUtil.changeSecToTime(afterSeconds);
             MogakkoRoomReadResponseDto responseDto = new MogakkoRoomReadResponseDto(mr, time);
             responseDtoList.add(responseDto);
         }
@@ -290,6 +252,22 @@ public class MogakkoService {
         else mogakkoTimer = Time.valueOf(mogakkoTimerRequestDto.getMogakkoTimer());
         long timeToSec = mogakkoTimer.toLocalTime().toSecondOfDay();
 
+        int dayOfWeek = LocalDateTime.now().getDayOfWeek().getValue();
+
+        MemberWeekStatistics memberWeekStatistic = memberWeekStatisticsRepository.findById(member.getEmail()).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+
+        switch (dayOfWeek) {
+            case 1 -> memberWeekStatistic.addMon(timeToSec);
+            case 2 -> memberWeekStatistic.addTue(timeToSec);
+            case 3 -> memberWeekStatistic.addWed(timeToSec);
+            case 4 -> memberWeekStatistic.addThu(timeToSec);
+            case 5 -> memberWeekStatistic.addFri(timeToSec);
+            case 6 -> memberWeekStatistic.addSat(timeToSec);
+            case 7 -> memberWeekStatistic.addSun(timeToSec);
+        }
+
         member.setTime(timeToSec);
         long totalTimer = member.getMogakkoTotalTime() + timeToSec;
 
@@ -302,14 +280,14 @@ public class MogakkoService {
         if (totalTimer >= 4140 && totalTimer < 14886) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_DOG);
         if (totalTimer >= 14886 && totalTimer < 36240) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVE);
         if (totalTimer >= 36240 && totalTimer < 90840) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_ANGEL);
-        if (totalTimer >= 90840 && totalTimer < 3810000) member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVELOVE);
-        if (totalTimer >= 3810000){
+        if (totalTimer >= 90840 && totalTimer < 3810000)
+            member.changeMemberStatusCode(MemberStatusCode.SPECIAL_LOVELOVE);
+        if (totalTimer >= 3810000) {
             member.changeMemberStatusCode(MemberStatusCode.EMOTICON);
             member.addCodingTem(63.5);
         }
 
         membersRepository.save(member);
-
         return new ResponseEntity<>(new Message("저장 성공", mogakkoTimer), HttpStatus.OK);
     }
 
@@ -366,14 +344,4 @@ public class MogakkoService {
         // 해당 채팅방에 프로퍼티스를 설정하면서 커넥션을 만들고, 방에 접속할 수 있는 토큰을 발급한다
         return session.createConnection(connectionProperties).getToken();
     }
-
-    public String changeSecToTime(Long totalTime) {
-        Long hour, min;
-
-        min = totalTime / 60 % 60;
-        hour = totalTime / 3600;
-
-        return String.format("%02dH%02dM", hour, min);
-    }
-
 }
