@@ -42,10 +42,9 @@ public class Members extends Timestamped {
     @Column
     private SocialType socialType;
 
-    // TODO : 디폴트 프사 url 임의로 지정해놓음
     @Column
     @Lob
-    private String profileImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtArY0iIz1b6rGdZ6xkSegyALtWQKBjupKJQ&usqp=CAU";
+    private String profileImage;
 
     @Column
     private String socialUid;
@@ -64,7 +63,6 @@ public class Members extends Timestamped {
     @JsonIgnore
     @Column
     private Long mogakkoWeekTime = 0L;
-
 
 
     public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode) {
@@ -91,27 +89,28 @@ public class Members extends Timestamped {
         this.profileImage = profileImage;
     }
 
-    public void deleteProfile() {
-        this.profileImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtArY0iIz1b6rGdZ6xkSegyALtWQKBjupKJQ&usqp=CAU";
+    public void deleteProfile(String nickname) {
+        this.profileImage = "https://source.boringavatars.com/beam/120/$" + nickname + "?colors=00F0FF,172435,394254,EAEBED,F9F9FA";
     }
 
     public void setGithubId(String githubId) {
         this.githubId = githubId;
     }
 
-    public void changeMemberStatusCode (MemberStatusCode memberStatusCode){
+    public void changeMemberStatusCode(MemberStatusCode memberStatusCode) {
         this.memberStatusCode = memberStatusCode;
     }
 
-    public void setTime(Long mogakkoTotalTime, Long mogakkoWeekTime){
+    public void setTime(Long mogakkoTotalTime, Long mogakkoWeekTime) {
         this.mogakkoTotalTime = mogakkoTotalTime;
         this.mogakkoWeekTime = mogakkoWeekTime;
     }
-    public void setTime(Long mogakkoWeekTime){
+
+    public void setTime(Long mogakkoWeekTime) {
         this.mogakkoWeekTime = mogakkoWeekTime;
     }
 
-    public void addCodingTem(Double codingTem){
+    public void addCodingTem(Double codingTem) {
         this.codingTem = 36.5 + codingTem;
     }
 }
