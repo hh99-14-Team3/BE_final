@@ -7,7 +7,6 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,7 +37,6 @@ public class JwtProvider {
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     private final UserDetailsServiceImpl userDetailsService;
-    private final RedisTemplate redisTemplate;
 
     @PostConstruct
     public void init() {
@@ -82,6 +80,19 @@ public class JwtProvider {
                 Jwts.builder()
                         .setSubject(email)
                         .setExpiration(new Date(date.getTime() + tokenType))
+                        .setIssuedAt(date)
+                        .signWith(key, signatureAlgorithm)
+                        .compact();
+    }
+
+    //Refresh Token 재발급
+    public String createNewRefreshToken(String memberId, long time) {
+        Date date = new Date();
+
+        return BEARER_PREFIX +
+                Jwts.builder()
+                        .setSubject(memberId)
+                        .setExpiration(new Date(date.getTime() + time))
                         .setIssuedAt(date)
                         .signWith(key, signatureAlgorithm)
                         .compact();
@@ -138,8 +149,8 @@ public class JwtProvider {
         response.setHeader(REFRESH_KEY, refreshToken);
     }
 
+    // 토큰에서 만료 시간 정보 추출
     public long getExpirationTime(String token) {
-        // 토큰에서 만료 시간 정보를 추출
         Claims claims = Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
