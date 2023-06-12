@@ -1,7 +1,6 @@
 package com.mogakko.be_final.domain.members.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,13 +59,8 @@ public class Members extends Timestamped {
     @Column
     private Long mogakkoTotalTime = 0L;
 
-    @JsonIgnore
-    @Column
-    private Long mogakkoWeekTime = 0L;
-
     @Column
     private Integer friendCode;
-
 
 
     public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode, Integer friendCode) {
@@ -106,13 +100,8 @@ public class Members extends Timestamped {
         this.memberStatusCode = memberStatusCode;
     }
 
-    public void setTime(Long mogakkoTotalTime, Long mogakkoWeekTime) {
-        this.mogakkoTotalTime = mogakkoTotalTime;
-        this.mogakkoWeekTime = mogakkoWeekTime;
-    }
-
-    public void setTime(Long mogakkoWeekTime) {
-        this.mogakkoWeekTime = mogakkoWeekTime;
+    public void setTime(Long mogakkoTotalTime) {
+        this.mogakkoTotalTime += mogakkoTotalTime;
     }
 
     public void addCodingTem(Double codingTem) {
