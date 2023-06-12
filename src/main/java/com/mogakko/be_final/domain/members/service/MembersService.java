@@ -14,9 +14,7 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
-import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoTimerRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.service.MogakkoService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
@@ -66,8 +64,19 @@ public class MembersService {
             throw new CustomException(ALREADY_JOIN_USER);
         }
 
-        Members members = new Members(email, nickname, password, Role.USER, MemberStatusCode.BASIC);
-        membersRepository.save(members);
+        Members member = Members.builder()
+                .email(email)
+                .nickname(nickname)
+                .password(password)
+                .role(Role.USER)
+                .codingTem(36.5)
+                .mogakkoTotalTime(0L)
+                .mogakkoWeekTime(0L)
+                .memberStatusCode(MemberStatusCode.BASIC)
+                .profileImage("https://source.boringavatars.com/beam/120/$" + nickname + "?colors=00F0FF,172435,394254,EAEBED,F9F9FA")
+                .build();
+
+        membersRepository.save(member);
 
         MogakkoRoomTime mogakkoRoomTimes = new MogakkoRoomTime(email, Time.valueOf("00:00:00"));
         mogakkoRoomTimeRepository.save(mogakkoRoomTimes);
@@ -133,7 +142,7 @@ public class MembersService {
     }
 
 
-    // 마이페이지 조회 - 내가 참여중인 모각코 방, 총 참여 시간, 매너 ON:도 등 개인 정보
+    // 마이페이지 조회 - 총 참여 시간, 매너 ON:도 등 개인 정보
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
         String nickname = member.getNickname();
@@ -168,7 +177,9 @@ public class MembersService {
 
     // 마이페이지 - 프로필 사진 삭제
     public ResponseEntity<Message> profileDelete(Members member) {
-        member.deleteProfile();
+        member.deleteProfile(member.getNickname());
+        // TODO : SSE 개선 및 OSIV 설정 변경 후 제거 예정
+        membersRepository.save(member);
         return new ResponseEntity<>(new Message("프로필 사진 삭제 성공", null), HttpStatus.OK);
     }
 
@@ -184,8 +195,11 @@ public class MembersService {
         String totalTimer = mogakkoService.changeSecToTime(totalTimerSec);
         String totalTimerWeek = mogakkoService.changeSecToTime(totalTimerWeekSec);
         boolean isFriend = false;
-        if(friendshipRepository.findBySenderAndReceiverAndStatus(findmember, member, FriendshipStatus.ACCEPT).isPresent()) isFriend = !isFriend;
-        else if(friendshipRepository.findBySenderAndReceiverAndStatus(member, findmember, FriendshipStatus.ACCEPT).isPresent()) isFriend = !isFriend;
+        if (friendshipRepository.findBySenderAndReceiverAndStatus(findmember, member, FriendshipStatus.ACCEPT).isPresent())
+            isFriend = !isFriend;
+        else if (friendshipRepository.findBySenderAndReceiverAndStatus(member, findmember, FriendshipStatus.ACCEPT).isPresent())
+            isFriend = !isFriend;
+        else if (member.getId().equals(memberId)) isFriend = !isFriend;
         UserPageResponseDto userPageResponseDto = new UserPageResponseDto(findmember, totalTimer, totalTimerWeek, isFriend);
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPageResponseDto), HttpStatus.OK);
     }

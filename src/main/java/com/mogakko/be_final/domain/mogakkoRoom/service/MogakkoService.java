@@ -272,7 +272,7 @@ public class MogakkoService {
     @Transactional(readOnly = true)
     public ResponseEntity<Message> topMogakko() {
         List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findTop4NeighborhoodsOrderByCountDesc();
-        if (mogakkoRoomList.size() > 4) {
+        if (mogakkoRoomList.size() >= 4) {
             mogakkoRoomList = mogakkoRoomList.subList(0, 4);
         }
         return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
@@ -396,8 +396,7 @@ public class MogakkoService {
         min = totalTime / 60 % 60;
         hour = totalTime / 3600;
 
-        String timerBuffer = String.format("%02dH%02dM", hour, min);
-        return timerBuffer;
+        return String.format("%02dH%02dM", hour, min);
     }
 
 }
