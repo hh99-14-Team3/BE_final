@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 public class BestMembersResponseDto {
     private Members member;
     private String totalTimer;
-    private String totalTimerWeek;
 
-    public  BestMembersResponseDto(Members member, String totalTimer, String totalTimerWeek){
-        this. member = member;
+    public BestMembersResponseDto(Members member, String totalTimer) {
+        this.member = member;
         this.totalTimer = totalTimer;
-        this.totalTimerWeek = totalTimerWeek;
     }
 }

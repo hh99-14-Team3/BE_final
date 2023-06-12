@@ -11,7 +11,10 @@ import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoTimerRequestDt
 import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomCreateResponseDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomReadResponseDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponseDto;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.*;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomTime;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomTimeRepository;
@@ -285,15 +288,14 @@ public class MogakkoService {
         if (Long.parseLong(mogakkoTimerRequestDto.getMogakkoTimer().substring(0, 2)) > 23)
             mogakkoTimer = new Time(20, 0, 0);
         else mogakkoTimer = Time.valueOf(mogakkoTimerRequestDto.getMogakkoTimer());
-        String nickname = member.getNickname();
-        MogakkoTimer mogakkoTime = new MogakkoTimer(mogakkoTimer, nickname);
-        mogakkoTimerRepository.save(mogakkoTime);
-        Long totalTimer = totalTimer(nickname, "total");
-        Long totalTimerWeek = totalTimer(nickname, "week");
+        long timeToSec = mogakkoTimer.toLocalTime().toSecondOfDay();
+
+        member.setTime(timeToSec);
+        long totalTimer = member.getMogakkoTotalTime() + timeToSec;
 
         if (member.getCodingTem() <= 100) {
             long num = totalTimer / 600;
-            double numCnt = num * 0.01;
+            Double numCnt = Math.round((num * 0.01) * 100) / 100.0;
             member.addCodingTem(numCnt);
         }
 
@@ -306,7 +308,6 @@ public class MogakkoService {
             member.addCodingTem(63.5);
         }
 
-        member.setTime(totalTimer, totalTimerWeek);
         membersRepository.save(member);
 
         return new ResponseEntity<>(new Message("저장 성공", mogakkoTimer), HttpStatus.OK);
@@ -364,30 +365,6 @@ public class MogakkoService {
 
         // 해당 채팅방에 프로퍼티스를 설정하면서 커넥션을 만들고, 방에 접속할 수 있는 토큰을 발급한다
         return session.createConnection(connectionProperties).getToken();
-    }
-
-    @Transactional(readOnly = true)
-    public Long totalTimer(String nickname, String type) {
-        Long totalTime = 0L;
-        Long totalTimer;
-        if (type.equals("total")) {
-            List<Long> mogakkoTotalTimer = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname);
-            totalTimer = totalTimeTypeLong(totalTime, mogakkoTotalTimer);
-        } else if (type.equals("week")) {
-            List<Long> mogakkoTotalTimerWeek = mogakkoTimerRepository.findAllByNicknameAndMogakkoTimer(nickname, LocalDateTime.now().minusDays(7));
-            totalTimer = totalTimeTypeLong(totalTime, mogakkoTotalTimerWeek);
-        } else {
-            //nickname이나 type이 지정값이 아닌 경우 0을 리턴
-            return 0L;
-        }
-        return totalTimer;
-    }
-
-    public Long totalTimeTypeLong(Long totalTime, List<Long> mogakkoTotalTimer) {
-        for (int i = 0; i < mogakkoTotalTimer.size(); i++) {
-            totalTime = totalTime + mogakkoTotalTimer.get(i);
-        }
-        return totalTime;
     }
 
     public String changeSecToTime(Long totalTime) {

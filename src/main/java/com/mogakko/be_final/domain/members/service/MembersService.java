@@ -75,7 +75,6 @@ public class MembersService {
                 .role(Role.USER)
                 .codingTem(36.5)
                 .mogakkoTotalTime(0L)
-                .mogakkoWeekTime(0L)
                 .memberStatusCode(MemberStatusCode.BASIC)
                 .profileImage("https://source.boringavatars.com/beam/120/$" + nickname + "?colors=00F0FF,172435,394254,EAEBED,F9F9FA")
                 .friendCode(friendCode)
@@ -121,13 +120,9 @@ public class MembersService {
         String refreshToken = tokenDto.getRefreshToken();
         redisUtil.set(member.getEmail(), refreshToken, Duration.ofDays(7).toMillis());
         httpServletResponse.addHeader(JwtProvider.ACCESS_KEY, tokenDto.getAccessToken());
+        httpServletResponse.addHeader(JwtProvider.REFRESH_KEY, tokenDto.getRefreshToken());
         String nickname = member.getNickname();
         String profileImage = member.getProfileImage();
-
-        //로그인시 최근 1주일 모각코 순공 시간 동기화
-        Long totalTimerWeek = mogakkoService.totalTimer(nickname, "week");
-        member.setTime(totalTimerWeek);
-        membersRepository.save(member);
 
         return new ResponseEntity<>(new Message("로그인 성공", new LoginResponseDto(nickname, profileImage)), HttpStatus.OK);
     }
@@ -150,12 +145,8 @@ public class MembersService {
     // 마이페이지 조회 - 총 참여 시간, 매너 ON:도 등 개인 정보
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readMyPage(Members member) {
-        String nickname = member.getNickname();
-        Long totalTimerSec = mogakkoService.totalTimer(nickname, "total");
-        Long totalTimerWeekSec = mogakkoService.totalTimer(nickname, "week");
-        String totalTimer = mogakkoService.changeSecToTime(totalTimerSec);
-        String totalTimerWeek = mogakkoService.changeSecToTime(totalTimerWeekSec);
-        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(member, totalTimer, totalTimerWeek);
+        String totalTimer = mogakkoService.changeSecToTime(member.getMogakkoTotalTime());
+        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(member, totalTimer);
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", userPageResponseDto), HttpStatus.OK);
     }
 
@@ -191,21 +182,17 @@ public class MembersService {
     // 다른 유저 프로필 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> getMemberProfile(Members member, Long memberId) {
-        Members findmember = membersRepository.findById(memberId).orElseThrow(
+        Members findMember = membersRepository.findById(memberId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-        String nickname = findmember.getNickname();
-        Long totalTimerSec = mogakkoService.totalTimer(nickname, "total");
-        Long totalTimerWeekSec = mogakkoService.totalTimer(nickname, "week");
-        String totalTimer = mogakkoService.changeSecToTime(totalTimerSec);
-        String totalTimerWeek = mogakkoService.changeSecToTime(totalTimerWeekSec);
+        String totalTimer = mogakkoService.changeSecToTime(member.getMogakkoTotalTime());
         boolean isFriend = false;
-        if (friendshipRepository.findBySenderAndReceiverAndStatus(findmember, member, FriendshipStatus.ACCEPT).isPresent())
+        if (friendshipRepository.findBySenderAndReceiverAndStatus(findMember, member, FriendshipStatus.ACCEPT).isPresent())
             isFriend = !isFriend;
-        else if (friendshipRepository.findBySenderAndReceiverAndStatus(member, findmember, FriendshipStatus.ACCEPT).isPresent())
+        else if (friendshipRepository.findBySenderAndReceiverAndStatus(member, findMember, FriendshipStatus.ACCEPT).isPresent())
             isFriend = !isFriend;
         else if (member.getId().equals(memberId)) isFriend = !isFriend;
-        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(findmember, totalTimer, totalTimerWeek, isFriend);
+        UserPageResponseDto userPageResponseDto = new UserPageResponseDto(findMember, totalTimer, isFriend);
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPageResponseDto), HttpStatus.OK);
     }
 
@@ -232,8 +219,7 @@ public class MembersService {
         for (int i = 0; i < topMembers.size(); i++) {
             Members member = topMembers.get(i);
             BestMembersResponseDto responseMember = new BestMembersResponseDto(member,
-                    mogakkoService.changeSecToTime(member.getMogakkoTotalTime()),
-                    mogakkoService.changeSecToTime(member.getMogakkoWeekTime()));
+                    mogakkoService.changeSecToTime(member.getMogakkoTotalTime()));
             topMemberList.add(responseMember);
         }
         return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMemberList), HttpStatus.OK);
