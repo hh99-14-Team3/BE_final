@@ -3,11 +3,13 @@ package com.mogakko.be_final.domain.mogakkoRoom.dto.request;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
+@Setter
 @RequiredArgsConstructor
 public class MogakkoRoomCreateRequestDto {
 

@@ -34,11 +34,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         e.printStackTrace();
+        log.error("===== Exception 메세지 확인 : {}", e.getMessage());
         return ErrorResponse.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
     }
-//    @ExceptionHandler(value = RuntimeException.class)
-//    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e){
-//        e.printStackTrace();
-//        return ErrorResponse.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
-//    }
+    @ExceptionHandler(value = RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e){
+        e.printStackTrace();
+        log.error("===== RuntimeException 메세지 확인 : {}", e.getMessage());
+        return ErrorResponse.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
+    }
 }
