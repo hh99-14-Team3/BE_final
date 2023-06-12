@@ -1,11 +1,10 @@
 package com.mogakko.be_final.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,13 +23,10 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final MembersRepository membersRepository;
+    private final RedisUtil redisUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String access_token = jwtProvider.resolveToken(request, JwtProvider.ACCESS_KEY);
         String refresh_token = jwtProvider.resolveToken(request, JwtProvider.REFRESH_KEY);
 
@@ -41,15 +37,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (jwtProvider.validateToken(access_token)) {
                 setAuthentication(jwtProvider.getUserInfoFromToken(access_token));
             } else if (refresh_token != null && jwtProvider.refreshTokenValid(refresh_token)) {
-                //Refresh토큰으로 유저명 가져오기
+                // Refresh 토큰으로 유저명 가져오기
                 String email = jwtProvider.getUserInfoFromToken(refresh_token);
-                //유저명으로 유저 정보 가져오기
-//                Members member = memberRepository.findByEmail(email).get();
-                //새로운 ACCESS TOKEN 발급
+                // 새로운 ACCESS TOKEN 발급
+                log.info("===== Create New Access Token");
                 String newAccessToken = jwtProvider.createToken(email, "Access");
-                //Header에 ACCESS TOKEN 추가
+                // Header에 ACCESS TOKEN 추가
                 jwtProvider.setHeaderAccessToken(response, newAccessToken);
                 setAuthentication(email);
+                // Refresh Token 재발급 로직
+                log.info("===== Create New Refresh Token");
+                long refreshTime = jwtProvider.getExpirationTime(refresh_token);
+                String newRefreshToken = jwtProvider.createNewRefreshToken(email, refreshTime);
+                redisUtil.set(email, newRefreshToken, refreshTime);
+                jwtProvider.setHeaderRefreshToken(response, newRefreshToken);
             } else if (refresh_token == null) {
                 jwtExceptionHandler(response, "AccessToken Expired.");
                 return;
