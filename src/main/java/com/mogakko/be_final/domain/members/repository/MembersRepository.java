@@ -18,8 +18,8 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     Optional<String> findByGithubId(String githubId);
 
-//    @Query("SELECT m FROM Members m ORDER BY m.mogakkoWeekTime DESC")
-    List<Members> findTop8ByOrderByMogakkoWeekTimeDesc();
+    //    @Query("SELECT m FROM Members m ORDER BY m.mogakkoWeekTime DESC")
+//    List<Members> findTop8ByOrderByMogakkoWeekTimeDesc();
 
     Optional<Members> findByFriendCode(Integer friendCode);
 
