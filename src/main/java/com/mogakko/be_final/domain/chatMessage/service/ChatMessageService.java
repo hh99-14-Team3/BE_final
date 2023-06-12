@@ -25,6 +25,7 @@ public class ChatMessageService {
     public void sendChatMessage(ChatMessage chatMessage) {
         log.info("sendChatMessage 확인");
         chatMessage = badWordFiltering.checkBadWord(chatMessage);
+        log.debug("욕설필터링 확인");
         String msg = chatMessage.getNickname() + "님이 입장했습니다.";
         if (ChatMessage.MessageType.ENTER.equals(chatMessage.getType())) {
             chatMessage = ChatMessage.builder()
