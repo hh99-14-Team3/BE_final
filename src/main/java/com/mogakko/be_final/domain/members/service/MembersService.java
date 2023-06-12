@@ -64,6 +64,10 @@ public class MembersService {
             throw new CustomException(ALREADY_JOIN_USER);
         }
 
+        int friendCode;
+        do {
+            friendCode = (int) ((Math.random() * ((999999 - 100000) + 1)) + 100000);
+        } while (membersRepository.existsByFriendCode(friendCode));
         Members member = Members.builder()
                 .email(email)
                 .nickname(nickname)
@@ -74,6 +78,7 @@ public class MembersService {
                 .mogakkoWeekTime(0L)
                 .memberStatusCode(MemberStatusCode.BASIC)
                 .profileImage("https://source.boringavatars.com/beam/120/$" + nickname + "?colors=00F0FF,172435,394254,EAEBED,F9F9FA")
+                .friendCode(friendCode)
                 .build();
 
         membersRepository.save(member);
