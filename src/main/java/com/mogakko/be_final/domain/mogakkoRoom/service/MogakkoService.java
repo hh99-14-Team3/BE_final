@@ -16,6 +16,8 @@ import com.mogakko.be_final.domain.mogakkoRoom.dto.response.NeighborhoodResponse
 import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembersLanguageStatistics;
+import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLanguageStatisticsRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
 import com.mogakko.be_final.exception.CustomException;
@@ -51,6 +53,7 @@ public class MogakkoService {
     private final PasswordEncoder passwordEncoder;
     private final MembersRepository membersRepository;
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
+    private final MogakkoRoomMembersLanguageStatisticsRepository mogakkoRoomMembersLanguageStatisticsRepository;
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
 
@@ -161,6 +164,9 @@ public class MogakkoService {
         // 모각코 방 정보 저장
         mogakkoRoomRepository.save(mogakkoRoom);
         String token = mogakkoRoomMembers.getEnterRoomToken();
+        // 유저가 선택한 모각코 방 통계 up
+        LanguageEnum languageEnum = mogakkoRoom.getLanguage();
+        mogakkoRoomMembersLanguageStatisticsRepository.save(MogakkoRoomMembersLanguageStatistics.builder().email(member.getEmail()).language(languageEnum).build());
         log.info("===== {} 님 입장 완료", member.getNickname());
         return new ResponseEntity<>(new Message("모각코방 입장 성공", token), HttpStatus.OK);
     }
