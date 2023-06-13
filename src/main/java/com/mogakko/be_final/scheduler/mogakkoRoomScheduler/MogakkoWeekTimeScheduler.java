@@ -28,12 +28,10 @@ public class MogakkoWeekTimeScheduler {
     @Transactional
     public void updateWeekTimeOfMembers() {
         log.info("===== updateWeekTimeOfMembers Scheduler 호출");
-        List<Members> members = membersRepository.findAll();
+        List<MemberWeekStatistics> memberWeekStatistics = memberWeekStatisticsRepository.findAll();
 
-        for (Members mb : members) {
-            String email = mb.getEmail();
-            MemberWeekStatistics memberWeekStatistics = memberWeekStatisticsRepository.findByEmail(email);
-            memberWeekStatistics.init();
+        for (MemberWeekStatistics mbws : memberWeekStatistics) {
+            mbws.init();
         }
     }
 }
