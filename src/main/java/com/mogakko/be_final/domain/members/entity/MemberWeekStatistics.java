@@ -40,32 +40,52 @@ public class MemberWeekStatistics {
     @Column
     private long sat = 0L;
 
+    @Column
+    private long weekTotalTime = 0L;
+
     public void addSun(long time) {
         this.sun += time;
+        this.weekTotalTime += time;
     }
 
     public void addMon(long time) {
         this.mon += time;
+        this.weekTotalTime += time;
     }
 
     public void addTue(long time) {
         this.tue += time;
+        this.weekTotalTime += time;
     }
 
     public void addWed(long time) {
         this.wed += time;
+        this.weekTotalTime += time;
     }
 
     public void addThu(long time) {
         this.thu += time;
+        this.weekTotalTime += time;
     }
 
     public void addFri(long time) {
         this.fri += time;
+        this.weekTotalTime += time;
     }
 
     public void addSat(long time) {
         this.sat += time;
+        this.weekTotalTime += time;
     }
 
+    public void init() {
+        this.sun = 0;
+        this.mon = 0;
+        this.tue = 0;
+        this.wed = 0;
+        this.thu = 0;
+        this.fri = 0;
+        this.sat = 0;
+        this.weekTotalTime = 0;
+    }
 }
