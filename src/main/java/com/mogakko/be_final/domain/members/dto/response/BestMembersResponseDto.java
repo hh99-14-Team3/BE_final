@@ -4,13 +4,15 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Getter
 @NoArgsConstructor
 public class BestMembersResponseDto {
     private Members member;
-    private String totalTimer;
+    private Map<String, String> totalTimer;
 
-    public BestMembersResponseDto(Members member, String totalTimer) {
+    public BestMembersResponseDto(Members member, Map<String, String> totalTimer) {
         this.member = member;
         this.totalTimer = totalTimer;
     }
