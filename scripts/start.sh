@@ -1,21 +1,17 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-PROJECT_ROOT="/home/ubuntu/BE"
-JAR_FILE="$PROJECT_ROOT/spring-webapp.jar"
+ROOT_PATH="/home/ubuntu/BE"
+JAR="$ROOT_PATH/application.jar"
+APP_LOG="$ROOT_PATH/application.log"
+ERROR_LOG="$ROOT_PATH/error.log"
+START_LOG="$ROOT_PATH/start.log"
+NOW=$(date +%c)
 
-APP_LOG="$PROJECT_ROOT/application.log"
-ERROR_LOG="$PROJECT_ROOT/error.log"
-DEPLOY_LOG="$PROJECT_ROOT/deploy.log"
+echo "[$NOW] $JAR 복사" >> $START_LOG
+cp $ROOT_PATH/build/libs/BE_final_0.0.1-SNAPSHOT.jar $JAR
 
-TIME_NOW=$(date +%c)
+echo "[$NOW] > $JAR 실행" >> $START_LOG
+nohup java -jar $JAR > $APP_LOG 2> $ERROR_LOG &
+SERVICE_PID=$(pgrep -f $JAR)
 
-# build 파일 복사
-echo "$TIME_NOW > $JAR_FILE 파일 복사" >> $DEPLOY_LOG
-cp $PROJECT_ROOT/build/libs/*.jar $JAR_FILE
-
-# jar 파일 실행
-echo "$TIME_NOW > $JAR_FILE 파일 실행" >> $DEPLOY_LOG
-nohup java -jar $JAR_FILE > $APP_LOG 2> $ERROR_LOG &
-
-CURRENT_PID=$(pgrep -f $JAR_FILE)
-echo "$TIME_NOW > 실행된 프로세스 아이디 $CURRENT_PID 입니다." >> $DEPLOY_LOG
+echo "[$NOW] > 서비스 PID: $SERVICE_PID" >> $START_LOG
