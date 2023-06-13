@@ -18,7 +18,6 @@ public class MogakkoRoomMembers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomMemberId;
 
-    // 방 번호
     @ManyToOne
     @JoinColumn(name = "session_id")
     private MogakkoRoom mogakkoRoom;
@@ -29,21 +28,19 @@ public class MogakkoRoomMembers {
     @Column
     private String enterRoomToken;
 
-    // 입/퇴장 여부
     @Column
     private boolean isEntered = false;
 
 
-    // 방에서 나가는 경우
+    // 모각코 퇴장
     public void deleteRoomMembers() {
         this.isEntered = false;
     }
 
-    // 방에 재입장 하는 경우
+    // 모각코 재입장
     public void reEnterRoomMembers(String enterRoomToken) {
         this.isEntered = true;
         this.enterRoomToken = enterRoomToken;
     }
-
 }
 

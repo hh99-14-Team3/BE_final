@@ -17,10 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
@@ -30,8 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 public class MogakkoRoomScheduler {
-
-
     private final MogakkoRoomRepository mogakkoRoomRepository;
     private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
 
