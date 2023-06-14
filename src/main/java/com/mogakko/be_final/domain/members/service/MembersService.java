@@ -111,9 +111,11 @@ public class MembersService {
     // 로그인
     @Transactional
     public ResponseEntity<Message> login(LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse) {
-        Members member = membersRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(
+        String email = loginRequestDto.getEmail();
+        Members member = membersRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+        if(!member.getEmail().equals(email)) throw new CustomException(INVALID_EMAIL);
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())) {
             throw new CustomException(INVALID_PASSWORD);

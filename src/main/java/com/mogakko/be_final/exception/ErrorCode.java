@@ -13,6 +13,7 @@ public enum ErrorCode {
     DUPLICATE_IDENTIFIER(HttpStatus.BAD_REQUEST, "중복된 이메일 입니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "중복된 닉네임 입니다."),
     DUPLICATE_GITHUB_ID(HttpStatus.BAD_REQUEST, "중복된 깃허브 아이디 입니다."),
+    INVALID_EMAIL(HttpStatus.BAD_REQUEST, "잘못된 아이디 입니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 비밀번호 입니다."),
     PLZ_INPUT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 입력해주세요"),
     PLZ_INPUT_SEARCHKEYWORD(HttpStatus.BAD_REQUEST, "검색어를 입력해주세요"),
