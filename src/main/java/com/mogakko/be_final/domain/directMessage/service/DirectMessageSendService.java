@@ -27,6 +27,14 @@ public class DirectMessageSendService {
         );
         String messageContent = directMessageSendRequestDto.getContent();
 
+        if(messageReceiver.getNickname().equals(member.getNickname())){
+            return new ResponseEntity<>(new Message("자신에게는 쪽지를 보낼 수 없습니다.", null), HttpStatus.BAD_REQUEST);
+        }
+
+        if(messageContent.isEmpty()){
+            return  new ResponseEntity<>(new Message("내용을 입력해 주세요.", null), HttpStatus.BAD_REQUEST);
+        }
+
         saveMessage(member, messageReceiver, messageContent);
         notificationSendService.sendMessageReceivedNotification(member, messageReceiver);
 
