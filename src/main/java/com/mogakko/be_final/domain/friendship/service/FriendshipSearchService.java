@@ -1,11 +1,14 @@
 package com.mogakko.be_final.domain.friendship.service;
 
 import com.mogakko.be_final.domain.friendship.dto.FriendResponseDto;
+import com.mogakko.be_final.domain.friendship.dto.MemberSearchRequestDto;
 import com.mogakko.be_final.domain.friendship.entity.Friendship;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,5 +77,52 @@ public class FriendshipSearchService {
             }
             return new ResponseEntity<>(new Message("친구 요청 목록 조회 성공", friendRequestSenderList), HttpStatus.OK);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<Message> searchUser(MemberSearchRequestDto memberSearchRequestDto, UserDetailsImpl userDetails) {
+        Members member = membersRepository.findById(userDetails.getMember().getId()).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        String searchRequestNickname = memberSearchRequestDto.getSearchRequestNickname();
+        Integer friendCode = memberSearchRequestDto.getFriendCode();
+
+        if (!searchRequestNickname.isEmpty()) {
+            return findByNicknameContain(searchRequestNickname, member);
+        } else if (friendCode != null) {
+            return findByFriendCode(friendCode, member);
+        } else {
+            return new ResponseEntity<>(new Message("nickname 혹은 friendCode 를 입력해 주세요.", null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private ResponseEntity<Message> findByNicknameContain(String nickname, Members member) {
+        List<Members> searchedMemberList = membersRepository.findByNicknameContains(nickname);
+
+        searchedMemberList.removeIf(searchedMember -> searchedMember.equals(member));
+        searchedMemberList.removeIf(searchedMember -> checkAlreadyFriend(searchedMember, member));
+
+        return new ResponseEntity<>(new Message("nickname 을 포함한 member List 조회 성공", searchedMemberList), HttpStatus.OK);
+    }
+
+    private ResponseEntity<Message> findByFriendCode(Integer friendCode, Members member) {
+        Members findMember = membersRepository.findByFriendCode(friendCode).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        if (findMember.equals(member)) {
+            return new ResponseEntity<>(new Message("자신의 친구 코드를 사용하여 자신을 검색할 수 없습니다.", null), HttpStatus.BAD_REQUEST);
+        }
+        if (checkAlreadyFriend(findMember, member)) {
+            return new ResponseEntity<>(new Message("이미 친구임", null), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new Message("friendCode 를 통한 member 조회 성공", findMember), HttpStatus.OK);
+
+    }
+
+    private boolean checkAlreadyFriend(Members member, Members searchedMember) {
+        Optional<Friendship> findRequest = friendshipRepository.findBySenderAndReceiver(member, searchedMember);
+        Optional<Friendship> findReverseRequest = friendshipRepository.findBySenderAndReceiver(searchedMember, member);
+
+        return findRequest.isPresent() || findReverseRequest.isPresent();
     }
 }

@@ -1,9 +1,6 @@
 package com.mogakko.be_final.domain.friendship.controller;
 
-import com.mogakko.be_final.domain.friendship.dto.DeleteFriendRequestDto;
-import com.mogakko.be_final.domain.friendship.dto.DetermineRequestDto;
-import com.mogakko.be_final.domain.friendship.dto.FriendRequestByCodeDto;
-import com.mogakko.be_final.domain.friendship.dto.FriendRequestDto;
+import com.mogakko.be_final.domain.friendship.dto.*;
 import com.mogakko.be_final.domain.friendship.service.FriendshipSearchService;
 import com.mogakko.be_final.domain.friendship.service.FriendshipService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
@@ -60,5 +57,11 @@ public class FriendshipController {
     public ResponseEntity<Message> friendRequestByCode(@RequestBody FriendRequestByCodeDto friendRequestByCodeDto,
                                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
         return friendshipService.friendRequestByCode(friendRequestByCodeDto.getRequestReceiverFriendCode(), userDetails.getMember());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Message> searchMembers(@RequestBody MemberSearchRequestDto memberSearchRequestDto,
+                                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendshipSearchService.searchUser(memberSearchRequestDto, userDetails);
     }
 }
