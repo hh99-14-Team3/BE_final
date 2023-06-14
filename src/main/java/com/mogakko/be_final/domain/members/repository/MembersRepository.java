@@ -25,5 +25,7 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     Boolean existsByFriendCode(Integer friendCode);
 
+    List<Members> findByNicknameContains(String nickname);
+
 }
 

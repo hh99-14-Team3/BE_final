@@ -111,7 +111,7 @@ public class FriendshipService {
         /**
          * 여기 로직은 db를 두번씩 터치하는게 안좋게 느껴져서 똑같이 돌아가게 리펙토링만 해놓았습니다.
          */
-        for (Members requestReceiver : deleteMemberList){
+        for (Members requestReceiver : deleteMemberList) {
             Optional<Friendship> friendship = friendshipRepository.findBySenderAndReceiver(member, requestReceiver).or(
                     () -> friendshipRepository.findBySenderAndReceiver(requestReceiver, member)
             );
@@ -126,7 +126,7 @@ public class FriendshipService {
         return new ResponseEntity<>(new Message("친구 삭제가 완료 되었습니다.", "삭제된 사용자 : " + receiverNicknameList), HttpStatus.OK);
     }
 
-    public ResponseEntity<Message> friendRequestByCode(Integer code, Members requestSender){
+    public ResponseEntity<Message> friendRequestByCode(Integer code, Members requestSender) {
         Members requestReceiver = membersRepository.findByFriendCode(code).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
