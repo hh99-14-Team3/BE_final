@@ -8,8 +8,8 @@ on:
 env:
   AWS_REGION: ap-northeast-2
   S3_BUCKET_NAME: mogakko-deploy-s3
-  CODE_DEPLOY_APPLICATION_NAME: mogakko_codedeploy
-  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: mogakko_deploy_group
+  CODE_DEPLOY_APPLICATION_NAME: mogakko
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: mogakko
 
 permissions:
   contents: write
