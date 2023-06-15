@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -20,8 +21,7 @@ public class S3Uploader {
 
     public String uploadFile(MultipartFile multipartFile) throws IOException {
         String fileExtension = getFileExtension(multipartFile);
-        String fileName = UUID.randomUUID().toString() + "_" + multipartFile.getOriginalFilename() + fileExtension;
-
+        String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename() + fileExtension;
         ObjectMetadata objMeta = new ObjectMetadata();
         objMeta.setContentLength(multipartFile.getSize());
         objMeta.setContentType(getFileContentType(multipartFile));
@@ -46,5 +46,5 @@ public class S3Uploader {
         String[] temp = fileUrl.split("/");
         String fileKey = temp[temp.length - 1];
         amazonS3.deleteObject(bucket, fileKey);
-    }
+        }
 }
