@@ -58,7 +58,6 @@ class MogakkoServiceTest {
                 .nickname("nickname")
                 .memberStatusCode(MemberStatusCode.BASIC)
                 .mogakkoTotalTime(0L)
-                .mogakkoWeekTime(0L)
                 .githubId("github")
                 .profileImage("image")
                 .role(Role.USER)
