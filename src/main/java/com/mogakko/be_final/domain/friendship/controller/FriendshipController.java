@@ -26,6 +26,13 @@ public class FriendshipController {
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
         return friendshipService.friendRequest(friendRequestDto.getRequestReceiverNickname(), userDetails.getMember());
     }
+    @PostMapping("/code")
+    @Operation(summary = "친구 요청 API", description = "친구 요청을 보내는 메서드입니다. 수신자의 friendCode 를 보내면 요청이 완료됩니다.")
+    public ResponseEntity<Message> friendRequestByCode(@RequestBody FriendRequestByCodeDto friendRequestByCodeDto,
+                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendshipService.friendRequestByCode(friendRequestByCodeDto.getRequestReceiverFriendCode(), userDetails.getMember());
+    }
+
     @PostMapping("/determine")
     @Operation(summary = "친구 요청 결정 API", description = "친구 요청을 결정하는 메서드입니다. determineRequest 의 값이 true면 수락, false면 거절 입니다.")
     public ResponseEntity<Message> determineRequest(@RequestBody DetermineRequestDto determineRequestDto,
@@ -52,16 +59,10 @@ public class FriendshipController {
         return friendshipSearchService.getMyFriendRequest(userDetails.getMember());
     }
 
-    @PostMapping("/code")
-    @Operation(summary = "친구코드로 친구 요청 API", description = "친구 요청을 보내는 메서드입니다. 수신자의 friendCode 를 보내면 요청이 완료됩니다.")
-    public ResponseEntity<Message> friendRequestByCode(@RequestBody FriendRequestByCodeDto friendRequestByCodeDto,
-                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return friendshipService.friendRequestByCode(friendRequestByCodeDto.getRequestReceiverFriendCode(), userDetails.getMember());
-    }
-
     @GetMapping("/search")
-    public ResponseEntity<Message> searchMembers(@RequestBody MemberSearchRequestDto memberSearchRequestDto,
+    @Operation(summary = "친구 검색 API", description = "친구를 검색하는 메서드입니다.")
+    public ResponseEntity<Message> searchFriends(@RequestBody MemberSearchRequestDto memberSearchRequestDto,
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return friendshipSearchService.searchUser(memberSearchRequestDto, userDetails);
+        return friendshipSearchService.searchFriends(memberSearchRequestDto, userDetails.getMember());
     }
 }
