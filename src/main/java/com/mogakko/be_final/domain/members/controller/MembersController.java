@@ -97,7 +97,7 @@ public class MembersController {
 
     @Operation(summary = "다른 유저 코드 검색 API", description = "다른 유저를 코드로 검색하는 메서드입니다.")
     @GetMapping("/search/friend-code")
-    public ResponseEntity<Message> searchMemberByFriendsCode(@RequestParam Integer friendCode, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<Message> searchMemberByFriendsCode(@RequestParam String friendCode, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return membersService.searchMemberByFriendsCode(friendCode, userDetails.getMember());
     }
 
