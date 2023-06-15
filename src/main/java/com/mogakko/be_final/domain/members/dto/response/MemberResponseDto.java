@@ -5,11 +5,11 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class LoginResponseDto {
+public class MemberResponseDto {
     private String nickname;
     private String profileImage;
 
-    public LoginResponseDto(String nickname, String profileImage) {
+    public MemberResponseDto(String nickname, String profileImage) {
         this.nickname = nickname;
         this.profileImage = profileImage;
     }
