@@ -243,9 +243,8 @@ public class MogakkoService {
     @Transactional(readOnly = true)
     public ResponseEntity<Message> topMogakko() {
         List<NeighborhoodResponseDto> mogakkoRoomList = mogakkoRoomRepository.findTop4NeighborhoodsOrderByCountDesc();
-        if (mogakkoRoomList.size() >= 4) {
-            mogakkoRoomList = mogakkoRoomList.subList(0, 4);
-        }
+        if (mogakkoRoomList.size() == 0) return new ResponseEntity<>(new Message("조회된 지역이 없습니다.", null), HttpStatus.OK);
+        if (mogakkoRoomList.size() >= 4) mogakkoRoomList = mogakkoRoomList.subList(0, 4);
         return new ResponseEntity<>(new Message("인기 지역 모각코 조회 성공", mogakkoRoomList), HttpStatus.OK);
     }
 
