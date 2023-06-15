@@ -6,10 +6,7 @@ import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
-import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
-import com.mogakko.be_final.domain.members.dto.response.LanguageDto;
-import com.mogakko.be_final.domain.members.dto.response.LoginResponseDto;
-import com.mogakko.be_final.domain.members.dto.response.UserPageResponseDto;
+import com.mogakko.be_final.domain.members.dto.response.*;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.MemberWeekStatistics;
 import com.mogakko.be_final.domain.members.entity.Members;
@@ -115,7 +112,7 @@ public class MembersService {
         Members member = membersRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-        if(!member.getEmail().equals(email)) throw new CustomException(INVALID_EMAIL);
+        if (!member.getEmail().equals(email)) throw new CustomException(INVALID_EMAIL);
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())) {
             throw new CustomException(INVALID_PASSWORD);
@@ -129,7 +126,7 @@ public class MembersService {
         String nickname = member.getNickname();
         String profileImage = member.getProfileImage();
 
-        return new ResponseEntity<>(new Message("로그인 성공", new LoginResponseDto(nickname, profileImage)), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("로그인 성공", new MemberResponseDto(nickname, profileImage)), HttpStatus.OK);
     }
 
     // 로그아웃
@@ -157,7 +154,7 @@ public class MembersService {
         // 언어 선택 통계
         List<LanguageDto> languagePercentage = mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email);
 
-        UserPageResponseDto mypage = new UserPageResponseDto(member, allTimeTotal, weekTimeParse(email), languagePercentage);
+        MemberPageResponseDto mypage = new MemberPageResponseDto(member, allTimeTotal, weekTimeParse(email), languagePercentage);
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", mypage), HttpStatus.OK);
     }
 
@@ -204,14 +201,7 @@ public class MembersService {
         // 언어 선택 통계
         List<LanguageDto> languagePercentage = mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email);
 
-        boolean isFriend = false;
-        if (friendshipRepository.findBySenderAndReceiverAndStatus(findMember, member, FriendshipStatus.ACCEPT).isPresent())
-            isFriend = !isFriend;
-        else if (friendshipRepository.findBySenderAndReceiverAndStatus(member, findMember, FriendshipStatus.ACCEPT).isPresent())
-            isFriend = !isFriend;
-        else if (member.getId().equals(memberId)) isFriend = !isFriend;
-
-        UserPageResponseDto userPage = new UserPageResponseDto(findMember, allTimeTotal, weekTimeParse(email), languagePercentage, isFriend);
+        MemberPageResponseDto userPage = new MemberPageResponseDto(findMember, allTimeTotal, weekTimeParse(email), languagePercentage, checkFriend(member, findMember));
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPage), HttpStatus.OK);
     }
 
@@ -244,6 +234,35 @@ public class MembersService {
         return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMemberList), HttpStatus.OK);
     }
 
+    // 멤버 검색 (닉네임 / 친구 코드)
+    @Transactional
+    public ResponseEntity<Message> searchMembersByNickname(String nickname, Members member) {
+        if (nickname == null) throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
+
+        List<Members> memberList = membersRepository.findByNicknameLike(nickname);
+
+        List<MemberSimpleResponseDto> members = new ArrayList<>();
+        for (Members mb : memberList) {
+            MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(mb.getNickname(), mb.getProfileImage(), checkFriend(member, mb));
+            members.add(memberSimple);
+        }
+        if (members.size() == 0) return new ResponseEntity<>(new Message("검색된 멤버가 없습니다.", null), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("멤버 검색 성공", members), HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<Message> searchMemberByFriendsCode(Integer friendCode, Members member) {
+        if (friendCode == null) throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
+
+        if (friendCode.toString().length() != 6) throw new CustomException(INVALID_FRIEND_CODE);
+
+        Members findMember = membersRepository.findByFriendCode(friendCode).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+        MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(findMember.getNickname(), findMember.getProfileImage(), checkFriend(member, findMember));
+        return new ResponseEntity<>(new Message("멤버 검색 성공", memberSimple), HttpStatus.OK);
+    }
+
 
     /**
      * Method
@@ -270,5 +289,15 @@ public class MembersService {
         timeOfWeek.put("weekTotal", TimeUtil.changeSecToTime(memberWeekStatistics.getWeekTotalTime()));
 
         return timeOfWeek;
+    }
+
+    public boolean checkFriend(Members member, Members findMember) {
+        boolean isFriend = false;
+        if (friendshipRepository.findBySenderAndReceiverAndStatus(findMember, member, FriendshipStatus.ACCEPT).isPresent())
+            isFriend = !isFriend;
+        else if (friendshipRepository.findBySenderAndReceiverAndStatus(member, findMember, FriendshipStatus.ACCEPT).isPresent())
+            isFriend = !isFriend;
+        else if (member.getId().equals(findMember.getId())) isFriend = !isFriend;
+        return isFriend;
     }
 }
