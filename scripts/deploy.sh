@@ -6,7 +6,7 @@ source $HOME/.bash_profile
 
 echo "> 이전에 실행 중인 애플리케이션 종료"
 
-CURRENT_PID=$(pgrep -fla java | grep Mogakko | awk '{print $1}')
+CURRENT_PID=$(pgrep -fla java | grep BE | awk '{print $1}')
 
 if [ -z "$CURRENT_PID" ]; then
   echo "이전에 실행 중인 애플리케이션이 없습니다."
