@@ -36,7 +36,7 @@ public class FriendshipService {
                 () -> new CustomException(USER_NOT_FOUND)
         );
 
-        if (member == receiver) {
+        if (member.getNickname().equals(receiverNickname)) {
             return new ResponseEntity<>(new Message("자신에게 친구 요청을 할 수 없습니다.", null), HttpStatus.BAD_REQUEST);
         }
 
