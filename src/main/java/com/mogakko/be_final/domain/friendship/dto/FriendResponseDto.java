@@ -11,7 +11,7 @@ public class FriendResponseDto {
     private Members member;
     private boolean isSelected;
 
-    public FriendResponseDto(Members member, boolean isSelected){
+    public FriendResponseDto(Members member, boolean isSelected) {
         this.member = member;
         this.isSelected = isSelected;
     }

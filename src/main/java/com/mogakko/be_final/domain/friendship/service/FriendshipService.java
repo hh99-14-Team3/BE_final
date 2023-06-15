@@ -37,7 +37,7 @@ public class FriendshipService {
         );
 
         if (member == receiver) {
-            return new ResponseEntity<>(new Message("자신에게는 친구 요청 할 수 없음", null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Message("자신에게 친구 요청을 할 수 없습니다.", null), HttpStatus.BAD_REQUEST);
         }
 
         Optional<Friendship> findRequest = friendshipRepository.findBySenderAndReceiver(member, receiver);
@@ -53,29 +53,12 @@ public class FriendshipService {
         if (findRequest.isPresent()) {
             Friendship request = findRequest.get();
             if (request.getStatus() == FriendshipStatus.REFUSE) {
-                return new ResponseEntity<>(new Message("상대방이 친구 요청을 거절했습니다.", null), HttpStatus.OK);
+                return new ResponseEntity<>(new Message("상대방이 요청을 거절했습니다.", null), HttpStatus.OK);
             } else if (request.getStatus() == FriendshipStatus.PENDING) {
-                return new ResponseEntity<>(new Message("이미 친구 요청을 하셨습니다.", null), HttpStatus.OK);
+                return new ResponseEntity<>(new Message("이미 요청을 하셨습니다.", null), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
-
-        /**
-         * 친구 요청 로직에서 이 밑부분까지 예외처리가 필요한지 궁금합니다.
-         * 친구 요청을 보낼 때 이미 보내려고 하는 사람에게서 요청이 와있거나 거절했을 경우에 저렇게 리턴하면 한번 거절하면 영원히 친구를 못하게 되는건지,
-         * 이미 요청이 와있을때에는 요청을 보내면 안되는 이유가 있는 건지 궁금합니다.
-         */
-//        else {
-//            Friendship reverseRequest = findReverseRequest.get();
-//            if (reverseRequest.getStatus() == FriendshipStatus.REFUSE) {
-//                return new ResponseEntity<>(new Message("당신이 친구 요청을 거절했습니다.", null), HttpStatus.OK);
-//            } else if (reverseRequest.getStatus() == FriendshipStatus.PENDING) {
-//                return new ResponseEntity<>(new Message("당신에게 이미 친구 요청이 왔습니다.", null), HttpStatus.OK);
-//            } else {
-//                return new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
-//            }
-//        }
-
     }
 
     // 친구 요청 결정
@@ -87,12 +70,12 @@ public class FriendshipService {
             findFriendRequest.accept();
             notificationSendService.sendAcceptNotification(member, requestSender);
             friendshipRepository.save(findFriendRequest);
-            return new ResponseEntity<>(new Message("친구요청이 수락 되었습니다.", null), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("친구요청이 수락되었습니다.", null), HttpStatus.OK);
         } else {
             findFriendRequest.refuse();
             notificationSendService.sendRefuseNotification(member, requestSender);
             friendshipRepository.save(findFriendRequest);
-            return new ResponseEntity<>(new Message("친구요청이 거절 되었습니다.", null), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("친구요청이 거절되었습니다.", null), HttpStatus.OK);
         }
     }
 
@@ -107,9 +90,6 @@ public class FriendshipService {
             deleteMemberList.add(deleteMember);
         }
 
-        /**
-         * 여기 로직은 db를 두번씩 터치하는게 안좋게 느껴져서 똑같이 돌아가게 리펙토링만 해놓았습니다.
-         */
         for (Members requestReceiver : deleteMemberList) {
             Optional<Friendship> friendship = friendshipRepository.findBySenderAndReceiver(member, requestReceiver).or(
                     () -> friendshipRepository.findBySenderAndReceiver(requestReceiver, member)
@@ -118,11 +98,11 @@ public class FriendshipService {
                 Friendship findFriendship = friendship.get();
                 friendshipRepository.delete(findFriendship);
             } else {
-                return new ResponseEntity<>(new Message("삭제 대상이 존재하지 않습니다.", null), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new Message("삭제 대상이 존재하지 않습니다.", null), HttpStatus.OK);
             }
         }
 
-        return new ResponseEntity<>(new Message("친구 삭제가 완료 되었습니다.", "삭제된 사용자 : " + receiverNicknameList), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("친구 삭제 완료", null), HttpStatus.OK);
     }
 
     public ResponseEntity<Message> friendRequestByCode(Integer code, Members requestSender) {
