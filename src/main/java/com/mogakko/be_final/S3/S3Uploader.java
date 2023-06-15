@@ -19,33 +19,32 @@ public class S3Uploader {
     private String bucket;
 
     public String uploadFile(MultipartFile multipartFile) throws IOException {
-        String fileName = UUID.randomUUID().toString() + "_" + multipartFile.getOriginalFilename();
-//        if (!fileName.toLowerCase().endsWith(".jpg")) {
-//            fileName += ".jpg";
-//        }
+        String fileExtension = getFileExtension(multipartFile);
+        String fileName = UUID.randomUUID().toString() + "_" + multipartFile.getOriginalFilename() + fileExtension;
+
         ObjectMetadata objMeta = new ObjectMetadata();
         objMeta.setContentLength(multipartFile.getSize());
+        objMeta.setContentType(getFileContentType(multipartFile));
+
         amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), objMeta);
 
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 
-    public String uploadImage(String image){
-        ObjectMetadata objMeta = new ObjectMetadata();
-        objMeta.setContentLength(image.length());
-        amazonS3.putObject(bucket, image, image);
-
-        return amazonS3.getUrl(bucket, image).toString();
+    private String getFileExtension(MultipartFile file) {
+        String originalFileName = file.getOriginalFilename();
+        assert originalFileName != null;
+        int dotIndex = originalFileName.lastIndexOf(".");
+        return (dotIndex == -1) ? "" : originalFileName.substring(dotIndex);
     }
 
-    public boolean delete(String fileUrl) {
-        try {
-            String[] temp = fileUrl.split("/");
-            String fileKey = temp[temp.length-1];
-            amazonS3.deleteObject(bucket, fileKey);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    private String getFileContentType(MultipartFile file) {
+        return file.getContentType();
+    }
+
+    public void delete(String fileUrl) {
+        String[] temp = fileUrl.split("/");
+        String fileKey = temp[temp.length - 1];
+        amazonS3.deleteObject(bucket, fileKey);
     }
 }
