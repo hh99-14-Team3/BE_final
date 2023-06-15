@@ -260,13 +260,13 @@ public class MembersService {
         MemberWeekStatistics memberWeekStatistics = findMemberWeekStatistics(email);
 
         Map<String, String> timeOfWeek = new HashMap<>();
-        timeOfWeek.put("Sunday", TimeUtil.changeSecToTime(memberWeekStatistics.getSun()));
-        timeOfWeek.put("Monday", TimeUtil.changeSecToTime(memberWeekStatistics.getMon()));
-        timeOfWeek.put("Tuesday", TimeUtil.changeSecToTime(memberWeekStatistics.getTue()));
-        timeOfWeek.put("Wednesday", TimeUtil.changeSecToTime(memberWeekStatistics.getWed()));
-        timeOfWeek.put("Thursday", TimeUtil.changeSecToTime(memberWeekStatistics.getThu()));
-        timeOfWeek.put("Friday", TimeUtil.changeSecToTime(memberWeekStatistics.getFri()));
-        timeOfWeek.put("Saturday", TimeUtil.changeSecToTime(memberWeekStatistics.getSat()));
+        timeOfWeek.put("Sunday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getSun())));
+        timeOfWeek.put("Monday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getMon())));
+        timeOfWeek.put("Tuesday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getTue())));
+        timeOfWeek.put("Wednesday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getWed())));
+        timeOfWeek.put("Thursday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getThu())));
+        timeOfWeek.put("Friday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getFri())));
+        timeOfWeek.put("Saturday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getSat())));
         timeOfWeek.put("weekTotal", TimeUtil.changeSecToTime(memberWeekStatistics.getWeekTotalTime()));
 
         return timeOfWeek;
