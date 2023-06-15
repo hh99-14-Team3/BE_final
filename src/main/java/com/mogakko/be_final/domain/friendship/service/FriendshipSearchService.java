@@ -9,7 +9,6 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
-import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ public class FriendshipSearchService {
     private final MembersRepository membersRepository;
 
     // 친구 목록 조회
-    @Transactional(readOnly = true)
+    @Transactional
     public ResponseEntity<Message> getMyFriend(Members member) {
         List<Long> friendsId = new ArrayList<>();
 
@@ -40,7 +39,7 @@ public class FriendshipSearchService {
 
 //        List<Friendship> findList = friendshipRepository.findAllBySenderOrReceiverAndStatus(member, member, FriendshipStatus.ACCEPT);
         if (findList.isEmpty()) {
-            return new ResponseEntity<>(new Message("조회된 친구가 없습니다.", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Message("조회된 친구가 없습니다.", null), HttpStatus.OK);
         }
         for (Friendship friendship : findList) {
             Long receiverId = friendship.getReceiver().getId();
@@ -80,8 +79,8 @@ public class FriendshipSearchService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> searchUser(MemberSearchRequestDto memberSearchRequestDto, UserDetailsImpl userDetails) {
-        Members member = membersRepository.findById(userDetails.getMember().getId()).orElseThrow(
+    public ResponseEntity<Message> searchFriends(MemberSearchRequestDto memberSearchRequestDto, Members member) {
+        Members findMember = membersRepository.findById(member.getId()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         String searchRequestNickname = memberSearchRequestDto.getSearchRequestNickname();
