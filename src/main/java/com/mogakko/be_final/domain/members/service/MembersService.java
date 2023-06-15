@@ -33,10 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
 
@@ -237,7 +234,7 @@ public class MembersService {
     // 멤버 검색 (닉네임 / 친구 코드)
     @Transactional
     public ResponseEntity<Message> searchMembersByNickname(String nickname, Members member) {
-        if (nickname == null) throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
+        if (nickname.equals("")) throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
 
         List<Members> memberList = membersRepository.findByNicknameLike(nickname);
 
@@ -251,15 +248,23 @@ public class MembersService {
     }
 
     @Transactional
-    public ResponseEntity<Message> searchMemberByFriendsCode(Integer friendCode, Members member) {
-        if (friendCode == null) throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
+    public ResponseEntity<Message> searchMemberByFriendsCode(String friendCode, Members member) {
+        if (friendCode.equals("")) throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
+        if (friendCode.length() != 6) throw new CustomException(INVALID_FRIEND_CODE);
 
-        if (friendCode.toString().length() != 6) throw new CustomException(INVALID_FRIEND_CODE);
+        int friendCodeNum;
+        try {
+            friendCodeNum = Integer.parseInt(friendCode);
+        } catch (NumberFormatException e) {
+            throw new CustomException(INVALID_FRIEND_CODE);
+        }
 
-        Members findMember = membersRepository.findByFriendCode(friendCode).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND)
-        );
-        MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(findMember.getNickname(), findMember.getProfileImage(), checkFriend(member, findMember));
+        Optional<Members> findMember = membersRepository.findByFriendCode(friendCodeNum);
+        Members foundMember;
+        if (findMember.isPresent()) foundMember = findMember.get();
+        else return new ResponseEntity<>(new Message("검색된 멤버가 없습니다.", null), HttpStatus.OK);
+
+        MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(foundMember.getNickname(), foundMember.getProfileImage(), checkFriend(member, foundMember));
         return new ResponseEntity<>(new Message("멤버 검색 성공", memberSimple), HttpStatus.OK);
     }
 
