@@ -19,16 +19,12 @@ public class DirectMessageSearchResponseDto {
     private String createdAt;
 
 
-
     public DirectMessageSearchResponseDto(DirectMessage directMessage) {
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = time.format(formatter);
         this.id = directMessage.getId();
         this.content = directMessage.getContent();
         this.isRead = directMessage.isRead();
         this.senderNickname = directMessage.getSender().getNickname();
         this.receiverNickname = directMessage.getReceiver().getNickname();
-        this.createdAt = formattedNow;
+        this.createdAt = directMessage.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

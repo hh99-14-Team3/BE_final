@@ -74,11 +74,4 @@ public class FriendshipSearchService {
             return new ResponseEntity<>(new Message("친구 요청 목록 조회 성공", friendRequestSenderList), HttpStatus.OK);
         }
     }
-
-    private boolean checkAlreadyFriend(Members member, Members searchedMember) {
-        Optional<Friendship> findRequest = friendshipRepository.findBySenderAndReceiver(member, searchedMember);
-        Optional<Friendship> findReverseRequest = friendshipRepository.findBySenderAndReceiver(searchedMember, member);
-
-        return findRequest.isPresent() || findReverseRequest.isPresent();
-    }
 }
