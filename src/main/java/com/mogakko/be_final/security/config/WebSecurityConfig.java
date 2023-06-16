@@ -81,6 +81,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .antMatchers("/members/updatePassword**").permitAll()
                 .antMatchers("/members/best").permitAll()
                 .antMatchers("/mogakkos/top").permitAll()
+                .antMatchers("/pub**").permitAll()
+                .antMatchers("/sub**").permitAll()
+                .antMatchers("/ws**").permitAll()
+                .antMatchers("/chat/room").permitAll()
+                .antMatchers("/chat/topic/messages").permitAll()
+                .antMatchers("/**").permitAll()
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -97,7 +103,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
                 });
 
-
         return httpSecurity.build();
     }
 
@@ -107,7 +112,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedOrigins("http://localhost:3000", "https://test-repo-five-flame.vercel.app")
-                .exposedHeaders(JwtProvider.ACCESS_KEY)
+                .exposedHeaders(JwtProvider.ACCESS_KEY, JwtProvider.REFRESH_KEY)
                 .allowCredentials(true);
     }
 

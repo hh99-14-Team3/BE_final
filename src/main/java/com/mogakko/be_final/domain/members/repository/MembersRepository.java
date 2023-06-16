@@ -1,5 +1,7 @@
 package com.mogakko.be_final.domain.members.repository;
 
+import com.mogakko.be_final.domain.members.dto.response.MemberResponseDto;
+import com.mogakko.be_final.domain.members.dto.response.MemberSimpleResponseDto;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.SocialType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,14 +20,11 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     Optional<String> findByGithubId(String githubId);
 
-    //    @Query("SELECT m FROM Members m ORDER BY m.mogakkoWeekTime DESC")
-//    List<Members> findTop8ByOrderByMogakkoWeekTimeDesc();
-
     Optional<Members> findByFriendCode(Integer friendCode);
 
     Boolean existsByFriendCode(Integer friendCode);
 
-    List<Members> findByNicknameContains(String nickname);
-
+    @Query("SELECT m FROM Members m WHERE m.nickname LIKE %:nickname%")
+    List<Members> findByNicknameLike(@Param("nickname") String nickname);
 }
 

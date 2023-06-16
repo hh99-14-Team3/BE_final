@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class DirectMessageSendService {
     private final DirectMessageRepository directMessageRepository;
     private final NotificationSendService notificationSendService;
 
+    @Transactional
     public ResponseEntity<Message> sendDirectMessage(Members member, DirectMessageSendRequestDto directMessageSendRequestDto) {
         Members messageReceiver = membersRepository.findByNickname(directMessageSendRequestDto.getMessageReceiverNickname()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -35,15 +37,10 @@ public class DirectMessageSendService {
             return  new ResponseEntity<>(new Message("내용을 입력해 주세요.", null), HttpStatus.BAD_REQUEST);
         }
 
-        saveMessage(member, messageReceiver, messageContent);
+        DirectMessage directMessage = new DirectMessage(member, messageReceiver, messageContent, false);
+        directMessageRepository.save(directMessage);
         notificationSendService.sendMessageReceivedNotification(member, messageReceiver);
 
         return new ResponseEntity<>(new Message("쪽지 전송 선공", null), HttpStatus.OK);
-
-    }
-
-    public void saveMessage(Members sender, Members receiver, String messageContent) {
-        DirectMessage directMessage = new DirectMessage(sender, receiver, messageContent, false);
-        directMessageRepository.save(directMessage);
     }
 }

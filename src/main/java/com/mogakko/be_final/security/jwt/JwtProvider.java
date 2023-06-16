@@ -119,7 +119,8 @@ public class JwtProvider {
 
     // 토큰에서 사용자 정보 가져오기
     public String getUserInfoFromToken(String token) {
-        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject();
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        return claims.getBody().getSubject();
     }
 
     // 인증 객체 생성
@@ -151,15 +152,10 @@ public class JwtProvider {
 
     // 토큰에서 만료 시간 정보 추출
     public long getExpirationTime(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
-
+        Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
         // 현재 시간과 만료 시간의 차이를 계산하여 반환
-        Date expirationDate = claims.getExpiration();
+        Date expirationDate = claims.getBody().getExpiration();
         Date now = new Date();
-        long diff = (expirationDate.getTime() - now.getTime()) / 1000;
-        return diff;
+        return (expirationDate.getTime() - now.getTime());
     }
 }
