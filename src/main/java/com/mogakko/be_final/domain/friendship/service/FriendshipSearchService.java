@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,16 +61,12 @@ public class FriendshipSearchService {
     // 받은 요청 조회
     @Transactional(readOnly = true)
     public ResponseEntity<Message> getMyFriendRequest(Members member) {
-        List<Friendship> friendRequests = friendshipRepository.findAllByReceiverAndStatus(member, FriendshipStatus.PENDING);
-        List<Members> friendRequestSenderList = new ArrayList<>();
+        List<Members> friendRequestSenderList = friendshipRepository.findAllByReceiverAndStatus(member, FriendshipStatus.PENDING)
+                .stream().map(Friendship::getSender).collect(Collectors.toList());
 
-        if (friendRequests.isEmpty()) {
+        if (friendRequestSenderList.isEmpty()) {
             return new ResponseEntity<>(new Message("수신된 친구 요청이 없습니다", null), HttpStatus.OK);
         } else {
-            for (Friendship friendRequest : friendRequests) {
-                Members requestSender = friendRequest.getSender();
-                friendRequestSenderList.add(requestSender);
-            }
             return new ResponseEntity<>(new Message("친구 요청 목록 조회 성공", friendRequestSenderList), HttpStatus.OK);
         }
     }
