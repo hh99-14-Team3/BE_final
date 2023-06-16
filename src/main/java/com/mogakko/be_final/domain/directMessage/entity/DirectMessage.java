@@ -30,7 +30,7 @@ public class DirectMessage extends Timestamped {
     @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private Members receiver;
 
-    @Column
+    @Column(length = 500)
     @Lob
     private String content;
 
