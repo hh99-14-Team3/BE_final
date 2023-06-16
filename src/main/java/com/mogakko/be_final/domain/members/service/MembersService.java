@@ -18,6 +18,7 @@ import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.security.jwt.JwtProvider;
 import com.mogakko.be_final.security.jwt.TokenDto;
+import com.mogakko.be_final.util.BadWordFiltering;
 import com.mogakko.be_final.util.Message;
 import com.mogakko.be_final.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ import static com.mogakko.be_final.exception.ErrorCode.*;
 public class MembersService {
     private final JwtProvider jwtProvider;
     private final RedisUtil redisUtil;
+    private final BadWordFiltering badWordFiltering;
     private final S3Uploader s3Uploader;
     private final PasswordEncoder passwordEncoder;
     private final FriendshipRepository friendshipRepository;
@@ -55,7 +57,7 @@ public class MembersService {
     public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto) {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
-        String nickname = signupRequestDto.getNickname();
+        String nickname = badWordFiltering.checkBadWord(signupRequestDto.getNickname());
 
         if (membersRepository.findByEmail(email).isPresent()) {
             throw new CustomException(ALREADY_JOIN_USER);
