@@ -57,7 +57,7 @@ public class MembersService {
     public ResponseEntity<Message> signup(SignupRequestDto signupRequestDto) {
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
-        String nickname = badWordFiltering.checkBadWord(signupRequestDto.getNickname());
+        String nickname = badWordFiltering.checkBadWordUUID(signupRequestDto.getNickname());
 
         if (membersRepository.findByEmail(email).isPresent()) {
             throw new CustomException(ALREADY_JOIN_USER);
