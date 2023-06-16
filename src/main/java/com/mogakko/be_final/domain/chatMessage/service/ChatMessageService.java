@@ -1,8 +1,8 @@
 package com.mogakko.be_final.domain.chatMessage.service;
 
 import com.mogakko.be_final.domain.chatMessage.dto.ChatMessage;
-import com.mogakko.be_final.util.BadWordFiltering;
 import com.mogakko.be_final.redis.util.RedisUtil;
+import com.mogakko.be_final.util.BadWordFiltering;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,7 +10,6 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
-
 
 @Slf4j
 @Service

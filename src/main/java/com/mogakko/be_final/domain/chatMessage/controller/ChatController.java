@@ -17,7 +17,6 @@ public class ChatController {
     @ResponseBody
     @MessageMapping("/chat/room")
     public void message(ChatMessage chatMessage) {
-        log.info("===== /chat/room 통과, msg : {}", chatMessage.getMessage());
         chatMessageService.sendChatMessage(chatMessage);
     }
 }
