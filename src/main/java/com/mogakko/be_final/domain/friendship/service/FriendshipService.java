@@ -36,28 +36,28 @@ public class FriendshipService {
                 () -> new CustomException(USER_NOT_FOUND)
         );
 
-        if (member == receiver) {
+        if (member.getNickname().equals(receiverNickname)) {
             return new ResponseEntity<>(new Message("자신에게 친구 요청을 할 수 없습니다.", null), HttpStatus.BAD_REQUEST);
         }
 
-        Optional<Friendship> findRequest = friendshipRepository.findBySenderAndReceiver(member, receiver);
-        Optional<Friendship> findReverseRequest = friendshipRepository.findBySenderAndReceiver(receiver, member);
+        Friendship findRequest = friendshipRepository.findBySenderAndReceiver(member, receiver)
+                .or(() -> friendshipRepository.findBySenderAndReceiver(receiver, member))
+                .orElse(null);
 
-        if (findRequest.isEmpty() && findReverseRequest.isEmpty()) {
+        if (findRequest == null) {
             Friendship friendship = new Friendship(member, receiver, FriendshipStatus.PENDING);
             friendshipRepository.save(friendship);
             notificationSendService.sendFriendRequestNotification(member, receiver);
             return new ResponseEntity<>(new Message("친구 요청 완료", null), HttpStatus.OK);
         }
 
-        if (findRequest.isPresent()) {
-            Friendship request = findRequest.get();
-            if (request.getStatus() == FriendshipStatus.REFUSE) {
-                return new ResponseEntity<>(new Message("상대방이 요청을 거절했습니다.", null), HttpStatus.OK);
-            } else if (request.getStatus() == FriendshipStatus.PENDING) {
-                return new ResponseEntity<>(new Message("이미 요청을 하셨습니다.", null), HttpStatus.OK);
-            }
+        FriendshipStatus status = findRequest.getStatus();
+        if (status == FriendshipStatus.REFUSE) {
+            return new ResponseEntity<>(new Message("상대방이 요청을 거절했습니다.", null), HttpStatus.OK);
+        } else if (status == FriendshipStatus.PENDING) {
+            return new ResponseEntity<>(new Message("이미 요청을 하셨습니다.", null), HttpStatus.OK);
         }
+
         return new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
     }
 

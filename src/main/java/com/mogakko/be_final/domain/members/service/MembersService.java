@@ -264,7 +264,8 @@ public class MembersService {
         if (findMember.isPresent()) foundMember = findMember.get();
         else return new ResponseEntity<>(new Message("검색된 멤버가 없습니다.", null), HttpStatus.OK);
 
-        MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(foundMember.getNickname(), foundMember.getProfileImage(), checkFriend(member, foundMember));
+        List<MemberSimpleResponseDto> memberSimple = new ArrayList<>();
+        memberSimple.add(new MemberSimpleResponseDto(foundMember.getNickname(), foundMember.getProfileImage(), checkFriend(member, foundMember)));
         return new ResponseEntity<>(new Message("멤버 검색 성공", memberSimple), HttpStatus.OK);
     }
 
