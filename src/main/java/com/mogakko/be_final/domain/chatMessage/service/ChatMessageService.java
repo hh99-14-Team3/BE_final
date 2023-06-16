@@ -1,7 +1,7 @@
 package com.mogakko.be_final.domain.chatMessage.service;
 
 import com.mogakko.be_final.domain.chatMessage.dto.ChatMessage;
-import com.mogakko.be_final.domain.chatMessage.util.BadWordFiltering;
+import com.mogakko.be_final.util.BadWordFiltering;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,9 @@ public class ChatMessageService {
     // 메세지 발송
     public void sendChatMessage(ChatMessage chatMessage) {
         log.info("sendChatMessage 확인");
-        chatMessage = badWordFiltering.checkBadWord(chatMessage);
-        log.debug("욕설필터링 확인");
+        String filteredMessage = badWordFiltering.checkBadWordString(chatMessage.getMessage());
+        chatMessage.setMessage(filteredMessage);
+
         String msg = chatMessage.getNickname() + "님이 입장했습니다.";
         if (ChatMessage.MessageType.ENTER.equals(chatMessage.getType())) {
             chatMessage = ChatMessage.builder()

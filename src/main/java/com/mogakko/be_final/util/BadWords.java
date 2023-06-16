@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.chatMessage.util;
+package com.mogakko.be_final.util;
 
 public interface BadWords {
     //BadWord
