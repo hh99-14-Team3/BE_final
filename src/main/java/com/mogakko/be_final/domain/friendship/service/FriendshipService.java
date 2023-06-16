@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
+import static com.mogakko.be_final.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -70,12 +70,12 @@ public class FriendshipService {
             findFriendRequest.accept();
             notificationSendService.sendAcceptNotification(member, requestSender);
             friendshipRepository.save(findFriendRequest);
-            return new ResponseEntity<>(new Message("친구요청이 수락되었습니다.", null), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("친구요청을 수락하였습니다.", null), HttpStatus.OK);
         } else {
             findFriendRequest.refuse();
             notificationSendService.sendRefuseNotification(member, requestSender);
             friendshipRepository.save(findFriendRequest);
-            return new ResponseEntity<>(new Message("친구요청이 거절되었습니다.", null), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("친구요청을 거절하였습니다.", null), HttpStatus.OK);
         }
     }
 
@@ -98,7 +98,7 @@ public class FriendshipService {
                 Friendship findFriendship = friendship.get();
                 friendshipRepository.delete(findFriendship);
             } else {
-                return new ResponseEntity<>(new Message("삭제 대상이 존재하지 않습니다.", null), HttpStatus.OK);
+                throw new CustomException(USER_NOT_FOUND);
             }
         }
 
@@ -116,6 +116,30 @@ public class FriendshipService {
     /**
      * Method
      */
+
+    private ResponseEntity<Message> friendRequestMethod(Members member, Members receiver) {
+        if (member.getNickname().equals(receiver.getNickname())) throw new CustomException(CANNOT_REQUEST);
+
+        Optional<Friendship> findRequest = friendshipRepository.findBySenderAndReceiver(member, receiver)
+                .or(() -> friendshipRepository.findBySenderAndReceiver(receiver, member));
+
+        if (findRequest.isPresent()) {
+            Friendship friendship = new Friendship(member, receiver, FriendshipStatus.PENDING);
+            friendshipRepository.save(friendship);
+            notificationSendService.sendFriendRequestNotification(member, receiver);
+            return new ResponseEntity<>(new Message("친구 요청 완료", null), HttpStatus.OK);
+        }
+
+        FriendshipStatus status = findRequest.get().getStatus();
+        switch (status) {
+            case REFUSE:
+                return new ResponseEntity<>(new Message("상대방이 요청을 거절했습니다.", null), HttpStatus.OK);
+            case PENDING:
+                return new ResponseEntity<>(new Message("이미 요청을 하셨습니다.", null), HttpStatus.OK);
+            default:
+                return new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
+        }
+    }
 
     private Members findMember(String memberNickname) {
         return membersRepository.findByNickname(memberNickname).orElseThrow(
