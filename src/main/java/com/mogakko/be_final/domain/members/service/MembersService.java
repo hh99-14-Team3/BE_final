@@ -243,7 +243,7 @@ public class MembersService {
 
         List<MemberSimpleResponseDto> members = new ArrayList<>();
         for (Members mb : memberList) {
-            MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(mb.getNickname(), mb.getProfileImage(), checkFriend(member, mb));
+            MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(mb.getId(), mb.getNickname(), mb.getProfileImage(), checkFriend(member, mb));
             members.add(memberSimple);
         }
         if (members.size() == 0) return new ResponseEntity<>(new Message("검색된 멤버가 없습니다.", null), HttpStatus.OK);
@@ -268,7 +268,7 @@ public class MembersService {
         else return new ResponseEntity<>(new Message("검색된 멤버가 없습니다.", null), HttpStatus.OK);
 
         List<MemberSimpleResponseDto> memberSimple = new ArrayList<>();
-        memberSimple.add(new MemberSimpleResponseDto(foundMember.getNickname(), foundMember.getProfileImage(), checkFriend(member, foundMember)));
+        memberSimple.add(new MemberSimpleResponseDto(foundMember.getId(), foundMember.getNickname(), foundMember.getProfileImage(), checkFriend(member, foundMember)));
         return new ResponseEntity<>(new Message("멤버 검색 성공", memberSimple), HttpStatus.OK);
     }
 
@@ -297,7 +297,7 @@ public class MembersService {
             case 6 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getSat()));
             case 7 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getSun()));
         }
-        
+
         timeOfWeek.put("Sunday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getSun())));
         timeOfWeek.put("Monday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getMon())));
         timeOfWeek.put("Tuesday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getTue())));
