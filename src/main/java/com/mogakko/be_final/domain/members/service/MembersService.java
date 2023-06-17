@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
@@ -285,8 +286,18 @@ public class MembersService {
 
     public Map<String, String> weekTimeParse(String email) {
         MemberWeekStatistics memberWeekStatistics = findMemberWeekStatistics(email);
-
         Map<String, String> timeOfWeek = new HashMap<>();
+        int dayOfWeek = LocalDateTime.now().getDayOfWeek().getValue();
+        switch (dayOfWeek) {
+            case 1 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getMon()));
+            case 2 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getTue()));
+            case 3 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getWed()));
+            case 4 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getThu()));
+            case 5 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getFri()));
+            case 6 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getSat()));
+            case 7 -> timeOfWeek.put("today", TimeUtil.changeSecToTime(memberWeekStatistics.getSun()));
+        }
+        
         timeOfWeek.put("Sunday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getSun())));
         timeOfWeek.put("Monday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getMon())));
         timeOfWeek.put("Tuesday", String.valueOf(TimeUtil.changeSecToMin(memberWeekStatistics.getTue())));
