@@ -1,8 +1,7 @@
 package com.mogakko.be_final.domain.directMessage.controller;
 
-import com.mogakko.be_final.domain.directMessage.dto.DirectMessageSendRequestDto;
-import com.mogakko.be_final.domain.directMessage.service.DirectMessageSearchService;
-import com.mogakko.be_final.domain.directMessage.service.DirectMessageSendService;
+import com.mogakko.be_final.domain.directMessage.dto.request.DirectMessageSendRequestDto;
+import com.mogakko.be_final.domain.directMessage.service.DirectMessageService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,33 +16,39 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/directMessage")
 public class DirectMessageController {
-    private final DirectMessageSendService directMessageSendService;
-    private final DirectMessageSearchService directMessageSearchService;
+    private final DirectMessageService directMessageService;
 
     @Operation(summary = "쪽지 전송 API", description = "쪽지를 전송하는 메서드입니다.")
     @PostMapping("/send")
     public ResponseEntity<Message> sendDirectMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                     @RequestBody DirectMessageSendRequestDto directMessageSendRequestDto) {
-        return directMessageSendService.sendDirectMessage(userDetails.getMember(), directMessageSendRequestDto);
+                                                     @RequestBody DirectMessageSendRequestDto requestDto) {
+        return directMessageService.sendDirectMessage(userDetails.getMember(), requestDto);
     }
 
     @Operation(summary = "받은 쪽지 조회 API", description = "받은 쪽지를 조회하는 메서드입니다.")
     @GetMapping("/received")
     public ResponseEntity<Message> receivedDirectMessage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return directMessageSearchService.searchReceivedMessage(userDetails.getMember());
+        return directMessageService.searchReceivedMessage(userDetails.getMember());
     }
 
     @Operation(summary = "보낸 쪽지 조회 API", description = "보낸 쪽지를 조회하는 메서드입니다.")
     @GetMapping("/sent")
     public ResponseEntity<Message> sentDirectMessage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return directMessageSearchService.searchSentMessage(userDetails.getMember());
+        return directMessageService.searchSentMessage(userDetails.getMember());
     }
 
     @Operation(summary = "쪽지 조회 API", description = "특정 쪽지를 조회하는 메서드입니다.")
     @GetMapping("/read/{messageId}")
     public ResponseEntity<Message> readDirectMessage(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long messageId) {
-        return directMessageSearchService.readDirectMessage(userDetails.getMember(), messageId);
+        return directMessageService.readDirectMessage(userDetails.getMember(), messageId);
     }
+
+//    @Operation(summary = "쪽지 삭제API", description = "쪽지를 삭제하는 메서드 입니다.")
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<Message> deleteDirectMessage(@RequestBody DirectMessageDeleteRequestDto requestDto,
+//                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        return directMessageService.deleteDirectMessage(requestDto, userDetails.getMember());
+//    }
 
 
 }
