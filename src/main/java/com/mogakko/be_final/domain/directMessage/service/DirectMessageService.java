@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
+import static com.mogakko.be_final.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +53,7 @@ public class DirectMessageService {
         return new ResponseEntity<>(new Message("쪽지 전송 성공", null), HttpStatus.OK);
     }
 
+// 나중에 확인하고 삭제
 //    @Transactional
 //    public ResponseEntity<Message> deleteDirectMessage(DirectMessageDeleteRequestDto requestDto, Members member) {
 //        List<Long> dmList = requestDto.getDirectMessageList();
@@ -68,7 +69,7 @@ public class DirectMessageService {
     public ResponseEntity<Message> searchReceivedMessage(Members member) {
         List<DirectMessageSearchResponseDto> messageList = new ArrayList<>();
 
-        List<DirectMessage> list = directMessageRepository.findAllByReceiver(member);
+        List<DirectMessage> list = directMessageRepository.findAllByReceiverAndDeleteByReceiverFalse(member);
 
         for (DirectMessage directMessage : list) {
             DirectMessageSearchResponseDto message = new DirectMessageSearchResponseDto(directMessage);
@@ -87,7 +88,7 @@ public class DirectMessageService {
     public ResponseEntity<Message> searchSentMessage(Members member) {
         List<DirectMessageSearchResponseDto> messageList = new ArrayList<>();
 
-        List<DirectMessage> list = directMessageRepository.findAllBySender(member);
+        List<DirectMessage> list = directMessageRepository.findAllBySenderAndDeleteBySenderFalse(member);
 
         for (DirectMessage directMessage : list) {
             DirectMessageSearchResponseDto message = new DirectMessageSearchResponseDto(directMessage);
@@ -104,12 +105,51 @@ public class DirectMessageService {
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readDirectMessage(Members member, Long messageId) {
         DirectMessage findMessage = findDirectMessageById(messageId);
-        if (member == findMessage.getReceiver()) {
+
+        if (member.getNickname().equals(findMessage.getReceiver().getNickname()))  {
             findMessage.markRead();
             return new ResponseEntity<>(new Message("쪽지 조회 완료", findMessage), HttpStatus.OK);
         } else {
-            throw new CustomException(ErrorCode.INTERNAL_SERER_ERROR);
+            throw new CustomException(USER_MISMATCH_ERROR);
         }
+    }
+
+    @Transactional
+    public ResponseEntity<Message> deleteDirectMessage(Members member, List<Long> messageIdList){
+        List<Long> notFoundMessageList = new ArrayList<>();
+
+        for (Long messageId : messageIdList) {
+            DirectMessage directMessage = directMessageRepository.findById(messageId).orElse(null);
+            if(directMessage == null){
+                notFoundMessageList.add(messageId);
+                continue;
+            }
+            if (directMessage.getReceiver().getNickname().equals(member.getNickname()) && !directMessage.isDeleteByReceiver()) {
+                directMessage.markDeleteByReceiverTrue();
+
+                if (directMessage.isDeleteBySender()) {
+                    directMessageRepository.delete(directMessage);
+                } else {
+                    directMessageRepository.save(directMessage);
+                }
+            } else if (directMessage.getSender().getNickname().equals(member.getNickname()) && !directMessage.isDeleteBySender()) {
+                directMessage.markDeleteBySenderTrue();
+
+                if (directMessage.isDeleteByReceiver()) {
+                    directMessageRepository.delete(directMessage);
+                } else {
+                    directMessageRepository.save(directMessage);
+                }
+            }else{
+                notFoundMessageList.add(messageId);
+            }
+        }
+        if(notFoundMessageList.isEmpty()){
+            return new ResponseEntity<>(new Message("쪽지 삭제가 완료되었습니다.", null), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(new Message("유효한 요청에 대해서만 완료 되었습니다.","존재하지 않는 message" + notFoundMessageList), HttpStatus.OK);
+        }
+
     }
 
     /**
