@@ -94,7 +94,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedHeaders("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedOrigins("http://localhost:3000", "https://test-repo-five-flame.vercel.app","https://mogakko-on.vercel.app/")
+                .allowedOrigins("http://localhost:3000", "https://test-repo-five-flame.vercel.app","https://mogakko-on.vercel.app")
                 .exposedHeaders(JwtProvider.ACCESS_KEY, JwtProvider.REFRESH_KEY)
                 .allowCredentials(true);
     }
