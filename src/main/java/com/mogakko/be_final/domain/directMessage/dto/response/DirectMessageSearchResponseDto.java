@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.directMessage.dto;
+package com.mogakko.be_final.domain.directMessage.dto.response;
 
 import com.mogakko.be_final.domain.directMessage.entity.DirectMessage;
 import lombok.Getter;
