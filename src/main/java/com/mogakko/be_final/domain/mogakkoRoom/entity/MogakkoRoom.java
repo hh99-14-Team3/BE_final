@@ -59,10 +59,6 @@ public class MogakkoRoom extends Timestamped {
     @Builder.Default
     private boolean isDeleted = false;
 
-    // 방이 삭제된 시간
-    @Column
-    private LocalDateTime roomDeleteTime;
-
     @Column
     private double lon;
 
