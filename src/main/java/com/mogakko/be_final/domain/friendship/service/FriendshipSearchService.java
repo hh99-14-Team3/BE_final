@@ -26,7 +26,7 @@ public class FriendshipSearchService {
     // 친구 목록 조회
     @Transactional
     public ResponseEntity<Message> getMyFriend(Members member) {
-        List<Friendship> friendshipList = friendshipRepository.findAllByReceiverOrSenderAndStatus(member, member, FriendshipStatus.ACCEPT);
+        List<Friendship> friendshipList = friendshipRepository.findAllByReceiverAndStatusOrSenderAndStatus(member, FriendshipStatus.ACCEPT, member, FriendshipStatus.ACCEPT);
 
         if (friendshipList.isEmpty()) {
             return new ResponseEntity<>(new Message("조회된 친구가 없습니다.", null), HttpStatus.OK);

@@ -34,23 +34,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
-    private static final String[] PERMIT_URL_ARRAY = {
-            "/v2/api-docs",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/webjars/**",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/bus/v3/api-docs/**",
-            "/api/members/*",
-            "/api/members/signup/*",
-            "/api/notification",
-            "/h2-console"
-    };
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -85,9 +68,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .antMatchers("/sub**").permitAll()
                 .antMatchers("/ws**").permitAll()
                 .antMatchers("/chat/room").permitAll()
-                .antMatchers("/chat/topic/messages").permitAll()
+                .antMatchers("/topic/messages").permitAll()
+                .antMatchers("swagger-ui/index.html#/").permitAll()
                 .antMatchers("/**").permitAll()
-                .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()
@@ -111,30 +94,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedHeaders("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedOrigins("http://localhost:3000", "https://test-repo-five-flame.vercel.app")
+                .allowedOrigins("http://localhost:3000", "https://test-repo-five-flame.vercel.app","https://mogakko-on.vercel.app")
                 .exposedHeaders(JwtProvider.ACCESS_KEY, JwtProvider.REFRESH_KEY)
                 .allowCredentials(true);
     }
-
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration config = new CorsConfiguration();
-
-//        config.addAllowedOrigin("https://test-repo-five-flame.vercel.app/");
-
-//        config.addAllowedOrigin("http://localhost:3000/");
-
-//        config.addExposedHeader(JwtProvider.ACCESS_KEY);
-
-//        config.addAllowedHeader("*");
-
-//        config.setAllowCredentials(true);
-
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-//        source.registerCorsConfiguration("/**", config);
-
-//        return source;
-//    }
-
 }
