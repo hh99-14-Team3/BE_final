@@ -21,6 +21,7 @@ import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLang
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
 import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.util.BadWordFiltering;
 import com.mogakko.be_final.util.Message;
 import com.mogakko.be_final.util.TimeUtil;
 import io.openvidu.java.client.*;
@@ -48,10 +49,11 @@ import static com.mogakko.be_final.exception.ErrorCode.*;
 @RequiredArgsConstructor
 public class MogakkoService {
 
+    private final PasswordEncoder passwordEncoder;
+    private final BadWordFiltering badWordFiltering;
+    private final MembersRepository membersRepository;
     private final MogakkoRoomRepository mogakkoRoomRepository;
     private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final MembersRepository membersRepository;
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
     private final MogakkoRoomMembersLanguageStatisticsRepository mogakkoRoomMembersLanguageStatisticsRepository;
     @Value("${OPENVIDU_URL}")
@@ -79,7 +81,7 @@ public class MogakkoService {
         // 모각코방 빌드
         MogakkoRoom mogakkoRoom = MogakkoRoom.builder()
                 .sessionId(newToken.getSessionId())
-                .title(mogakkoRoomCreateRequestDto.getTitle())
+                .title(badWordFiltering.checkBadWord(mogakkoRoomCreateRequestDto.getTitle()))
                 .masterMemberId(member.getId())
                 .maxMembers(mogakkoRoomCreateRequestDto.getMaxMembers())
                 .language(mogakkoRoomCreateRequestDto.getLanguage())

@@ -30,8 +30,8 @@ public class DirectMessage extends Timestamped {
     @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private Members receiver;
 
-    @Column(length = 320)
-    //320byte로 설정해 두었지만 최대 100자입니다. 입력제한을 300byte로 해야할듯합니다.
+    @Column(length = 500)
+    @Lob
     private String content;
 
     private boolean isRead;
