@@ -95,7 +95,7 @@ public class FriendshipService {
         Optional<Friendship> findRequest = friendshipRepository.findBySenderAndReceiver(member, receiver)
                 .or(() -> friendshipRepository.findBySenderAndReceiver(receiver, member));
 
-        if (findRequest.isPresent()) {
+        if (findRequest.isEmpty()) {
             Friendship friendship = new Friendship(member, receiver, FriendshipStatus.PENDING);
             friendshipRepository.save(friendship);
             notificationSendService.sendFriendRequestNotification(member, receiver);
@@ -103,14 +103,11 @@ public class FriendshipService {
         }
 
         FriendshipStatus status = findRequest.get().getStatus();
-        switch (status) {
-            case REFUSE:
-                return new ResponseEntity<>(new Message("상대방이 요청을 거절했습니다.", null), HttpStatus.OK);
-            case PENDING:
-                return new ResponseEntity<>(new Message("이미 요청을 하셨습니다.", null), HttpStatus.OK);
-            default:
-                return new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
-        }
+        return switch (status) {
+            case REFUSE -> new ResponseEntity<>(new Message("상대방이 요청을 거절했습니다.", null), HttpStatus.OK);
+            case PENDING -> new ResponseEntity<>(new Message("이미 요청을 하셨습니다.", null), HttpStatus.OK);
+            default -> new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
+        };
     }
 
     private Members findMemberByNickname(String memberNickname) {
