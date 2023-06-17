@@ -1,5 +1,6 @@
 package com.mogakko.be_final.security.oauth2.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.SocialType;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
@@ -9,6 +10,10 @@ import com.mogakko.be_final.security.oauth2.util.CustomOAuth2User;
 import com.mogakko.be_final.security.oauth2.util.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -17,10 +22,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -29,9 +33,11 @@ import java.util.Optional;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final MembersRepository membersRepository;
+    private final RestTemplate restTemplate;
 
     private static final String KAKAO = "kakao";
     private static final String GOOGLE = "google";
+    private static final String GITHUB = "github";
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -55,7 +61,35 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         SocialType socialType = getSocialType(registrationId);
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName(); // OAuth2 로그인 시 키(PK)가 되는 값
-        Map<String, Object> attributes = oAuth2User.getAttributes(); // 소셜 로그인에서 API가 제공하는 userInfo의 Json 값(유저 정보들)
+        Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes()); // 소셜 로그인에서 API가 제공하는 userInfo의 Json 값(유저 정보들)
+
+        if (socialType.equals(SocialType.GITHUB)) {
+            log.info("github 진입");
+            String token = userRequest.getAccessToken().getTokenValue();
+            System.out.println(token);
+
+            // Create headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            // Send request to GitHub API
+            ResponseEntity<JsonNode[]> response = restTemplate.exchange(
+                    "https://api.github.com/user/emails", HttpMethod.GET, entity, JsonNode[].class);
+
+            JsonNode primaryEmailNode = Arrays.stream(response.getBody())
+                    .filter(e -> e.get("primary").asBoolean())
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No primary email found"));
+
+            String email = primaryEmailNode.get("email").asText();
+            System.out.println(email);
+            // Add email to the attributes
+            if (email != null) {
+                attributes.put("email", email);
+
+            }
+        }
 
         // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
         OAuthAttributes extractAttributes = OAuthAttributes.of(socialType, userNameAttributeName, attributes);
@@ -79,6 +113,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         }
         else if (GOOGLE.equals(registrationId)) {
             return SocialType.GOOGLE;
+        }
+        else if (GITHUB.equals(registrationId)) {
+            return SocialType.GITHUB;
         } else {
             throw new CustomException(ErrorCode.NOT_SUPPORTED_SOCIALTYPE);
         }
@@ -91,23 +128,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private Members getMembers(OAuthAttributes attributes, SocialType socialType) {
         Optional<Members> findUser = membersRepository.findBySocialUidAndSocialType(attributes.getOauth2UserInfo().getId(), socialType);
 
-        if (findUser.isPresent()) {
-            Members existUser = findUser.get();
-
-            if(!existUser.getProfileImage().equals(attributes.getOauth2UserInfo().getProfileImage())){
-                existUser.updateProfileImage(attributes.getOauth2UserInfo().getProfileImage());
-                membersRepository.save(existUser);
-            }
-
-            if(!existUser.getNickname().equals(attributes.getOauth2UserInfo().getNickname())){
-                existUser.updateNickname(attributes.getOauth2UserInfo().getNickname());
-                membersRepository.save(existUser);
-            }
-            return existUser;
-
-        }else{
-            return saveMembers(attributes, socialType);
-        }
+        return findUser.orElseGet(() -> saveMembers(attributes, socialType));
 
     }
 
@@ -120,7 +141,19 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if(existMember.isPresent()){
             throw new CustomException(ErrorCode.DUPLICATE_IDENTIFIER);
         }else{
-            Members createdMembers = attributes.toEntity(socialType, attributes.getOauth2UserInfo());
+            int friendCode;
+            do {
+                friendCode = (int) ((Math.random() * ((999999 - 100000) + 1)) + 100000);
+            } while (membersRepository.existsByFriendCode(friendCode));
+
+            Members createdMembers = attributes.toEntity(socialType, attributes.getOauth2UserInfo(), friendCode);
+
+            if(membersRepository.existsByNickname(createdMembers.getNickname())){
+                String temporaryNickname = createdMembers.getNickname() + "_" + Integer.toString(friendCode);
+                createdMembers.updateNickname(temporaryNickname);
+            }
+
+
             return membersRepository.save(createdMembers);
         }
 
