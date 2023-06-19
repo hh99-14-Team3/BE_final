@@ -1,9 +1,9 @@
 package com.mogakko.be_final.domain.friendship.controller;
 
-import com.mogakko.be_final.domain.friendship.dto.DeleteFriendRequestDto;
-import com.mogakko.be_final.domain.friendship.dto.DetermineRequestDto;
-import com.mogakko.be_final.domain.friendship.dto.FriendRequestByCodeDto;
-import com.mogakko.be_final.domain.friendship.dto.FriendRequestDto;
+import com.mogakko.be_final.domain.friendship.dto.request.DeleteFriendRequestDto;
+import com.mogakko.be_final.domain.friendship.dto.request.DetermineRequestDto;
+import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestByCodeDto;
+import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestDto;
 import com.mogakko.be_final.domain.friendship.service.FriendshipService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
