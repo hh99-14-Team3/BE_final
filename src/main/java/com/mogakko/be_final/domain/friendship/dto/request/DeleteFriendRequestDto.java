@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.friendship.dto;
+package com.mogakko.be_final.domain.friendship.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
