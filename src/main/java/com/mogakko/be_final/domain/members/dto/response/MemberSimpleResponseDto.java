@@ -1,5 +1,7 @@
 package com.mogakko.be_final.domain.members.dto.response;
 
+import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
+import com.mogakko.be_final.domain.members.entity.Members;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,11 +12,13 @@ public class MemberSimpleResponseDto {
     private String nickname;
     private String profileImage;
     private boolean isFriend;
+    private boolean isPending;
 
-    public MemberSimpleResponseDto(Long id, String nickname, String profileImage, boolean isFriend) {
-        this.id = id;
-        this.nickname = nickname;
-        this.profileImage = profileImage;
+    public MemberSimpleResponseDto(Members member, boolean isFriend, boolean isPending) {
+        this.id = member.getId();
+        this.nickname = member.getNickname();
+        this.profileImage = member.getProfileImage();
         this.isFriend = isFriend;
+        this.isPending = isPending;
     }
 }
