@@ -4,7 +4,6 @@ import com.mogakko.be_final.domain.friendship.dto.DeleteFriendRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.DetermineRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.FriendRequestByCodeDto;
 import com.mogakko.be_final.domain.friendship.dto.FriendRequestDto;
-import com.mogakko.be_final.domain.friendship.service.FriendshipSearchService;
 import com.mogakko.be_final.domain.friendship.service.FriendshipService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class FriendshipController {
     private final FriendshipService friendshipService;
-    private final FriendshipSearchService friendshipSearchService;
 
     @PostMapping
     @Operation(summary = "친구 요청 API", description = "친구 요청을 보내는 메서드입니다. 수신자의 nickname을 보내주시면 요청이 완료됩니다.")
@@ -54,13 +52,13 @@ public class FriendshipController {
     @GetMapping("/accepted")
     @Operation(summary = "친구목록 조회 API", description = "사용자의 친구 목록을 조회하는 메서드입니다.")
     public ResponseEntity<Message> getMyFriend(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return friendshipSearchService.getMyFriend(userDetails.getMember());
+        return friendshipService.getMyFriend(userDetails.getMember());
     }
 
     @GetMapping("/pending")
     @Operation(summary = "받은 친구요청 조회 API", description = "사용자의 친구 요청 목록을 조회하는 메서드입니다.")
     public ResponseEntity<Message> getMyFriendRequest(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return friendshipSearchService.getMyFriendRequest(userDetails.getMember());
+        return friendshipService.getMyFriendRequest(userDetails.getMember());
     }
 
 }
