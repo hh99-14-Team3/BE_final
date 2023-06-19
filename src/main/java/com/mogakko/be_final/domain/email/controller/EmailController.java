@@ -1,6 +1,6 @@
 package com.mogakko.be_final.domain.email.controller;
 
-import com.mogakko.be_final.domain.email.dto.EmailConfirmRequestDto;
+import com.mogakko.be_final.domain.email.dto.request.EmailConfirmRequestDto;
 import com.mogakko.be_final.domain.email.service.EmailService;
 import com.mogakko.be_final.domain.members.dto.request.ChangePwRequestDto;
 import com.mogakko.be_final.util.Message;

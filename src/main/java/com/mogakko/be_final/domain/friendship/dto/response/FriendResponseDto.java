@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.friendship.dto;
+package com.mogakko.be_final.domain.friendship.dto.response;
 
 import com.mogakko.be_final.domain.members.entity.Members;
 import lombok.Getter;
