@@ -238,7 +238,7 @@ public class MembersService {
     // 멤버 검색 (닉네임 / 친구 코드)
     @Transactional
     public ResponseEntity<Message> searchMembersByNickname(String nickname, Members member) {
-        if (nickname.equals("")) throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
+        if (nickname.equals("")) throw new CustomException(PLZ_INPUT_CONTENT);
 
         List<Members> memberList = membersRepository.findByNicknameLike(nickname);
 
@@ -253,7 +253,7 @@ public class MembersService {
 
     @Transactional
     public ResponseEntity<Message> searchMemberByFriendsCode(String friendCode, Members member) {
-        if (friendCode.equals("")) throw new CustomException(PLZ_INPUT_SEARCHKEYWORD);
+        if (friendCode.equals("")) throw new CustomException(PLZ_INPUT_CONTENT);
         if (friendCode.length() != 6) throw new CustomException(INVALID_FRIEND_CODE);
 
         int friendCodeNum;
