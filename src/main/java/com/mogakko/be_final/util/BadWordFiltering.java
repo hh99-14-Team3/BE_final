@@ -16,7 +16,7 @@ public class BadWordFiltering implements BadWords {
     public String checkBadWord(String inputString) {
         // 문자열을 빌더 패턴을 사용하여 생성
         StringBuilder stringBuilder = new StringBuilder("[");
-        for (String str : strings) stringBuilder.append(Pattern.quote(str));
+        for (String str : sings) stringBuilder.append(Pattern.quote(str));
         stringBuilder.append("]*");
         String patternText = stringBuilder.toString();
 
