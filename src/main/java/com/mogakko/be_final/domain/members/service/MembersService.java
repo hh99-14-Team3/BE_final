@@ -202,7 +202,7 @@ public class MembersService {
         // 언어 선택 통계
         List<LanguageDto> languagePercentage = mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email);
 
-        MemberPageResponseDto userPage = new MemberPageResponseDto(findMember, allTimeTotal, weekTimeParse(email), languagePercentage, checkFriend(member, findMember));
+        MemberPageResponseDto userPage = new MemberPageResponseDto(findMember, allTimeTotal, weekTimeParse(email), languagePercentage, checkFriend(member, findMember), checkFriendStatus(member, findMember));
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPage), HttpStatus.OK);
     }
 
