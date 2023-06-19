@@ -1,6 +1,7 @@
 package com.mogakko.be_final.domain.members.service;
 
 import com.mogakko.be_final.S3.S3Uploader;
+import com.mogakko.be_final.domain.friendship.entity.Friendship;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
@@ -201,7 +202,7 @@ public class MembersService {
         // 언어 선택 통계
         List<LanguageDto> languagePercentage = mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email);
 
-        MemberPageResponseDto userPage = new MemberPageResponseDto(findMember, allTimeTotal, weekTimeParse(email), languagePercentage, checkFriend(member, findMember));
+        MemberPageResponseDto userPage = new MemberPageResponseDto(findMember, allTimeTotal, weekTimeParse(email), languagePercentage, checkFriend(member, findMember), checkFriendStatus(member, findMember));
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPage), HttpStatus.OK);
     }
 
@@ -243,7 +244,7 @@ public class MembersService {
 
         List<MemberSimpleResponseDto> members = new ArrayList<>();
         for (Members mb : memberList) {
-            MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(mb.getId(), mb.getNickname(), mb.getProfileImage(), checkFriend(member, mb));
+            MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(mb, checkFriend(member, mb), checkFriendStatus(member, mb));
             members.add(memberSimple);
         }
         if (members.size() == 0) return new ResponseEntity<>(new Message("검색된 멤버가 없습니다.", null), HttpStatus.OK);
@@ -268,9 +269,20 @@ public class MembersService {
         else return new ResponseEntity<>(new Message("검색된 멤버가 없습니다.", null), HttpStatus.OK);
 
         List<MemberSimpleResponseDto> memberSimple = new ArrayList<>();
-        memberSimple.add(new MemberSimpleResponseDto(foundMember.getId(), foundMember.getNickname(), foundMember.getProfileImage(), checkFriend(member, foundMember)));
+
+        memberSimple.add(new MemberSimpleResponseDto(foundMember, checkFriend(member, foundMember), checkFriendStatus(member, foundMember)));
         return new ResponseEntity<>(new Message("멤버 검색 성공", memberSimple), HttpStatus.OK);
     }
+
+    // 회원 신고
+    //TODO : 신고기능 추가 여부 결정 후 디테일 잡기
+//    public ResponseEntity<Message> declareMember(Long memberId, Members member) {
+//        Members findMember = membersRepository.findById(memberId).orElseThrow(
+//                () -> new CustomException(USER_NOT_FOUND)
+//        );
+//        findMember.declare();
+//        return new ResponseEntity<>(new Message("멤버 신고 성공", null), HttpStatus.OK);
+//    }
 
 
     /**
@@ -319,4 +331,15 @@ public class MembersService {
         else if (member.getId().equals(findMember.getId())) isFriend = !isFriend;
         return isFriend;
     }
+
+    public boolean checkFriendStatus(Members member, Members findMember) {
+        boolean isPending = false;
+        if (friendshipRepository.findBySenderAndReceiverAndStatus(findMember, member, FriendshipStatus.PENDING).isPresent())
+            isPending = !isPending;
+        else if (friendshipRepository.findBySenderAndReceiverAndStatus(member, findMember, FriendshipStatus.PENDING).isPresent())
+            isPending = !isPending;
+        else if (member.getId().equals(findMember.getId())) isPending = !isPending;
+        return isPending;
+    }
+
 }
