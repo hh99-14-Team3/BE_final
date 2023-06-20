@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.sse.dto;
+package com.mogakko.be_final.domain.sse.dto.response;
 
 import com.mogakko.be_final.domain.sse.entity.Notification;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;

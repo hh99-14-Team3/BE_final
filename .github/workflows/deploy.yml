@@ -26,6 +26,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set PROPERTIES
+        run: |
+          mkdir -p src/main/resources
+              echo "${{ secrets.APPLICATION_PROPERTIES }}" | base64 --decode > src/main/resources/application.properties
+              find src
+
       # gradle caching - 빌드 시간 향상
       - name: Gradle Caching
         uses: actions/cache@v3
@@ -42,12 +48,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build
-
-      - name: Set PROPERTIES
-        run: |
-          mkdir -p src/main/resources
-      #        echo "${{ secrets.APPLICATION_PROPERTIES }}" | base64 --decode > src/main/resources/application.properties
-      #        find src
 
       # 디렉토리 생성
       - name: Make Directory

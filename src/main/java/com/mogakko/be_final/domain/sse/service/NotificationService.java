@@ -2,7 +2,7 @@ package com.mogakko.be_final.domain.sse.service;
 
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.sse.dto.NotificationResponseDto;
+import com.mogakko.be_final.domain.sse.dto.response.NotificationResponseDto;
 import com.mogakko.be_final.domain.sse.entity.Notification;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepository;

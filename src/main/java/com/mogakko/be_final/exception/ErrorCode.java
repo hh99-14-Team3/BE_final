@@ -31,7 +31,7 @@ public enum ErrorCode {
     MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 메세지가 존재하지 않습니다."),
     INVALID_FRIEND_CODE(HttpStatus.BAD_REQUEST, "친구 코드를 정확하게 입력해주세요."),
     CANNOT_REQUEST(HttpStatus.BAD_REQUEST, "자신에게 요청을 보낼 수 없습니다."),
-    USER_MISMATCH_ERROR(HttpStatus.FORBIDDEN, "사용자와 해당 메세지의 발신자, 수신자와 일치하지 않습니다."),
+    PLZ_INPUT(HttpStatus.BAD_REQUEST, "입력해주세요."),
 
 
     //인증
