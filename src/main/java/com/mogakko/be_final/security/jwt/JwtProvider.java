@@ -29,8 +29,8 @@ public class JwtProvider {
     private static final String BEARER_PREFIX = "Bearer ";
     public static final String ACCESS_KEY = "ACCESS_KEY";
     public static final String REFRESH_KEY = "REFRESH_KEY";
-//    private static final long ACCESS_TIME = Duration.ofMinutes(60).toMillis();
-    private static final long ACCESS_TIME = Duration.ofDays(1).toMillis();
+    private static final long ACCESS_TIME = Duration.ofMinutes(3).toMillis();
+//    private static final long ACCESS_TIME = Duration.ofDays(1).toMillis();
     private static final long REFRESH_TIME = Duration.ofDays(7).toMillis();
 
     @Value("${jwt.secret.key}")
