@@ -24,7 +24,11 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
 
     Boolean existsByFriendCode(Integer friendCode);
 
+    Boolean existsByNickname(String nickname);
+
     @Query("SELECT m FROM Members m WHERE m.nickname LIKE %:nickname%")
     List<Members> findByNicknameLike(@Param("nickname") String nickname);
+
+    Optional<Members> findByGithubStateCode(String state);
 }
 

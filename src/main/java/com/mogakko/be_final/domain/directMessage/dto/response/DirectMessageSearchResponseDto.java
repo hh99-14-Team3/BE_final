@@ -4,8 +4,6 @@ import com.mogakko.be_final.domain.directMessage.entity.DirectMessage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Getter
