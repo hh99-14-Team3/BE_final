@@ -66,6 +66,9 @@ public class Members extends Timestamped {
     private String githubStateCode;
 
     @Column
+    private Integer declared = 0;
+
+    @Column
     @Builder.Default
     private boolean isTutorialCheck = false;
 
@@ -118,6 +121,10 @@ public class Members extends Timestamped {
         this.githubStateCode = stateCode;
     }
 
+    public void declare() {
+        this.declared += 1;
+    }
+  
     public void setTutorialCheck() {
         this.isTutorialCheck = true;
     }
