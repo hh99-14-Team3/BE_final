@@ -84,7 +84,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
             String email = primaryEmailNode.get("email").asText();
             System.out.println(email);
-            // Add email to the attributes
+
             if (email != null) {
                 attributes.put("email", email);
 

@@ -1,6 +1,6 @@
 package com.mogakko.be_final.security.oauth2.controller;
 
-import com.mogakko.be_final.security.oauth2.service.GithubLoginService;
+import com.mogakko.be_final.security.oauth2.service.GitHubLoginService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,9 +19,9 @@ import java.util.Map;
 @RequestMapping("/oauth2")
 @RequiredArgsConstructor
 @Tag(name = "GitHub 소셜 정보 연동 API", description = "GitHub 소셜 정보 연동 API 입니다.")
-public class GithubLoginController {
+public class GitHubLoginController {
 
-    private final GithubLoginService githubLoginService;
+    private final GitHubLoginService githubLoginService;
 
     @Operation(summary = "소셜 인증 요청 API", description = "이 API에 요청이 도달하면 소셜 인증이 시작됩니다.")
     @GetMapping("/githubLogin")

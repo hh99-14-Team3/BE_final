@@ -16,7 +16,7 @@ public enum ErrorCode {
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "잘못된 아이디 입니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 비밀번호 입니다."),
     PLZ_INPUT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 입력해주세요"),
-    PLZ_INPUT_SEARCHKEYWORD(HttpStatus.BAD_REQUEST, "검색어를 입력해주세요"),
+    PLZ_INPUT_CONTENT(HttpStatus.BAD_REQUEST, "내용을 입력해주세요"),
     EMAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "이메일을 찾을 수 없습니다."),
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 토큰입니다."),
     MOGAKKO_IS_FULL(HttpStatus.BAD_REQUEST, "모각코 인원이 마감되었습니다."),
@@ -35,6 +35,7 @@ public enum ErrorCode {
     USER_MISMATCH_ERROR(HttpStatus.FORBIDDEN, "사용자와 해당 메세지의 발신자, 수신자와 일치하지 않습니다."),
     GITHUB_TOKEN_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"GitHub 에서 엑세스 토큰을 가져오지 못했습니다."),
     FAILED_TO_GET_USERINFO(HttpStatus.BAD_REQUEST, "GitHub로 부터 정보를 받아오지 못했습니다."),
+    TTL_IS_NULL(HttpStatus.FORBIDDEN, "다시 친구요청을 할 수 있습니다."),
 
     //인증
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다.");

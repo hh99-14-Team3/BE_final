@@ -2,8 +2,8 @@ package com.mogakko.be_final.security.oauth2.userinfo;
 
 import java.util.Map;
 
-public class GIthubOAuth2UserInfo extends OAuth2UserInfo{
-    public GIthubOAuth2UserInfo(Map<String, Object> attributes) {
+public class GItHubOAuth2UserInfo extends OAuth2UserInfo{
+    public GItHubOAuth2UserInfo(Map<String, Object> attributes) {
         super(attributes);
     }
 

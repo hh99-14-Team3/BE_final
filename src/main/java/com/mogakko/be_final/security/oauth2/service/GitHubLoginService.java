@@ -19,7 +19,7 @@ import static com.mogakko.be_final.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
-public class GithubLoginService {
+public class GitHubLoginService {
 
     private final RestTemplate restTemplate;
     private final MembersRepository membersRepository;
