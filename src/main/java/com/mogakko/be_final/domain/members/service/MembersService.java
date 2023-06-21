@@ -283,6 +283,13 @@ public class MembersService {
         return new ResponseEntity<>(new Message("멤버 신고 성공", null), HttpStatus.OK);
     }
 
+    @Transactional
+    public ResponseEntity<Message> tutorialCheck(Members member) {
+        member.setTutorialCheck();
+        membersRepository.save(member);
+        return new ResponseEntity<>(new Message("튜토리얼 확인 요청 성공", null), HttpStatus.OK);
+    }
+
 
     /**
      * Method
@@ -339,12 +346,5 @@ public class MembersService {
             isPending = !isPending;
         else if (member.getId().equals(findMember.getId())) isPending = !isPending;
         return isPending;
-    }
-
-    @Transactional
-    public ResponseEntity<Message> tutorialCheck(Members member) {
-        member.setTutorialCheck();
-        membersRepository.save(member);
-        return new ResponseEntity<>(new Message("튜토리얼 확인 요청 성공", null), HttpStatus.OK);
     }
 }
