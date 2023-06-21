@@ -2,6 +2,17 @@
 > 항해99 14기 실전 프로젝트 <br>
 > BE : 신동현 박다솜 변희준 정종현 / FE : 신주영 신희제 조현정 <br>
 > DE : 임현서
+<br>
+| 이름 | 주특기 |  | GitHub                           | 
+| --- | --- | --- |----------------------------------|
+| 신동현 | Spring | BE 리더  | https://github.com/been1118      |
+| 신주영 | React | FE 리더 | https://github.com/godjooyoung   |
+| 신희제 | React |  | https://github.com/Shinheeje  |
+| 조현정 | React |  | https://github.com/chohyunjungai |
+| 정종현 | Spring |  | https://github.com/Shuan75       |
+| 박다솜 | Spring | 총무🔫 | https://github.com/mansooonuna   |
+| 변희준 | Spring |  | https://github.com/bheejun       |
+| 임현서 | Designer | 디자이너 |
 
 <br>
 <br>
