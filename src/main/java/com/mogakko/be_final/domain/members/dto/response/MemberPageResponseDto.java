@@ -16,6 +16,7 @@ public class MemberPageResponseDto {
     private Map<String, String> timeOfWeek;
     private List<LanguageDto> languageList;
     private boolean isFriend;
+    private boolean isPending;
 
     public MemberPageResponseDto(Members member, String totalTimer, Map<String, String> timeOfWeek, List<LanguageDto> languageDtoList) {
         this.member = member;
@@ -24,12 +25,13 @@ public class MemberPageResponseDto {
         this.languageList = languageDtoList;
     }
 
-    public MemberPageResponseDto(Members member, String totalTimer, Map<String, String> timeOfWeek, List<LanguageDto> languageDtoList, boolean isFriend) {
+    public MemberPageResponseDto(Members member, String totalTimer, Map<String, String> timeOfWeek, List<LanguageDto> languageDtoList, boolean isFriend, boolean isPending) {
         this.member = member;
         this.totalTimer = totalTimer;
         this.timeOfWeek = timeOfWeek;
         this.languageList = languageDtoList;
         this.isFriend = isFriend;
+        this.isPending = isPending;
     }
 
 }

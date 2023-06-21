@@ -11,14 +11,17 @@ import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.util.BadWordFiltering;
 import com.mogakko.be_final.util.Message;
+import jnr.a64asm.Mem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
 
@@ -33,22 +36,32 @@ public class DirectMessageService {
     // 쪽지 전송
     @Transactional
     public ResponseEntity<Message> sendDirectMessage(Members member, DirectMessageSendRequestDto directMessageSendRequestDto) {
-        Members messageReceiver = membersRepository.findByNickname(directMessageSendRequestDto.getMessageReceiverNickname()).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND)
-        );
+        Optional<Members> messageReceiver;
+        String userInfo = directMessageSendRequestDto.getMessageReceiverNickname();
+
+        if (userInfo.length() == 6){
+            try {
+                int friendCode = Integer.parseInt(userInfo);
+                messageReceiver = membersRepository.findByFriendCode(friendCode);
+            } catch (NumberFormatException e) {
+                messageReceiver = membersRepository.findByNickname(userInfo);
+            }
+        } else {
+            messageReceiver = membersRepository.findByNickname(userInfo);
+        }
+
+        Members receiver;
+        if (messageReceiver.isPresent()) receiver = messageReceiver.get();
+        else throw new CustomException(USER_NOT_FOUND);
+
         String messageContent = badWordFiltering.checkBadWord(directMessageSendRequestDto.getContent());
 
-        if (messageReceiver.getNickname().equals(member.getNickname())) {
-            return new ResponseEntity<>(new Message("자신에게는 쪽지를 보낼 수 없습니다.", null), HttpStatus.BAD_REQUEST);
-        }
+        if (receiver.getNickname().equals(member.getNickname())) throw new CustomException(CANNOT_REQUEST);
+        if (messageContent.isEmpty()) throw new CustomException(PLZ_INPUT);
 
-        if (messageContent.isEmpty()) {
-            return new ResponseEntity<>(new Message("내용을 입력해 주세요.", null), HttpStatus.BAD_REQUEST);
-        }
-
-        DirectMessage directMessage = new DirectMessage(member, messageReceiver, messageContent, false);
+        DirectMessage directMessage = new DirectMessage(member, receiver, messageContent, false);
         directMessageRepository.save(directMessage);
-        notificationSendService.sendMessageReceivedNotification(member, messageReceiver);
+        notificationSendService.sendMessageReceivedNotification(member, receiver);
 
         return new ResponseEntity<>(new Message("쪽지 전송 성공", null), HttpStatus.OK);
     }
