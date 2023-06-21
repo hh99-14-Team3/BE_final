@@ -36,6 +36,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.mogakko.be_final.domain.members.entity.Role.PROHIBITION;
 import static com.mogakko.be_final.exception.ErrorCode.*;
 
 @Slf4j
@@ -288,9 +289,7 @@ public class MembersService {
         String declaredNickname = declareRequestDto.getDeclaredNickname();
         String declaredReason = declareRequestDto.getDeclaredReason();
 
-        Members findMember = membersRepository.findByNickname(declaredNickname).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND)
-        );
+        Members findMember = findMember(declaredNickname);
 
         declaredMembersRepository.save(DeclaredMembers.builder().memberNickname(findMember.getNickname()).declaredReason(declaredReason).build());
         return new ResponseEntity<>(new Message("멤버 신고 성공", null), HttpStatus.OK);
@@ -300,11 +299,25 @@ public class MembersService {
     public ResponseEntity<Message> getReportedMembers(Members member) {
         Role role = member.getRole();
         if (role != Role.ADMIN) throw new CustomException(NOT_ADMIN);
-
         List<DeclaredMembers> declaredMembersList = declaredMembersRepository.findAll();
         return new ResponseEntity<>(new Message("신고된 멤버 조회 성공", declaredMembersList), HttpStatus.OK);
     }
 
+    // 관리자 페이지 연결 (신고 적용)
+    @Transactional
+    public ResponseEntity<Message> reportMember(String nickname, Members member) {
+        Members findMember = findMember(nickname);
+        findMember.declare();
+        int declareCnt = findMember.getDeclared() + 1;
+        if (declareCnt == 1) findMember.changeMemberStatusCode(MemberStatusCode.BAD_REQUEST);
+        if (declareCnt == 2) findMember.changeMemberStatusCode(MemberStatusCode.BAD_GATE_WAY);
+        if (declareCnt == 3) {
+            findMember.changeMemberStatusCode(MemberStatusCode.BAD3);
+            findMember.changeRole(PROHIBITION);
+        }
+        membersRepository.save(findMember);
+        return new ResponseEntity<>(new Message("신고 처리 완료", null), HttpStatus.OK);
+    }
 
     /**
      * Method
@@ -361,5 +374,11 @@ public class MembersService {
             isPending = !isPending;
         else if (member.getId().equals(findMember.getId())) isPending = !isPending;
         return isPending;
+    }
+
+    public Members findMember(String nickname) {
+        return membersRepository.findByNickname(nickname).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
     }
 }

@@ -127,5 +127,11 @@ public class MembersController {
     public ResponseEntity<Message> getReportedMembers(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.getReportedMembers(userDetails.getMember());
     }
+
+    @Operation(summary = "신고 적용 API", description = "관리자가 신고를 적용하는 API입니다.")
+    @PutMapping("/admin/ok")
+    public ResponseEntity<Message> reportMember(@RequestParam String nickname, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return membersService.reportMember(nickname, userDetails.getMember());
+    }
 }
 
