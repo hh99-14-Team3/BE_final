@@ -1,7 +1,6 @@
 package com.mogakko.be_final.domain.members.service;
 
 import com.mogakko.be_final.S3.S3Uploader;
-import com.mogakko.be_final.domain.friendship.entity.Friendship;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
@@ -126,8 +125,9 @@ public class MembersService {
         httpServletResponse.addHeader(JwtProvider.REFRESH_KEY, tokenDto.getRefreshToken());
         String nickname = member.getNickname();
         String profileImage = member.getProfileImage();
+        boolean isTutorialCheck = member.isTutorialCheck();
 
-        return new ResponseEntity<>(new Message("로그인 성공", new MemberResponseDto(nickname, profileImage)), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("로그인 성공", new MemberResponseDto(nickname, profileImage, isTutorialCheck)), HttpStatus.OK);
     }
 
     // 로그아웃
@@ -342,4 +342,10 @@ public class MembersService {
         return isPending;
     }
 
+    @Transactional
+    public ResponseEntity<Message> tutorialCheck(Members member) {
+        member.setTutorialCheck();
+        membersRepository.save(member);
+        return new ResponseEntity<>(new Message("튜토리얼 확인 요청 성공", null), HttpStatus.OK);
+    }
 }
