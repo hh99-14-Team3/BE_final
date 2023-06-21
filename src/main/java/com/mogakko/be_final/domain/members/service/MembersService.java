@@ -3,14 +3,13 @@ package com.mogakko.be_final.domain.members.service;
 import com.mogakko.be_final.S3.S3Uploader;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
+import com.mogakko.be_final.domain.members.dto.request.DeclareRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.dto.response.*;
-import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
-import com.mogakko.be_final.domain.members.entity.MemberWeekStatistics;
-import com.mogakko.be_final.domain.members.entity.Members;
-import com.mogakko.be_final.domain.members.entity.Role;
+import com.mogakko.be_final.domain.members.entity.*;
+import com.mogakko.be_final.domain.members.repository.DeclaredMembersRepository;
 import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLanguageStatisticsRepository;
@@ -52,6 +51,8 @@ public class MembersService {
     private final MembersRepository membersRepository;
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
     private final MogakkoRoomMembersLanguageStatisticsRepository mogakkoRoomMembersLanguageStatisticsRepository;
+    private final DeclaredMembersRepository declaredMembersRepository;
+
 
     // 회원가입
     @Transactional
@@ -274,20 +275,34 @@ public class MembersService {
         return new ResponseEntity<>(new Message("멤버 검색 성공", memberSimple), HttpStatus.OK);
     }
 
-    // 회원 신고
-    public ResponseEntity<Message> declareMember(Long memberId, Members member) {
-        Members findMember = membersRepository.findById(memberId).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND)
-        );
-        findMember.declare();
-        return new ResponseEntity<>(new Message("멤버 신고 성공", null), HttpStatus.OK);
-    }
-
     @Transactional
     public ResponseEntity<Message> tutorialCheck(Members member) {
         member.setTutorialCheck();
         membersRepository.save(member);
         return new ResponseEntity<>(new Message("튜토리얼 확인 요청 성공", null), HttpStatus.OK);
+    }
+
+    // 회원 신고
+    @Transactional
+    public ResponseEntity<Message> declareMember(DeclareRequestDto declareRequestDto, Members member) {
+        String declaredNickname = declareRequestDto.getDeclaredNickname();
+        String declaredReason = declareRequestDto.getDeclaredReason();
+
+        Members findMember = membersRepository.findByNickname(declaredNickname).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+
+        declaredMembersRepository.save(DeclaredMembers.builder().memberNickname(findMember.getNickname()).declaredReason(declaredReason).build());
+        return new ResponseEntity<>(new Message("멤버 신고 성공", null), HttpStatus.OK);
+    }
+
+    // 관리자 페이지 연결 (신고된 유저 확인)
+    public ResponseEntity<Message> getReportedMembers(Members member) {
+        Role role = member.getRole();
+        if (role != Role.ADMIN) throw new CustomException(NOT_ADMIN);
+
+        List<DeclaredMembers> declaredMembersList = declaredMembersRepository.findAll();
+        return new ResponseEntity<>(new Message("신고된 멤버 조회 성공", declaredMembersList), HttpStatus.OK);
     }
 
 
