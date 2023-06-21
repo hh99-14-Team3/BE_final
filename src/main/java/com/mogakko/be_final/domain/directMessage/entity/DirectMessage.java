@@ -34,6 +34,12 @@ public class DirectMessage extends Timestamped {
     @Lob
     private String content;
 
+    @Column(name = "delete_by_sender")
+    private  boolean deleteBySender = false;
+
+    @Column(name = "delete_by_receiver")
+    private  boolean deleteByReceiver =false;
+
     private boolean isRead;
 
     public DirectMessage(Members sender, Members receiver, String content, boolean isRead) {
@@ -42,6 +48,10 @@ public class DirectMessage extends Timestamped {
         this.content = content;
         this.isRead = isRead;
     }
+
+    public void markDeleteBySenderTrue() { this.deleteBySender = true; }
+
+    public void markDeleteByReceiverTrue() { this.deleteByReceiver = true; }
 
     public void markRead() {
         this.isRead = true;
