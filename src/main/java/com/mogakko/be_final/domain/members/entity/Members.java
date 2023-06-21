@@ -63,9 +63,11 @@ public class Members extends Timestamped {
     private Integer friendCode;
 
     @Column
+    private String githubStateCode;
+
+    @Column
     @Builder.Default
     private boolean isTutorialCheck = false;
-
 
     public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode, Integer friendCode) {
         this.email = email;
@@ -110,6 +112,10 @@ public class Members extends Timestamped {
 
     public void addCodingTem(Double codingTem) {
         this.codingTem = 36.5 + codingTem;
+    }
+
+    public void setGithubStateCode(String stateCode) {
+        this.githubStateCode = stateCode;
     }
 
     public void setTutorialCheck() {

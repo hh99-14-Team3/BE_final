@@ -8,7 +8,6 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationSendService;
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.util.BadWordFiltering;
 import com.mogakko.be_final.util.Message;
 import jnr.a64asm.Mem;
@@ -66,22 +65,12 @@ public class DirectMessageService {
         return new ResponseEntity<>(new Message("쪽지 전송 성공", null), HttpStatus.OK);
     }
 
-//    @Transactional
-//    public ResponseEntity<Message> deleteDirectMessage(DirectMessageDeleteRequestDto requestDto, Members member) {
-//        List<Long> dmList = requestDto.getDirectMessageList();
-//
-//        for (Long dm : dmList) {
-//            DirectMessage directMessage = findDirectMessageById(dm);
-//            directMessageRepository.delete(directMessage);
-//        }
-//        return new ResponseEntity<>(new Message("쪽지 삭제 성공", null), HttpStatus.OK);
-//    }
 
     @Transactional(readOnly = true)
     public ResponseEntity<Message> searchReceivedMessage(Members member) {
         List<DirectMessageSearchResponseDto> messageList = new ArrayList<>();
 
-        List<DirectMessage> list = directMessageRepository.findAllByReceiver(member);
+        List<DirectMessage> list = directMessageRepository.findAllByReceiverAndDeleteByReceiverFalse(member);
 
         for (DirectMessage directMessage : list) {
             DirectMessageSearchResponseDto message = new DirectMessageSearchResponseDto(directMessage);
@@ -100,7 +89,7 @@ public class DirectMessageService {
     public ResponseEntity<Message> searchSentMessage(Members member) {
         List<DirectMessageSearchResponseDto> messageList = new ArrayList<>();
 
-        List<DirectMessage> list = directMessageRepository.findAllBySender(member);
+        List<DirectMessage> list = directMessageRepository.findAllBySenderAndDeleteBySenderFalse(member);
 
         for (DirectMessage directMessage : list) {
             DirectMessageSearchResponseDto message = new DirectMessageSearchResponseDto(directMessage);
@@ -117,12 +106,42 @@ public class DirectMessageService {
     @Transactional(readOnly = true)
     public ResponseEntity<Message> readDirectMessage(Members member, Long messageId) {
         DirectMessage findMessage = findDirectMessageById(messageId);
-        if (member == findMessage.getReceiver()) {
+
+        if (member.getNickname().equals(findMessage.getReceiver().getNickname()))  {
             findMessage.markRead();
             return new ResponseEntity<>(new Message("쪽지 조회 완료", findMessage), HttpStatus.OK);
         } else {
-            throw new CustomException(ErrorCode.INTERNAL_SERER_ERROR);
+            throw new CustomException(USER_MISMATCH_ERROR);
         }
+    }
+
+    @Transactional
+    public ResponseEntity<Message> deleteDirectMessage(Members member, List<Long> messageIdList){
+
+        for (Long messageId : messageIdList) {
+            DirectMessage directMessage = findDirectMessageById(messageId);
+
+            if (directMessage.getReceiver().getNickname().equals(member.getNickname()) && !directMessage.isDeleteByReceiver()) {
+                directMessage.markDeleteByReceiverTrue();
+
+                if (directMessage.isDeleteBySender()) {
+                    directMessageRepository.delete(directMessage);
+                } else {
+                    directMessageRepository.save(directMessage);
+                }
+            } else if (directMessage.getSender().getNickname().equals(member.getNickname()) && !directMessage.isDeleteBySender()) {
+                directMessage.markDeleteBySenderTrue();
+
+                if (directMessage.isDeleteByReceiver()) {
+                    directMessageRepository.delete(directMessage);
+                } else {
+                    directMessageRepository.save(directMessage);
+                }
+            } else {
+                throw new CustomException(USER_MISMATCH_ERROR);
+            }
+        }
+        return new ResponseEntity<>(new Message("쪽지 삭제가 완료되었습니다.", null), HttpStatus.OK);
     }
 
     /**
@@ -131,7 +150,7 @@ public class DirectMessageService {
 
     private DirectMessage findDirectMessageById(Long id) {
         return directMessageRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND)
+                () -> new CustomException(MESSAGE_NOT_FOUND)
         );
     }
 }

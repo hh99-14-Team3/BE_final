@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.directMessage.controller;
 
+import com.mogakko.be_final.domain.directMessage.dto.request.DirectMessageDeleteRequestDto;
 import com.mogakko.be_final.domain.directMessage.dto.request.DirectMessageSendRequestDto;
 import com.mogakko.be_final.domain.directMessage.service.DirectMessageService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
@@ -43,12 +44,12 @@ public class DirectMessageController {
         return directMessageService.readDirectMessage(userDetails.getMember(), messageId);
     }
 
-//    @Operation(summary = "쪽지 삭제API", description = "쪽지를 삭제하는 메서드 입니다.")
-//    @DeleteMapping("/delete")
-//    public ResponseEntity<Message> deleteDirectMessage(@RequestBody DirectMessageDeleteRequestDto requestDto,
-//                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
-//        return directMessageService.deleteDirectMessage(requestDto, userDetails.getMember());
-//    }
+    @Operation(summary = "쪽지 삭제 API", description = "특정 쪽지를 삭제하는 메서드입니다.")
+    @PostMapping("/delete")
+    public ResponseEntity<Message> deleteDirectMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                       @RequestBody DirectMessageDeleteRequestDto directMessageDeleteRequestDto){
+        return directMessageService.deleteDirectMessage(userDetails.getMember(), directMessageDeleteRequestDto.getDirectMessageList());
+    }
 
 
 }
