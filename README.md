@@ -6,7 +6,7 @@
 <br>
 <br>
 <div align=center>
-<img width="500" alt="main" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/5883a96c-cbd8-43dc-966a-bee827405d73">
+<img width="500" alt="main" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/18121c2a-63b0-4e7d-b763-b4a53b73f651">
 </div>
 
 ## ⌚프로젝트 기간
@@ -48,7 +48,7 @@
 ## 🖥️ 기술 아키텍쳐
 
 <div align = center>
-<img width="900" alt="architecture" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/0ec9d209-00a9-4d66-9dd8-e9e41cb58c3f">
+<img width="900" alt="architecture" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/f7267c92-c23f-4f65-9d2b-3d095edeb2cf">
 </div>
 <br>
 <br>
