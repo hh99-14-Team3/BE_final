@@ -97,15 +97,20 @@ public class MembersController {
 
     @Operation(summary = "다른 유저 코드 검색 API", description = "다른 유저를 코드로 검색하는 메서드입니다.")
     @GetMapping("/search/friend-code")
-    public ResponseEntity<Message> searchMemberByFriendsCode(@RequestParam String friendCode, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<Message> searchMemberByFriendsCode(@RequestParam String friendCode, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.searchMemberByFriendsCode(friendCode, userDetails.getMember());
     }
-
 
     @Operation(summary = "최고의 유저 조회 API", description = "순공 시간이 가장 높은 모각코인을 조회하는 메서드입니다.")
     @GetMapping("/best")
     public ResponseEntity<Message> readBestMembers() {
         return membersService.readBestMembers();
+    }
+
+    @Operation(summary = "유저 신고 API", description = "선택한 유저를 신고하는 메서드입니다.")
+    @PutMapping("/declare")
+    public ResponseEntity<Message> declareMember(@RequestParam Long memberId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return membersService.declareMember(memberId, userDetails.getMember());
     }
 }
 
