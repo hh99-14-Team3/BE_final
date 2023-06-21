@@ -46,7 +46,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 jwtProvider.setHeaderAccessToken(response, newAccessToken);
                 setAuthentication(email);
                 // Refresh Token 재발급 로직
-                log.info("===== Create New Refresh Token");
                 long refreshTime = jwtProvider.getExpirationTime(refresh_token);
                 String newRefreshToken = jwtProvider.createNewRefreshToken(email, refreshTime);
                 redisUtil.set(email, newRefreshToken, refreshTime);

@@ -97,7 +97,6 @@ public class GitHubLoginService {
             );
             member.setGithubId((String) map.get("login"));
             membersRepository.save(member);
-            System.out.println(member);
         }else {
             throw new CustomException(FAILED_TO_GET_USERINFO);
         }
