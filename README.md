@@ -2,18 +2,6 @@
 > 항해99 14기 실전 프로젝트 <br>
 > BE : 신동현 박다솜 변희준 정종현 / FE : 신주영 신희제 조현정 <br>
 > DE : 임현서
-<br>
-
-| 이름 | 주특기 |  | GitHub                           | 
-| --- | --- | --- |----------------------------------|
-| 신동현 | Spring | BE 리더  | https://github.com/been1118      |
-| 신주영 | React | FE 리더 | https://github.com/godjooyoung   |
-| 신희제 | React |  | https://github.com/Shinheeje  |
-| 조현정 | React |  | https://github.com/chohyunjungai |
-| 정종현 | Spring |  | https://github.com/Shuan75       |
-| 박다솜 | Spring | 총무🔫 | https://github.com/mansooonuna   |
-| 변희준 | Spring |  | https://github.com/bheejun       |
-| 임현서 | Designer | 디자이너 |
 
 <br>
 <br>
@@ -21,7 +9,7 @@
 <img width="500" alt="main" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/5883a96c-cbd8-43dc-966a-bee827405d73">
 </div>
 
-## 프로젝트 기간
+## ⌚프로젝트 기간
 2023-05-19 ~ 2023-06-29 <br>
 1차 릴리즈 : 6.17
 <br>
@@ -101,5 +89,18 @@
 </details>
 <br>
 
+
+##  🎓 프로젝트 멤버
+
+|  이름  |    주특기    |        | GitHub                             | 
+|:----:|:---------:|:------:|:-----------------------------------|
+| 신동현  |  Spring   | BE 리더  | https://github.com/been1118        |
+| 신주영  |   React   | FE 리더  | https://github.com/godjooyoung     |
+| 신희제  |   React   |        | https://github.com/Shinheeje       |
+| 조현정  |   React   |        | https://github.com/chohyunjungai   |
+| 박다솜  |  Spring   |  총무🔫  | https://github.com/mansooonuna     |
+| 정종현  |  Spring   |        | https://github.com/Shuan75         |
+| 변희준  |  Spring   |        | https://github.com/bheejun         |
+| 임현서  | Designer  |  디자이너  |
 
 
