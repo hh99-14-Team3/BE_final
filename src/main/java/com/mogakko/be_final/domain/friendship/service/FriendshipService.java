@@ -5,11 +5,13 @@ import com.mogakko.be_final.domain.friendship.dto.request.DetermineRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.response.FriendResponseDto;
 import com.mogakko.be_final.domain.friendship.entity.Friendship;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
+import com.mogakko.be_final.domain.friendship.entity.RejectedFriendship;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationSendService;
 import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
@@ -31,6 +34,7 @@ public class FriendshipService {
     private final MembersRepository membersRepository;
     private final FriendshipRepository friendshipRepository;
     private final NotificationSendService notificationSendService;
+    private final RedisUtil redisUtil;
 
     // 친구 요청 (닉네임)
     public ResponseEntity<Message> friendRequest(String receiverNickname, Members member) {
@@ -57,9 +61,23 @@ public class FriendshipService {
             friendshipRepository.save(findFriendRequest);
             return new ResponseEntity<>(new Message("친구요청을 수락하였습니다.", null), HttpStatus.OK);
         } else {
+            String requestSenderNickname = requestSender.getNickname();
+            String memberNickname = member.getNickname();
+
             findFriendRequest.refuse();
-            notificationSendService.sendRefuseNotification(member, requestSender);
             friendshipRepository.save(findFriendRequest);
+
+            RejectedFriendship rejectedFriendship = new RejectedFriendship(requestSenderNickname, memberNickname);
+            RejectedFriendship reverseRejectedFriendship = new RejectedFriendship(memberNickname, requestSenderNickname);
+
+            String rejectedKey = "rejectedfriendship:" + requestSenderNickname + "-" + memberNickname;
+            String reverseRejectedKey = "rejectedfriendship:" + memberNickname + "-" + requestSenderNickname;
+
+            notificationSendService.sendRefuseNotification(member, requestSender);
+
+            redisUtil.setRejectedFriendshipWithExpireTime(rejectedKey, rejectedFriendship, 1, TimeUnit.DAYS);
+            redisUtil.setRejectedFriendshipWithExpireTime(reverseRejectedKey, reverseRejectedFriendship, 1, TimeUnit.DAYS);
+
             return new ResponseEntity<>(new Message("친구요청을 거절하였습니다.", null), HttpStatus.OK);
         }
     }
@@ -131,24 +149,43 @@ public class FriendshipService {
      */
 
     private ResponseEntity<Message> friendRequestMethod(Members member, Members receiver) {
-        if (member.getNickname().equals(receiver.getNickname())) throw new CustomException(CANNOT_REQUEST);
+        String senderNickname = member.getNickname();
+        String receiverNickname = receiver.getNickname();
+        String rejectedKey = "rejectedfriendship:" + senderNickname + "-" + receiverNickname;
+
+        if (senderNickname.equals(receiverNickname)) throw new CustomException(CANNOT_REQUEST);
 
         Optional<Friendship> findRequest = friendshipRepository.findBySenderAndReceiver(member, receiver)
                 .or(() -> friendshipRepository.findBySenderAndReceiver(receiver, member));
 
-        if (findRequest.isEmpty()) {
-            Friendship friendship = new Friendship(member, receiver, FriendshipStatus.PENDING);
-            friendshipRepository.save(friendship);
+
+        if(redisUtil.hasKeyFriendship(rejectedKey)) {
+            Long remainingTime = redisUtil.getExpire(rejectedKey, TimeUnit.SECONDS);
+            String formattedTime = formatSeconds(remainingTime);
+
+            return new ResponseEntity<>(new Message("친구 요청이 거절된 상태입니다.","남은 시간: " + formattedTime),HttpStatus.OK);
+        } else if(findRequest.isPresent()) {
+            FriendshipStatus status = findRequest.get().getStatus();
+
+            if(status.equals(FriendshipStatus.REFUSE)){
+                friendshipRepository.delete(findRequest.get());
+
+                Friendship newFriendship = new Friendship(member, receiver, FriendshipStatus.PENDING);
+                friendshipRepository.save(newFriendship);
+                notificationSendService.sendFriendRequestNotification(member, receiver);
+
+                return new ResponseEntity<>(new Message("친구 요청 완료", null), HttpStatus.OK);
+            } else if (status.equals(FriendshipStatus.PENDING)) {
+                return new ResponseEntity<>(new Message("이미 친구 요청을 하셨습니다.", null), HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
+            }
+        } else {
+            Friendship newFriendship = new Friendship(member, receiver, FriendshipStatus.PENDING);
+            friendshipRepository.save(newFriendship);
             notificationSendService.sendFriendRequestNotification(member, receiver);
             return new ResponseEntity<>(new Message("친구 요청 완료", null), HttpStatus.OK);
         }
-
-        FriendshipStatus status = findRequest.get().getStatus();
-        return switch (status) {
-            case REFUSE -> new ResponseEntity<>(new Message("상대방이 요청을 거절했습니다.", null), HttpStatus.OK);
-            case PENDING -> new ResponseEntity<>(new Message("이미 요청을 하셨습니다.", null), HttpStatus.BAD_REQUEST);
-            default -> new ResponseEntity<>(new Message("이미 친구로 등록된 사용자입니다.", null), HttpStatus.OK);
-        };
     }
 
     private Members findMemberByNickname(String memberNickname) {
@@ -161,5 +198,13 @@ public class FriendshipService {
         return membersRepository.findByFriendCode(friendCode).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+    }
+
+    private String formatSeconds(Long remainingTime){
+        long hours = remainingTime / 3600;
+        long minutes = (remainingTime % 3600) / 60;
+        long seconds = remainingTime % 60;
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 }
