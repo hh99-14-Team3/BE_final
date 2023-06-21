@@ -8,7 +8,6 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationSendService;
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.util.BadWordFiltering;
 import com.mogakko.be_final.util.Message;
 import jnr.a64asm.Mem;
@@ -66,17 +65,6 @@ public class DirectMessageService {
         return new ResponseEntity<>(new Message("쪽지 전송 성공", null), HttpStatus.OK);
     }
 
-// 나중에 확인하고 삭제
-//    @Transactional
-//    public ResponseEntity<Message> deleteDirectMessage(DirectMessageDeleteRequestDto requestDto, Members member) {
-//        List<Long> dmList = requestDto.getDirectMessageList();
-//
-//        for (Long dm : dmList) {
-//            DirectMessage directMessage = findDirectMessageById(dm);
-//            directMessageRepository.delete(directMessage);
-//        }
-//        return new ResponseEntity<>(new Message("쪽지 삭제 성공", null), HttpStatus.OK);
-//    }
 
     @Transactional(readOnly = true)
     public ResponseEntity<Message> searchReceivedMessage(Members member) {
@@ -129,14 +117,10 @@ public class DirectMessageService {
 
     @Transactional
     public ResponseEntity<Message> deleteDirectMessage(Members member, List<Long> messageIdList){
-        List<Long> notFoundMessageList = new ArrayList<>();
 
         for (Long messageId : messageIdList) {
-            DirectMessage directMessage = directMessageRepository.findById(messageId).orElse(null);
-            if(directMessage == null){
-                notFoundMessageList.add(messageId);
-                continue;
-            }
+            DirectMessage directMessage = findDirectMessageById(messageId);
+
             if (directMessage.getReceiver().getNickname().equals(member.getNickname()) && !directMessage.isDeleteByReceiver()) {
                 directMessage.markDeleteByReceiverTrue();
 
@@ -153,16 +137,11 @@ public class DirectMessageService {
                 } else {
                     directMessageRepository.save(directMessage);
                 }
-            }else{
-                notFoundMessageList.add(messageId);
+            } else {
+                throw new CustomException(USER_MISMATCH_ERROR);
             }
         }
-        if(notFoundMessageList.isEmpty()){
-            return new ResponseEntity<>(new Message("쪽지 삭제가 완료되었습니다.", null), HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>(new Message("유효한 요청에 대해서만 완료 되었습니다.","존재하지 않는 message" + notFoundMessageList), HttpStatus.OK);
-        }
-
+        return new ResponseEntity<>(new Message("쪽지 삭제가 완료되었습니다.", null), HttpStatus.OK);
     }
 
     /**
@@ -171,7 +150,7 @@ public class DirectMessageService {
 
     private DirectMessage findDirectMessageById(Long id) {
         return directMessageRepository.findById(id).orElseThrow(
-                () -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND)
+                () -> new CustomException(MESSAGE_NOT_FOUND)
         );
     }
 }

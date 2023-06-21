@@ -32,7 +32,7 @@ public enum ErrorCode {
     INVALID_FRIEND_CODE(HttpStatus.BAD_REQUEST, "친구 코드를 정확하게 입력해주세요."),
     CANNOT_REQUEST(HttpStatus.BAD_REQUEST, "자신에게 요청을 보낼 수 없습니다."),
     PLZ_INPUT(HttpStatus.BAD_REQUEST, "입력해주세요."),
-
+    USER_MISMATCH_ERROR(HttpStatus.BAD_REQUEST, "사용자와 해당 메세지의 발신자 혹은 수신자가 일치하지 않습니다."),
 
     //인증
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다.");

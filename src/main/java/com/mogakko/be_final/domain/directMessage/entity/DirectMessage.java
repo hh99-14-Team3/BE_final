@@ -52,6 +52,7 @@ public class DirectMessage extends Timestamped {
     public void markDeleteBySenderTrue() { this.deleteBySender = true; }
 
     public void markDeleteByReceiverTrue() { this.deleteByReceiver = true; }
+
     public void markRead() {
         this.isRead = true;
     }
