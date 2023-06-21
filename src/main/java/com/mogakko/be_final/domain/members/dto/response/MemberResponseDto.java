@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 public class MemberResponseDto {
     private String nickname;
     private String profileImage;
+    private boolean isTutorialCheck;
 
-    public MemberResponseDto(String nickname, String profileImage) {
+    public MemberResponseDto(String nickname, String profileImage, boolean isTutorialCheck) {
         this.nickname = nickname;
         this.profileImage = profileImage;
+        this.isTutorialCheck = isTutorialCheck;
     }
 }

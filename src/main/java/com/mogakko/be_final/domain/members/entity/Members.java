@@ -68,6 +68,9 @@ public class Members extends Timestamped {
     @Column
     private Integer declared = 0;
 
+    @Column
+    @Builder.Default
+    private boolean isTutorialCheck = false;
 
     public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode, Integer friendCode) {
         this.email = email;
@@ -120,5 +123,9 @@ public class Members extends Timestamped {
 
     public void declare() {
         this.declared += 1;
+    }
+  
+    public void setTutorialCheck() {
+        this.isTutorialCheck = true;
     }
 }
