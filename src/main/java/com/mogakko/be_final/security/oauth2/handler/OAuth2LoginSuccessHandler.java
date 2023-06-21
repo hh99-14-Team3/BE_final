@@ -37,17 +37,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             // User의 Role이 GUEST일 경우 처음 요청한 회원이므로 회원가입 페이지로 리다이렉트
             if (oAuth2User.getRole() == Role.GUEST) {
-                Members member = membersRepository.findByEmail(oAuth2User.getEmail()).orElseThrow(
-                        () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-                );
-                member.changeRole(Role.USER);
-                membersRepository.save(member);
-
-                loginSuccess(response, oAuth2User);
 
 
-            } else {
-                loginSuccess(response, oAuth2User);
+                guestLoginSuccess(response, oAuth2User);
+            }else {
+                userLoginSuccess(response, oAuth2User);
             }
         } catch (Exception e) {
             throw e;
@@ -55,12 +49,25 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     }
 
-    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
+    private void guestLoginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
+        TokenDto token = jwtProvider.createAllToken(oAuth2User.getEmail());
+
+        jwtProvider.setHeaderAccessToken(response, token.getAccessToken());
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        //TODO: 위치기반정보 활용 동의 페이지로 리다이렉트 할 예정입니다.
+        // 해당 페이지에서 동의를 하고 프론트에서 토큰과 함께 지정된 api로 요청을 보내면 ROLE 을 USER 로 바꿔줄 계획입니다. ( api는 아직 미구현)
+        response.sendRedirect("http://localhost:8080/");
+    }
+
+    private void userLoginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
         TokenDto token = jwtProvider.createAllToken(oAuth2User.getEmail());
 
         jwtProvider.setHeaderAccessToken(response, token.getAccessToken());
         jwtProvider.setHeaderRefreshToken(response, token.getRefreshToken());
 
         response.setStatus(HttpServletResponse.SC_OK);
+        //TODO: 메인페이지로 리다이렉트 할 예정입니다. 이 부분에서 기존 로그인 하는 방법과 동일하게 진행 하려고 합니다.
+        response.sendRedirect("http://localhost:8080/");
     }
 }
