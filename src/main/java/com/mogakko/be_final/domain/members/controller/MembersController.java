@@ -114,7 +114,7 @@ public class MembersController {
     }
   
     @Operation(summary = "튜토리얼 체크 메서드 API", description = "유저가 튜토리얼을 확인했는지 체크하는 메서드입니다.")
-    @PutMapping("/tutorialCheck")
+    @PutMapping("/tutorial-check")
     public ResponseEntity<Message> tutorialCheck(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.tutorialCheck(userDetails.getMember());
     }
