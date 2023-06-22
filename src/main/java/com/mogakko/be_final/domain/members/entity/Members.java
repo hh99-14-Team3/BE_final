@@ -85,10 +85,6 @@ public class Members extends Timestamped {
         this.password = password;
     }
 
-    public void changeRole(Role newRole) {
-        this.role = newRole;
-    }
-
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
@@ -124,8 +120,12 @@ public class Members extends Timestamped {
     public void declare() {
         this.declared += 1;
     }
-  
+
     public void setTutorialCheck() {
         this.isTutorialCheck = true;
+    }
+
+    public void changeRole(Role newRole) {
+        this.role = newRole;
     }
 }
