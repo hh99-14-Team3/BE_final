@@ -19,9 +19,16 @@ public class DeclaredMembers {
     private Long id;
 
     @Column
-    private String memberNickname;
+    private String reportedNickname;
 
     @Column
-    private String declaredReason;
+    private String declaredMemberNickname;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private DeclaredReason declaredReason;
+
+    @Column
+    private String reason;
 
 }
