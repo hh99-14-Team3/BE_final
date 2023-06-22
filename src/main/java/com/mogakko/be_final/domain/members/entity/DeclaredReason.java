@@ -14,10 +14,10 @@ public enum DeclaredReason {
     }
 
     @JsonCreator
-    public static MemberStatusCode from(String value) {
-        for (MemberStatusCode status : MemberStatusCode.values()) {
-            if (status.getValue().equals(value)) {
-                return status;
+    public static DeclaredReason from(String value) {
+        for (DeclaredReason reason : DeclaredReason.values()) {
+            if (reason.getValue().equals(value)) {
+                return reason;
             }
         }
         return null;
