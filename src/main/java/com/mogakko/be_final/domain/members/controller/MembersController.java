@@ -1,8 +1,10 @@
 package com.mogakko.be_final.domain.members.controller;
 
+import com.mogakko.be_final.domain.members.dto.request.DeclareRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
+import com.mogakko.be_final.domain.members.entity.DeclaredMembers;
 import com.mogakko.be_final.domain.members.service.MembersService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -107,16 +110,28 @@ public class MembersController {
         return membersService.readBestMembers();
     }
 
-    @Operation(summary = "유저 신고 API", description = "선택한 유저를 신고하는 메서드입니다.")
-    @PutMapping("/declare")
-    public ResponseEntity<Message> declareMember(@RequestParam Long memberId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return membersService.declareMember(memberId, userDetails.getMember());
-    }
-  
     @Operation(summary = "튜토리얼 체크 메서드 API", description = "유저가 튜토리얼을 확인했는지 체크하는 메서드입니다.")
     @PutMapping("/tutorial-check")
     public ResponseEntity<Message> tutorialCheck(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.tutorialCheck(userDetails.getMember());
+    }
+
+    @Operation(summary = "유저 신고 API", description = "선택한 유저를 신고하는 메서드입니다.")
+    @PutMapping("/declare")
+    public ResponseEntity<Message> declareMember(@RequestBody DeclareRequestDto declareRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return membersService.declareMember(declareRequestDto, userDetails.getMember());
+    }
+
+    @Operation(summary = "유저 신고 조회 API", description = "신고된 유저를 조회하는 메서드입니다. (관리자 페이지)")
+    @GetMapping("/admin")
+    public ResponseEntity<Message> getReportedMembers(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return membersService.getReportedMembers(userDetails.getMember());
+    }
+
+    @Operation(summary = "신고 적용 API", description = "관리자가 신고를 적용하는 API입니다.")
+    @PutMapping("/admin/ok")
+    public ResponseEntity<Message> reportMember(@RequestParam String nickname, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return membersService.reportMember(nickname, userDetails.getMember());
     }
 }
 

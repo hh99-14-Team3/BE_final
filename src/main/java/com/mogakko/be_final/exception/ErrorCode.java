@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     INTERNAL_SERER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR"),
+    NOT_ADMIN(HttpStatus.BAD_REQUEST, "관리자 회원이 아닙니다."),
     ALREADY_JOIN_USER(HttpStatus.BAD_REQUEST, "이미 가입한 회원입니다. 로그인해주세요"),
     DUPLICATE_IDENTIFIER(HttpStatus.BAD_REQUEST, "중복된 이메일 입니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "중복된 닉네임 입니다."),
@@ -32,7 +33,7 @@ public enum ErrorCode {
     INVALID_FRIEND_CODE(HttpStatus.BAD_REQUEST, "친구 코드를 정확하게 입력해주세요."),
     CANNOT_REQUEST(HttpStatus.BAD_REQUEST, "자신에게 요청을 보낼 수 없습니다."),
     PLZ_INPUT(HttpStatus.BAD_REQUEST, "입력해주세요."),
-    GITHUB_TOKEN_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"GitHub 에서 엑세스 토큰을 가져오지 못했습니다."),
+    GITHUB_TOKEN_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GitHub 에서 엑세스 토큰을 가져오지 못했습니다."),
     FAILED_TO_GET_USERINFO(HttpStatus.BAD_REQUEST, "GitHub로 부터 정보를 받아오지 못했습니다."),
     TTL_IS_NULL(HttpStatus.FORBIDDEN, "다시 친구요청을 할 수 있습니다."),
     USER_MISMATCH_ERROR(HttpStatus.BAD_REQUEST, "사용자와 해당 메세지의 발신자 혹은 수신자가 일치하지 않습니다."),
