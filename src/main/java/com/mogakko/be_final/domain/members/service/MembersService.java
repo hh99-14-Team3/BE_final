@@ -287,11 +287,22 @@ public class MembersService {
     @Transactional
     public ResponseEntity<Message> declareMember(DeclareRequestDto declareRequestDto, Members member) {
         String declaredNickname = declareRequestDto.getDeclaredNickname();
-        String declaredReason = declareRequestDto.getDeclaredReason();
+        DeclaredReason declaredReason = declareRequestDto.getDeclaredReason();
+        String reason = declareRequestDto.getReason();
 
         Members findMember = findMember(declaredNickname);
 
-        declaredMembersRepository.save(DeclaredMembers.builder().memberNickname(findMember.getNickname()).declaredReason(declaredReason).build());
+        String findMemberNickname = findMember.getNickname();
+        String reportedMemberNickname = member.getNickname();
+
+        if (findMemberNickname.equals(reportedMemberNickname)) throw new CustomException(CANNOT_REQUEST);
+        if (declaredReason.equals(DeclaredReason.ETC) && reason.equals("")) throw new CustomException(PLZ_INPUT);
+
+        declaredMembersRepository.save(DeclaredMembers.builder()
+                .reportedNickname(reportedMemberNickname)
+                .declaredMemberNickname(findMemberNickname)
+                .declaredReason(declaredReason)
+                .reason(reason).build());
         return new ResponseEntity<>(new Message("멤버 신고 성공", null), HttpStatus.OK);
     }
 
