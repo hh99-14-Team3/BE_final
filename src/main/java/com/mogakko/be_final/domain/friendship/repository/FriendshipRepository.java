@@ -18,4 +18,6 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     List<Friendship> findAllByReceiverAndStatus(Members receiver, FriendshipStatus status);
 
     Optional<Friendship> findStatusBySenderAndReceiverOrReceiverAndSender(Members sender1, Members receiver1, Members receiver2, Members sender2);
+
+    void deleteAllBySenderAndReceiver(Members sender, Members receiver);
 }

@@ -11,4 +11,5 @@ public interface DirectMessageRepository extends JpaRepository<DirectMessage, Lo
 
     List<DirectMessage> findAllBySenderAndDeleteBySenderFalse(Members receiver);
 
+    List<DirectMessage> findAllBySenderOrReceiver(Members member1, Members member2);
 }

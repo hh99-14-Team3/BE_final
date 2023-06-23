@@ -11,4 +11,6 @@ import java.util.List;
 public interface MogakkoRoomMembersLanguageStatisticsRepository extends JpaRepository<MogakkoRoomMembersLanguageStatistics, Long> {
     @Query("SELECT NEW com.mogakko.be_final.domain.members.dto.response.LanguageDto(m.language, COUNT(m.language), (SELECT COUNT(ml.language) FROM MogakkoRoomMembersLanguageStatistics ml WHERE ml.email = :email)) FROM MogakkoRoomMembersLanguageStatistics m WHERE m.email = :email GROUP BY m.language")
     List<LanguageDto> countByEmailAndLanguage(@Param("email") String email);
+
+    void deleteByEmail(String email);
 }

@@ -20,12 +20,10 @@ public class DirectMessage extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private Members sender;
 
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne
     @JoinColumn(name = "receiver_id", referencedColumnName = "id")
     private Members receiver;
@@ -55,5 +53,10 @@ public class DirectMessage extends Timestamped {
 
     public void markRead() {
         this.isRead = true;
+    }
+
+    public void deleteMember(Members member){
+        if (member.getEmail().equals(this.receiver.getEmail())) this.receiver = null;
+        else this.sender = null;
     }
 }

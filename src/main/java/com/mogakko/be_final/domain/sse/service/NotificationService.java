@@ -48,9 +48,9 @@ public class NotificationService {
 
         for (Notification missedNotification : missedNotifications) {
             String senderNickname = missedNotification.getSenderNickname();
-            Members sender = membersRepository.findByNickname(senderNickname).orElseThrow( () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            Members sender = membersRepository.findByNickname(senderNickname).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             String senderProfileUrl = sender.getProfileImage();
-                    sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification, senderProfileUrl),missedNotification);
+            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification, senderProfileUrl), missedNotification);
         }
 
 
@@ -70,7 +70,7 @@ public class NotificationService {
 
 
     public void send(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
-        Notification notification = createNotification(sender , receiver, notificationType, content, url);
+        Notification notification = createNotification(sender, receiver, notificationType, content, url);
         notificationRepository.save(notification);
         String memberId = String.valueOf(receiver.getId());
 
@@ -80,7 +80,7 @@ public class NotificationService {
         Map<String, SseEmitter> sseEmitters = emitterRepository.findAllEmitterStartWithByMemberId(memberId);
         sseEmitters.forEach(
                 (key, emitter) -> {
-                    sendToClient(emitter, key, new NotificationResponseDto(notification, sender.getProfileImage()),notification );
+                    sendToClient(emitter, key, new NotificationResponseDto(notification, sender.getProfileImage()), notification);
                 }
         );
     }
@@ -104,7 +104,7 @@ public class NotificationService {
             emitter.send(SseEmitter.event()
                     .id(emitterId)
                     .data(data));
-            if(data instanceof NotificationResponseDto){
+            if (data instanceof NotificationResponseDto) {
                 markAsRead(notification);
             }
         } catch (IOException exception) {
@@ -149,7 +149,7 @@ public class NotificationService {
         );
     }
 
-    public List<Notification> findUnreadNotificationList(Long memberId){
+    public List<Notification> findUnreadNotificationList(Long memberId) {
         return notificationRepository.findAllByReceiverIdAndReadStatusAndCreatedAtLessThan(
                 memberId, false, Instant.now(Clock.system(ZoneId.of("Asia/Seoul"))));
     }

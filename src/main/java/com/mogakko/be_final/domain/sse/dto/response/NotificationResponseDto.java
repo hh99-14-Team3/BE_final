@@ -5,6 +5,7 @@ import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +23,6 @@ public class NotificationResponseDto {
     private String createdAt;
     private boolean readStatus;
     private String senderProfileUrl;
-
 
 
     public NotificationResponseDto(Notification notification, String senderProfileUrl) {
