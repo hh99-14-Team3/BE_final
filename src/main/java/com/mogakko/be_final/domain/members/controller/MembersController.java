@@ -4,7 +4,6 @@ import com.mogakko.be_final.domain.members.dto.request.DeclareRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
-import com.mogakko.be_final.domain.members.entity.DeclaredMembers;
 import com.mogakko.be_final.domain.members.service.MembersService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
@@ -21,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -129,9 +127,9 @@ public class MembersController {
     }
 
     @Operation(summary = "신고 적용 API", description = "관리자가 신고를 적용하는 API입니다.")
-    @PutMapping("/admin/ok")
-    public ResponseEntity<Message> reportMember(@RequestParam String nickname, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return membersService.reportMember(nickname, userDetails.getMember());
+    @PutMapping("/admin/ok/{declaredMemberId}")
+    public ResponseEntity<Message> handleReport(@PathVariable Long declaredMemberId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return membersService.handleReport(declaredMemberId, userDetails.getMember());
     }
 
     @Operation(summary = "회원 탈퇴 API", description = "회원 탈퇴하는 메서드입니다.")
