@@ -117,7 +117,7 @@ public class MembersController {
     }
 
     @Operation(summary = "유저 신고 API", description = "선택한 유저를 신고하는 메서드입니다.")
-    @PutMapping("/declare")
+    @PostMapping("/declare")
     public ResponseEntity<Message> declareMember(@RequestBody DeclareRequestDto declareRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.declareMember(declareRequestDto, userDetails.getMember());
     }
