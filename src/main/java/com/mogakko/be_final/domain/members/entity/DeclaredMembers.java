@@ -21,8 +21,8 @@ public class DeclaredMembers {
     @Column
     private String reportedNickname;
 
-    @Column
-    private String declaredMemberNickname;
+    @ManyToOne
+    private Members declaredMember;
 
     @Column
     @Enumerated(EnumType.STRING)
