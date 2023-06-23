@@ -1,12 +1,16 @@
 package com.mogakko.be_final.domain.sse.entity;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Table;
 import java.time.Instant;
 
 @Table
@@ -16,7 +20,7 @@ public class Notification {
     @PrimaryKeyColumn(name = "receiver_id", type = PrimaryKeyType.PARTITIONED, ordinal = 0)
     private Long receiverId;
 
-    @PrimaryKeyColumn(name = "read_status", type = PrimaryKeyType.CLUSTERED,ordering = Ordering.DESCENDING, ordinal = 1)
+    @PrimaryKeyColumn(name = "read_status", type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING, ordinal = 1)
     private boolean readStatus;
 
     @PrimaryKeyColumn(name = "created_at", type = PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING, ordinal = 2)
@@ -60,7 +64,8 @@ public class Notification {
         this.url = notification.getUrl();
         this.type = notification.getType();
     }
-    public void changeReadStatus(){
+
+    public void changeReadStatus() {
         this.readStatus = true;
     }
 }

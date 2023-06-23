@@ -19,8 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationSearchService {
     private final NotificationRepository notificationRepository;
+
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> getMyNotification(UserDetailsImpl userDetails){
+    public ResponseEntity<Message> getMyNotification(UserDetailsImpl userDetails) {
         Members receiver = userDetails.getMember();
 
         List<Notification> notificationList = notificationRepository.findAllByReceiverId(receiver.getId());
@@ -31,9 +32,9 @@ public class NotificationSearchService {
         }
 
 
-        if(!notificationList.isEmpty()){
+        if (!notificationList.isEmpty()) {
             return new ResponseEntity<>(new Message("알림 조회 완료", receivedNotificationList), HttpStatus.OK);
-        }else {
+        } else {
             return new ResponseEntity<>(new Message("알림이 없습니다.", null), HttpStatus.OK);
         }
 
