@@ -9,5 +9,5 @@ public interface MemberWeekStatisticsRepository extends JpaRepository<MemberWeek
 
     List<MemberWeekStatistics> findTop8ByOrderByWeekTotalTimeDesc();
 
-    MemberWeekStatistics findByEmail(String email);
+    void deleteByEmail(String email);
 }
