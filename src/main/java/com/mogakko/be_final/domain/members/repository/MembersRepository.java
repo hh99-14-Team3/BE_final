@@ -1,7 +1,5 @@
 package com.mogakko.be_final.domain.members.repository;
 
-import com.mogakko.be_final.domain.members.dto.response.MemberResponseDto;
-import com.mogakko.be_final.domain.members.dto.response.MemberSimpleResponseDto;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.SocialType;
 import org.springframework.data.jpa.repository.JpaRepository;
