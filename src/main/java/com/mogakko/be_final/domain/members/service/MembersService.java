@@ -1,6 +1,8 @@
 package com.mogakko.be_final.domain.members.service;
 
 import com.mogakko.be_final.S3.S3Uploader;
+import com.mogakko.be_final.domain.directMessage.entity.DirectMessage;
+import com.mogakko.be_final.domain.directMessage.repository.DirectMessageRepository;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.dto.request.DeclareRequestDto;
@@ -13,6 +15,7 @@ import com.mogakko.be_final.domain.members.repository.DeclaredMembersRepository;
 import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLanguageStatisticsRepository;
+import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.security.jwt.JwtProvider;
@@ -43,6 +46,8 @@ import static com.mogakko.be_final.exception.ErrorCode.*;
 @Service
 @RequiredArgsConstructor
 public class MembersService {
+    private final DirectMessageRepository directMessageRepository;
+    private final MogakkoRoomMembersRepository mogakkoRoomMembersRepository;
     private final JwtProvider jwtProvider;
     private final RedisUtil redisUtil;
     private final BadWordFiltering badWordFiltering;
@@ -328,6 +333,22 @@ public class MembersService {
         }
         membersRepository.save(findMember);
         return new ResponseEntity<>(new Message("신고 처리 완료", null), HttpStatus.OK);
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public ResponseEntity<Message> withdrawMember(Members member) {
+        memberWeekStatisticsRepository.deleteByEmail(member.getEmail());
+        mogakkoRoomMembersLanguageStatisticsRepository.deleteByEmail(member.getEmail());
+        friendshipRepository.deleteAllBySenderAndReceiver(member, member);
+        mogakkoRoomMembersRepository.deleteById(member.getId());
+        List<DirectMessage> dmList = directMessageRepository.findAllBySenderOrReceiver(member, member);
+        for (DirectMessage directMessage : dmList) {
+            directMessage.deleteMember(member);
+        }
+        membersRepository.delete(member);
+
+        return new ResponseEntity<>(new Message("회원 탈퇴 성공", null), HttpStatus.OK);
     }
 
     /**

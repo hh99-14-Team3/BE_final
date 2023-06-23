@@ -133,5 +133,11 @@ public class MembersController {
     public ResponseEntity<Message> reportMember(@RequestParam String nickname, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return membersService.reportMember(nickname, userDetails.getMember());
     }
+
+    @Operation(summary = "회원 탈퇴 API", description = "회원 탈퇴하는 메서드입니다.")
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<Message> withdrawMember(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return membersService.withdrawMember(userDetails.getMember());
+    }
 }
 
