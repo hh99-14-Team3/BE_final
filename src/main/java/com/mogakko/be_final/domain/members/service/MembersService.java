@@ -114,6 +114,8 @@ public class MembersService {
         Members member = membersRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+
+        //대소문자 구별하기 위한 코드
         if (!member.getEmail().equals(email)) throw new CustomException(INVALID_EMAIL);
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), member.getPassword())) {
