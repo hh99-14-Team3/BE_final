@@ -136,8 +136,9 @@ public class MembersService {
         String nickname = member.getNickname();
         String profileImage = member.getProfileImage();
         boolean isTutorialCheck = member.isTutorialCheck();
+        Role role = member.getRole();
 
-        return new ResponseEntity<>(new Message("로그인 성공", new MemberResponseDto(nickname, profileImage, isTutorialCheck)), HttpStatus.OK);
+        return new ResponseEntity<>(new Message("로그인 성공", new MemberResponseDto(nickname, profileImage, isTutorialCheck, role)), HttpStatus.OK);
     }
 
     // 로그아웃
