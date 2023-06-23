@@ -85,6 +85,7 @@ public class MembersService {
                 .memberStatusCode(MemberStatusCode.BASIC)
                 .profileImage("https://source.boringavatars.com/beam/120/$" + nickname + "?colors=00F0FF,172435,394254,EAEBED,F9F9FA")
                 .friendCode(friendCode)
+                .declared(0)
                 .build();
 
         membersRepository.save(member);
