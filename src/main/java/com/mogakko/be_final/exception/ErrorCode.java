@@ -37,6 +37,7 @@ public enum ErrorCode {
     FAILED_TO_GET_USERINFO(HttpStatus.BAD_REQUEST, "GitHub로 부터 정보를 받아오지 못했습니다."),
     TTL_IS_NULL(HttpStatus.FORBIDDEN, "다시 친구요청을 할 수 있습니다."),
     USER_MISMATCH_ERROR(HttpStatus.BAD_REQUEST, "사용자와 해당 메세지의 발신자 혹은 수신자가 일치하지 않습니다."),
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 알림이 존재하지 않습니다"),
 
 
     //인증
