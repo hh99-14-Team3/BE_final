@@ -42,7 +42,7 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 
-nohup java -jar $JAR_NAME --server.port=8080 >> $REPOSITORY/nohup.out 2>&1 &
+nohup java -jar -Dspring.profiles.active=prod $JAR_NAME --server.port=8080 >> $REPOSITORY/nohup.out 2>&1 &
 
 echo "> 새로운 애플리케이션 실행 중"
 
