@@ -2,6 +2,9 @@
 
 REPOSITORY=/home/ubuntu/app
 
+# .bash_profile 파일 생성
+echo "" > $HOME/.bash_profile
+
 source $HOME/.bash_profile
 
 echo "> 이전에 실행 중인 애플리케이션 종료"
