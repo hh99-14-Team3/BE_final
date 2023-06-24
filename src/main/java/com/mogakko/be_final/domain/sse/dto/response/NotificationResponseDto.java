@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 @Schema(description = "알림 Dto")
 @Getter
@@ -23,27 +25,15 @@ public class NotificationResponseDto {
     private String createdAt;
     private boolean readStatus;
     private String senderProfileUrl;
+    private UUID notificationId;
 
 
-    public NotificationResponseDto(Notification notification, String senderProfileUrl) {
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = time.format(formatter);
-        this.receiverId = notification.getReceiverId();
-        this.content = notification.getContent();
-        this.url = notification.getUrl();
-        this.receiverNickname = notification.getReceiverNickname();
-        this.senderNickname = notification.getSenderNickname();
-        this.notificationType = notification.getType();
-        this.createdAt = formattedNow;
-        this.readStatus = notification.isReadStatus();
-        this.senderProfileUrl = senderProfileUrl;
-    }
 
     public NotificationResponseDto(Notification notification) {
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        Instant time = notification.getCreatedAt();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(time, ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = time.format(formatter);
+        String formattedNow = formatter.format(localDateTime);
         this.receiverId = notification.getReceiverId();
         this.content = notification.getContent();
         this.url = notification.getUrl();
@@ -52,6 +42,8 @@ public class NotificationResponseDto {
         this.notificationType = notification.getType();
         this.createdAt = formattedNow;
         this.readStatus = notification.isReadStatus();
+        this.senderProfileUrl = notification.getSenderProfileUrl();
+        this.notificationId = notification.getNotificationId();
     }
 
 }
