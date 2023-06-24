@@ -33,6 +33,7 @@ public enum ErrorCode {
     INVALID_FRIEND_CODE(HttpStatus.BAD_REQUEST, "친구 코드를 정확하게 입력해주세요."),
     CANNOT_REQUEST(HttpStatus.BAD_REQUEST, "자신에게 요청을 보낼 수 없습니다."),
     PLZ_INPUT(HttpStatus.BAD_REQUEST, "입력해주세요."),
+    PLZ_INPUT_REASON_OF_REPORT(HttpStatus.BAD_REQUEST, "신고 이유를 입력해주세요."),
     GITHUB_TOKEN_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GitHub 에서 엑세스 토큰을 가져오지 못했습니다."),
     FAILED_TO_GET_USERINFO(HttpStatus.BAD_REQUEST, "GitHub로 부터 정보를 받아오지 못했습니다."),
     TTL_IS_NULL(HttpStatus.FORBIDDEN, "다시 친구요청을 할 수 있습니다."),
