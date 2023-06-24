@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.members.entity;
+package com.mogakko.be_final.domain.declare.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

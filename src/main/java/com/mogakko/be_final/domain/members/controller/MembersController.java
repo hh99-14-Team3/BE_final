@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.members.controller;
 
-import com.mogakko.be_final.domain.members.dto.request.DeclareRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
@@ -112,24 +111,6 @@ public class MembersController {
     @PutMapping("/tutorial-check")
     public ResponseEntity<Message> tutorialCheck(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return membersService.tutorialCheck(userDetails.getMember());
-    }
-
-    @Operation(summary = "유저 신고 API", description = "선택한 유저를 신고하는 메서드입니다.")
-    @PostMapping("/declare")
-    public ResponseEntity<Message> declareMember(@Valid @RequestBody DeclareRequestDto declareRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return membersService.declareMember(declareRequestDto, userDetails.getMember());
-    }
-
-    @Operation(summary = "유저 신고 조회 API", description = "신고된 유저를 조회하는 메서드입니다. (관리자 페이지)")
-    @GetMapping("/admin")
-    public ResponseEntity<Message> getReportedMembers(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return membersService.getReportedMembers(userDetails.getMember());
-    }
-
-    @Operation(summary = "신고 적용 API", description = "관리자가 신고를 적용하는 API입니다.")
-    @PutMapping("/admin/ok/{declaredMemberId}")
-    public ResponseEntity<Message> handleReport(@PathVariable Long declaredMemberId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return membersService.handleReport(declaredMemberId, userDetails.getMember());
     }
 
     @Operation(summary = "회원 탈퇴 API", description = "회원 탈퇴하는 메서드입니다.")
