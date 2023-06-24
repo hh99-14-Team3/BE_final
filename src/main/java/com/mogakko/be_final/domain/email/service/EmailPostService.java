@@ -26,7 +26,7 @@ import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class EmailPostService {
     private final JavaMailSender emailSender;
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final MembersRepository memberRepository;
