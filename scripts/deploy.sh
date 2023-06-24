@@ -18,7 +18,7 @@ fi
 
 echo "> 현재 실행 중인 애플리케이션 프로세스 확인"
 
-CHECK_PID=$(pgrep -fla java | grep Mogakko | awk '{print $1}')
+CHECK_PID=$(pgrep -fla java | grep BE | awk '{print $1}')
 
 if [ -z "$CHECK_PID" ]; then
   echo "이전 애플리케이션 종료 완료"

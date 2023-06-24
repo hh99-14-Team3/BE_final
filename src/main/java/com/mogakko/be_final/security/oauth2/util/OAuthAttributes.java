@@ -32,8 +32,7 @@ public class OAuthAttributes {
 
         if (socialType == SocialType.KAKAO) {
             return ofKakao(userNameAttributeName, attributes);
-        }
-        else if (socialType == SocialType.GOOGLE) {
+        } else if (socialType == SocialType.GOOGLE) {
             return ofGoogle(userNameAttributeName, attributes);
         } else if (socialType == SocialType.GITHUB) {
             return ofGithub(userNameAttributeName, attributes);
