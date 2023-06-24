@@ -4,7 +4,6 @@ import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.entity.SocialType;
-import com.mogakko.be_final.domain.members.service.MembersService;
 import com.mogakko.be_final.security.oauth2.userinfo.GItHubOAuth2UserInfo;
 import com.mogakko.be_final.security.oauth2.userinfo.GoogleOAuth2UserInfo;
 import com.mogakko.be_final.security.oauth2.userinfo.KakaoOAuth2UserInfo;

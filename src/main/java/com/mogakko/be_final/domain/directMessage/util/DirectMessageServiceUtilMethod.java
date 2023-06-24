@@ -12,7 +12,7 @@ import static com.mogakko.be_final.exception.ErrorCode.MESSAGE_NOT_FOUND;
 @RequiredArgsConstructor
 public class DirectMessageServiceUtilMethod {
 
-    private DirectMessageRepository directMessageRepository;
+    private final DirectMessageRepository directMessageRepository;
 
     public DirectMessage findDirectMessageById(Long id) {
         return directMessageRepository.findById(id).orElseThrow(
