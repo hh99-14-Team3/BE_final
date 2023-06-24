@@ -24,7 +24,7 @@ public class MogakkoWeekTimeScheduler {
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
 
     @Async
-    @Scheduled(cron = "0 0 5 * * 7")
+    @Scheduled(cron = "0 0 5 * * 1")
     @Transactional
     public void updateWeekTimeOfMembers() {
         log.info("===== updateWeekTimeOfMembers Scheduler 호출");
