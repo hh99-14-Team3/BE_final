@@ -19,7 +19,7 @@ public class DeclaredMembers {
     private Long id;
 
     @Column
-    private String reportedNickname;
+    private String reporterNickname;
 
     @ManyToOne
     private Members declaredMember;

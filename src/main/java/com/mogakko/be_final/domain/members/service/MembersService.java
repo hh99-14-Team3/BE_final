@@ -305,9 +305,8 @@ public class MembersService {
 
         if (findMember.getNickname().equals(reportedMemberNickname)) throw new CustomException(CANNOT_REQUEST);
         if (declaredReason.equals(DeclaredReason.ETC) && reason.equals("")) throw new CustomException(PLZ_INPUT);
-
         declaredMembersRepository.save(DeclaredMembers.builder()
-                .reportedNickname(reportedMemberNickname)
+                .reporterNickname(reportedMemberNickname)
                 .declaredMember(findMember)
                 .declaredReason(declaredReason)
                 .reason(reason).build());
