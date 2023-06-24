@@ -1,6 +1,6 @@
-package com.mogakko.be_final.domain.members.dto.request;
+package com.mogakko.be_final.domain.declare.dto.request;
 
-import com.mogakko.be_final.domain.members.entity.DeclaredReason;
+import com.mogakko.be_final.domain.declare.entity.DeclaredReason;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

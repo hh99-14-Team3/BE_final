@@ -1,6 +1,6 @@
-package com.mogakko.be_final.domain.members.repository;
+package com.mogakko.be_final.domain.declare.repository;
 
-import com.mogakko.be_final.domain.members.entity.DeclaredMembers;
+import com.mogakko.be_final.domain.declare.entity.DeclaredMembers;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

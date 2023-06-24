@@ -1,5 +1,6 @@
-package com.mogakko.be_final.domain.members.entity;
+package com.mogakko.be_final.domain.declare.entity;
 
+import com.mogakko.be_final.domain.members.entity.Members;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
