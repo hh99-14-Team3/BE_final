@@ -1,4 +1,4 @@
-package com.mogakko.be_final.domain.members.controller;
+package com.mogakko.be_final.domain.test;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.GetMapping;
