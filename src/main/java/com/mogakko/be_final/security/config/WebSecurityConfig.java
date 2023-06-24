@@ -67,7 +67,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .antMatchers("/ws/**").permitAll()
                 .antMatchers("/ws").permitAll()
                 .antMatchers("swagger-ui/index.html#/").permitAll()
-//                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login()
