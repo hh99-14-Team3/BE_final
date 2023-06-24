@@ -60,7 +60,7 @@ public class DirectMessageService {
 
         DirectMessage directMessage = new DirectMessage(member, receiver, messageContent, false);
         directMessageRepository.save(directMessage);
-        notificationSendService.sendMessageReceivedNotification(member, receiver);
+        notificationSendService.sendMessageReceivedNotification(member, receiver).subscribe();
 
         return new ResponseEntity<>(new Message("쪽지 전송 성공", null), HttpStatus.OK);
     }

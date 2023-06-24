@@ -57,7 +57,7 @@ public class FriendshipService {
 
         if (determineRequestDto.isDetermineRequest()) {
             findFriendRequest.accept();
-            notificationSendService.sendAcceptNotification(member, requestSender);
+            notificationSendService.sendAcceptNotification(member, requestSender).subscribe();
             friendshipRepository.save(findFriendRequest);
             return new ResponseEntity<>(new Message("친구요청을 수락하였습니다.", null), HttpStatus.OK);
         } else {
@@ -73,7 +73,7 @@ public class FriendshipService {
             String rejectedKey = "rejectedfriendship:" + requestSenderNickname + "-" + memberNickname;
             String reverseRejectedKey = "rejectedfriendship:" + memberNickname + "-" + requestSenderNickname;
 
-            notificationSendService.sendRefuseNotification(member, requestSender);
+            notificationSendService.sendRefuseNotification(member, requestSender).subscribe();
 
             redisUtil.setRejectedFriendshipWithExpireTime(rejectedKey, rejectedFriendship, 1, TimeUnit.DAYS);
             redisUtil.setRejectedFriendshipWithExpireTime(reverseRejectedKey, reverseRejectedFriendship, 1, TimeUnit.DAYS);
@@ -172,7 +172,7 @@ public class FriendshipService {
 
                 Friendship newFriendship = new Friendship(member, receiver, FriendshipStatus.PENDING);
                 friendshipRepository.save(newFriendship);
-                notificationSendService.sendFriendRequestNotification(member, receiver);
+                notificationSendService.sendFriendRequestNotification(member, receiver).subscribe();
 
                 return new ResponseEntity<>(new Message("친구 요청 완료", null), HttpStatus.OK);
             } else if (status.equals(FriendshipStatus.PENDING)) {
@@ -183,7 +183,7 @@ public class FriendshipService {
         } else {
             Friendship newFriendship = new Friendship(member, receiver, FriendshipStatus.PENDING);
             friendshipRepository.save(newFriendship);
-            notificationSendService.sendFriendRequestNotification(member, receiver);
+            notificationSendService.sendFriendRequestNotification(member, receiver).subscribe();
             return new ResponseEntity<>(new Message("친구 요청 완료", null), HttpStatus.OK);
         }
     }
