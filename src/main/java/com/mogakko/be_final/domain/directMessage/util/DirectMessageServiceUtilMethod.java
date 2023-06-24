@@ -4,9 +4,11 @@ import com.mogakko.be_final.domain.directMessage.entity.DirectMessage;
 import com.mogakko.be_final.domain.directMessage.repository.DirectMessageRepository;
 import com.mogakko.be_final.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import static com.mogakko.be_final.exception.ErrorCode.MESSAGE_NOT_FOUND;
 
+@Service
 @RequiredArgsConstructor
 public class DirectMessageServiceUtilMethod {
 
