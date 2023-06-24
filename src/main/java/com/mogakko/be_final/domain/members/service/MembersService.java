@@ -5,13 +5,14 @@ import com.mogakko.be_final.domain.directMessage.entity.DirectMessage;
 import com.mogakko.be_final.domain.directMessage.repository.DirectMessageRepository;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
-import com.mogakko.be_final.domain.members.dto.request.DeclareRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.dto.response.*;
-import com.mogakko.be_final.domain.members.entity.*;
-import com.mogakko.be_final.domain.members.repository.DeclaredMembersRepository;
+import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
+import com.mogakko.be_final.domain.members.entity.MemberWeekStatistics;
+import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLanguageStatisticsRepository;
@@ -39,7 +40,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.mogakko.be_final.domain.members.entity.Role.PROHIBITION;
 import static com.mogakko.be_final.exception.ErrorCode.*;
 
 @Slf4j
@@ -57,8 +57,6 @@ public class MembersService {
     private final MembersRepository membersRepository;
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
     private final MogakkoRoomMembersLanguageStatisticsRepository mogakkoRoomMembersLanguageStatisticsRepository;
-    private final DeclaredMembersRepository declaredMembersRepository;
-
 
     // 회원가입
     @Transactional
@@ -262,6 +260,7 @@ public class MembersService {
         return new ResponseEntity<>(new Message("멤버 검색 성공", members), HttpStatus.OK);
     }
 
+    // 멤버 검색
     @Transactional
     public ResponseEntity<Message> searchMemberByFriendsCode(String friendCode, Members member) {
         if (friendCode.equals("")) throw new CustomException(PLZ_INPUT_CONTENT);
@@ -285,59 +284,12 @@ public class MembersService {
         return new ResponseEntity<>(new Message("멤버 검색 성공", memberSimple), HttpStatus.OK);
     }
 
+    // 튜토리얼 확인용
     @Transactional
     public ResponseEntity<Message> tutorialCheck(Members member) {
         member.setTutorialCheck();
         membersRepository.save(member);
         return new ResponseEntity<>(new Message("튜토리얼 확인 요청 성공", null), HttpStatus.OK);
-    }
-
-    // 회원 신고
-    @Transactional
-    public ResponseEntity<Message> declareMember(DeclareRequestDto declareRequestDto, Members member) {
-        String declaredNickname = declareRequestDto.getDeclaredNickname();
-        DeclaredReason declaredReason = declareRequestDto.getDeclaredReason();
-        String reason = declareRequestDto.getReason();
-
-        Members findMember = findMember(declaredNickname);
-
-        String reportedMemberNickname = member.getNickname();
-
-        if (findMember.getNickname().equals(reportedMemberNickname)) throw new CustomException(CANNOT_REQUEST);
-        if (declaredReason.equals(DeclaredReason.ETC) && reason.equals("")) throw new CustomException(PLZ_INPUT_REASON_OF_REPORT);
-        declaredMembersRepository.save(DeclaredMembers.builder()
-                .reporterNickname(reportedMemberNickname)
-                .declaredMember(findMember)
-                .declaredReason(declaredReason)
-                .reason(reason).build());
-        return new ResponseEntity<>(new Message("멤버 신고 성공", null), HttpStatus.OK);
-    }
-
-    // 관리자 페이지 연결 (신고된 유저 확인)
-    public ResponseEntity<Message> getReportedMembers(Members member) {
-        Role role = member.getRole();
-        if (role != Role.ADMIN) throw new CustomException(NOT_ADMIN);
-        List<DeclaredMembers> declaredMembersList = declaredMembersRepository.findAll();
-        return new ResponseEntity<>(new Message("신고된 멤버 조회 성공", declaredMembersList), HttpStatus.OK);
-    }
-
-    // 관리자 페이지 연결 (신고 적용)
-    @Transactional
-    public ResponseEntity<Message> handleReport(Long id, Members member) {
-        DeclaredMembers findMember = declaredMembersRepository.findByDeclaredMemberId(id).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND)
-        );
-        Members foundMember = findMember.getDeclaredMember();
-        foundMember.declare();
-        int declareCnt = foundMember.getDeclared() + 1;
-        if (declareCnt == 1) foundMember.changeMemberStatusCode(MemberStatusCode.BAD_REQUEST);
-        if (declareCnt == 2) foundMember.changeMemberStatusCode(MemberStatusCode.BAD_GATE_WAY);
-        if (declareCnt == 3) {
-            foundMember.changeMemberStatusCode(MemberStatusCode.BAD3);
-            foundMember.changeRole(PROHIBITION);
-        }
-        membersRepository.save(foundMember);
-        return new ResponseEntity<>(new Message("신고 처리 완료", null), HttpStatus.OK);
     }
 
     // 회원 탈퇴
@@ -413,9 +365,5 @@ public class MembersService {
         return isPending;
     }
 
-    public Members findMember(String nickname) {
-        return membersRepository.findByNickname(nickname).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND)
-        );
-    }
+
 }
