@@ -88,6 +88,39 @@ class MembersGetServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("닉네임 중복 확인 테스트")
+    class checkNickname {
+        @DisplayName("닉네임 중복 확인 성공 테스트")
+        @Test
+        void checkEmail_success() {
+            // given
+            String nickname = "been1118";
+
+            when(membersRepository.findByNickname(nickname)).thenReturn(Optional.empty());
+
+            // when
+            ResponseEntity<Message> response = membersGetService.checkNickname(nickname);
+
+            // then
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "중복 확인 성공");
+        }
+
+        @DisplayName("닉네임 중복 확인 실패 테스트")
+        @Test
+        void checkEmail_fail() {
+            // given
+            String nickname = "been1118";
+
+            when(membersRepository.findByNickname(nickname)).thenReturn(Optional.of(member));
+
+            // when & then
+            CustomException exception = assertThrows(CustomException.class, () -> membersGetService.checkNickname(nickname));
+            assertEquals(exception.getErrorCode(), DUPLICATE_NICKNAME);
+        }
+    }
+
     @Test
     void readMyPage() {
     }
