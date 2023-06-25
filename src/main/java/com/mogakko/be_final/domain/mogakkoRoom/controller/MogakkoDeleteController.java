@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "모각코방 DELETE 요청 관련 API", description = "모각코방 관련 DELETE 요청 API 입니다.")
 public class MogakkoDeleteController {
+
     private final MogakkoDeleteService mogakkoDeleteService;
 
     @Operation(summary = "모각코 방 퇴장 API", description = "퇴장하기 버튼 눌렀을때 모각코 방이 퇴장되는 메서드입니다.")

@@ -30,7 +30,7 @@ public class FriendshipPostService {
     private final FriendshipRepository friendshipRepository;
     private final NotificationSendService notificationSendService;
     private final RedisUtil redisUtil;
-    private FriendshipServiceUtilMethod friendshipServiceUtilMethod;
+    private final FriendshipServiceUtilMethod friendshipServiceUtilMethod;
 
     // 친구 요청 (닉네임)
     public ResponseEntity<Message> friendRequest(String receiverNickname, Members member) {
