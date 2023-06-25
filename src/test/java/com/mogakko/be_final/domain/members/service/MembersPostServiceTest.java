@@ -175,8 +175,43 @@ class MembersPostServiceTest {
         }
     }
 
-    @Test
-    void logout() {
+    @Nested
+    @DisplayName("로그아웃 테스트")
+    class logout {
+        @DisplayName("로그아웃 성공 테스트")
+        @Test
+        void logout_success() {
+            //given
+            String accessToken = "access-token-333333333333333";
+            String refreshToken = "refresh-token-2222222222222222";
+            String email = member.getEmail();
+
+            when(httpServletRequest.getHeader("ACCESS_KEY")).thenReturn("Bearer " + accessToken);
+            when(redisUtil.get(email)).thenReturn(refreshToken);
+            when(jwtProvider.getExpirationTime(accessToken)).thenReturn(7777777L);
+
+            //when
+            ResponseEntity<Message> response = membersPostService.logout(member, httpServletRequest);
+
+            //then
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("로그아웃 성공", response.getBody().getMessage());
+        }
+
+        @DisplayName("로그아웃 리프레시 토큰 찾기 실패 테스트")
+        @Test
+        void logout_refreshTokenNotFound() {
+            //given
+            String accessToken = "access-token-333333333333333";
+            String email = member.getEmail();
+
+            when(httpServletRequest.getHeader("ACCESS_KEY")).thenReturn("Bearer " + accessToken);
+            when(redisUtil.get(email)).thenReturn("");
+
+            // when & then
+            CustomException exception = assertThrows(CustomException.class, () -> membersPostService.logout(member, httpServletRequest));
+            assertEquals(exception.getErrorCode(), USER_NOT_FOUND);
+        }
     }
 
     @Test
