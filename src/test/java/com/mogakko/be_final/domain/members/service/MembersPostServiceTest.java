@@ -33,6 +33,7 @@ import java.util.Optional;
 import static com.mogakko.be_final.exception.ErrorCode.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
@@ -80,6 +81,24 @@ class MembersPostServiceTest {
             requestDto.setEmail("test@example.com");
             requestDto.setPassword("Password1!");
             requestDto.setNickname("nickname");
+
+            // when
+            ResponseEntity<Message> response = membersPostService.signup(requestDto);
+
+            // then
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("회원 가입 성공", response.getBody().getMessage());
+        }
+
+        @DisplayName("친구 코드 중복 테스트")
+        @Test
+        void signup_friendCodeDuplication() {
+            // given
+            SignupRequestDto requestDto = new SignupRequestDto();
+            requestDto.setEmail("test@example.com");
+            requestDto.setPassword("Password1!");
+            requestDto.setNickname("nickname");
+            when(membersRepository.existsByFriendCode(anyInt())).thenReturn(true, false);
 
             // when
             ResponseEntity<Message> response = membersPostService.signup(requestDto);

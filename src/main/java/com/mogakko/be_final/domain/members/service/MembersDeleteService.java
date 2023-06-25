@@ -36,9 +36,7 @@ public class MembersDeleteService {
         friendshipRepository.deleteAllBySenderAndReceiver(member, member);
         mogakkoRoomMembersRepository.deleteById(member.getId());
         List<DirectMessage> dmList = directMessageRepository.findAllBySenderOrReceiver(member, member);
-        for (DirectMessage directMessage : dmList) {
-            directMessage.deleteMember(member);
-        }
+        directMessageRepository.deleteAll(dmList);
         membersRepository.delete(member);
 
         return new ResponseEntity<>(new Message("회원 탈퇴 성공", null), HttpStatus.OK);
