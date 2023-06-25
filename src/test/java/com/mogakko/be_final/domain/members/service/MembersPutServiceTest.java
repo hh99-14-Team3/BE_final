@@ -167,8 +167,19 @@ class MembersPutServiceTest {
             assertEquals(member.getProfileImage(), "https://source.boringavatars.com/beam/120/$" + "nickname" + "?colors=00F0FF,172435,394254,EAEBED,F9F9FA");
         }
     }
+    @Nested
+    @DisplayName("튜토리얼 체크 메서드 테스트")
+    class TutorialCheck {
+        @DisplayName("튜토리얼 체크 메서드 성공 테스트")
+        @Test
+        void tutorialCheck_success() {
+            // when
+            ResponseEntity<Message> response = membersPutService.tutorialCheck(member);
 
-    @Test
-    void tutorialCheck() {
+            // then
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "튜토리얼 확인 요청 성공");
+            assertEquals(member.isTutorialCheck(), true);
+        }
     }
 }
