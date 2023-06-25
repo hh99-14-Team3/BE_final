@@ -2,6 +2,9 @@
 
 REPOSITORY=/home/ubuntu/app
 
+# .bash_profile 파일 생성
+echo "" > $HOME/.bash_profile
+
 source $HOME/.bash_profile
 
 echo "> 이전에 실행 중인 애플리케이션 종료"
@@ -18,7 +21,7 @@ fi
 
 echo "> 현재 실행 중인 애플리케이션 프로세스 확인"
 
-CHECK_PID=$(pgrep -fla java | grep Mogakko | awk '{print $1}')
+CHECK_PID=$(pgrep -fla java | grep BE | awk '{print $1}')
 
 if [ -z "$CHECK_PID" ]; then
   echo "이전 애플리케이션 종료 완료"
@@ -39,7 +42,7 @@ chmod +x $JAR_NAME
 
 echo "> $JAR_NAME 실행"
 
-nohup java -jar $JAR_NAME --server.port=8080 >> $REPOSITORY/nohup.out 2>&1 &
+nohup java -jar -Dspring.profiles.active=prod $JAR_NAME --server.port=8080 >> $REPOSITORY/nohup.out 2>&1 &
 
 echo "> 새로운 애플리케이션 실행 중"
 

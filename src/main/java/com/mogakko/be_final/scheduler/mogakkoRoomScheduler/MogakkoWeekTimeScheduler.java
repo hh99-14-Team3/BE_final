@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 스케줄러를 사용하여, 매주 일요일 5시 유저의 주간 통계 기본값으로 update
+ * 스케줄러를 사용하여, 매주 월요일 오전 5시 유저의 주간 통계 기본값으로 update
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class MogakkoWeekTimeScheduler {
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
 
     @Async
-    @Scheduled(cron = "0 0 5 * * 7")
+    @Scheduled(cron = "0 0 5 * * 1")
     @Transactional
     public void updateWeekTimeOfMembers() {
         log.info("===== updateWeekTimeOfMembers Scheduler 호출");
