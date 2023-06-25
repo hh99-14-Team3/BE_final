@@ -145,8 +145,27 @@ class MembersPutServiceTest {
         }
     }
 
-    @Test
-    void profileDelete() {
+    @Nested
+    @DisplayName("프로필 사진 삭제 테스트")
+    class ProfileDelete {
+        @DisplayName("프로필 사진 삭제 성공 테스트")
+        @Test
+        void profileDelete_success() throws IOException {
+            // given
+            MultipartFile imageFile = mock(MultipartFile.class);
+
+            when(s3Uploader.uploadFile(imageFile)).thenReturn("new-profile-image");
+
+            membersPutService.profileUpdate(imageFile, null, member);
+
+            // when
+            ResponseEntity<Message> response = membersPutService.profileDelete(member);
+
+            // then
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "프로필 사진 삭제 성공");
+            assertEquals(member.getProfileImage(), "https://source.boringavatars.com/beam/120/$" + "nickname" + "?colors=00F0FF,172435,394254,EAEBED,F9F9FA");
+        }
     }
 
     @Test
