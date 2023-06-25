@@ -106,8 +106,73 @@ class MembersPostServiceTest {
         }
     }
 
-    @Test
-    void login() {
+    @Nested
+    @DisplayName("로그인 테스트")
+    class login {
+        @DisplayName("로그인 성공 테스트")
+        @Test
+        void login_success() {
+            //given
+            LoginRequestDto requestDto = LoginRequestDto.builder().email("test@example.com").password("password1!").build();
+
+            TokenDto tokenDto = new TokenDto("access_token", "refresh_token");
+
+            when(membersRepository.findByEmail(requestDto.getEmail())).thenReturn(Optional.of(member));
+            when(passwordEncoder.matches(requestDto.getPassword(), member.getPassword())).thenReturn(true);
+            when(jwtProvider.createAllToken(member.getEmail())).thenReturn(tokenDto);
+
+            //when
+            ResponseEntity<Message> response = membersPostService.login(requestDto, httpServletResponse);
+
+            //then
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals("로그인 성공", response.getBody().getMessage());
+
+            MemberResponseDto responseDto = (MemberResponseDto) response.getBody().getData();
+            assertEquals(responseDto.getNickname(), member.getNickname());
+            assertEquals(responseDto.getProfileImage(), member.getProfileImage());
+            assertEquals(responseDto.isTutorialCheck(), member.isTutorialCheck());
+            assertEquals(responseDto.getRole(), member.getRole());
+        }
+
+        @DisplayName("로그인 없는 회원 테스트")
+        @Test
+        void login_notFoundMember() {
+            //given
+            LoginRequestDto requestDto = LoginRequestDto.builder().email("tset@example.com").password("password1!").build();
+
+            when(membersRepository.findByEmail(requestDto.getEmail())).thenReturn(Optional.empty());
+
+            // when & then
+            CustomException exception = assertThrows(CustomException.class, () -> membersPostService.login(requestDto, httpServletResponse));
+            assertEquals(exception.getErrorCode(), USER_NOT_FOUND);
+        }
+
+        @DisplayName("로그인 이메일 유효성 검사 실패 테스트")
+        @Test
+        void login_invalidEmail() {
+            //given
+            LoginRequestDto requestDto = LoginRequestDto.builder().email("tesT@example.com").password("password1!").build();
+
+            when(membersRepository.findByEmail(requestDto.getEmail())).thenReturn(Optional.of(member));
+
+            // when & then
+            CustomException exception = assertThrows(CustomException.class, () -> membersPostService.login(requestDto, httpServletResponse));
+            assertEquals(exception.getErrorCode(), INVALID_EMAIL);
+        }
+
+        @DisplayName("로그인 틀린 비밀번호 테스트")
+        @Test
+        void login_wrongPassword() {
+            //given
+            LoginRequestDto requestDto = LoginRequestDto.builder().email("test@example.com").password("password2!").build();
+
+            when(membersRepository.findByEmail(requestDto.getEmail())).thenReturn(Optional.of(member));
+
+            // when & then
+            CustomException exception = assertThrows(CustomException.class, () -> membersPostService.login(requestDto, httpServletResponse));
+            assertEquals(exception.getErrorCode(), INVALID_PASSWORD);
+        }
     }
 
     @Test
