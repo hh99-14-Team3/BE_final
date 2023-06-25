@@ -2,6 +2,7 @@ package com.mogakko.be_final.domain.members.service;
 
 import com.mogakko.be_final.domain.members.dto.response.LanguageDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberPageResponseDto;
+import com.mogakko.be_final.domain.members.dto.response.MemberSimpleResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
@@ -191,6 +192,7 @@ class MembersGetServiceTest {
             assertEquals(memberPageResponseDto.getTimeOfWeek(), weekMap);
             assertEquals(memberPageResponseDto.getLanguageList(), languageList);
         }
+
         @DisplayName("없는 유저 페이지 조회 테스트")
         @Test
         void getMemberProfile_notFoundMember() {
@@ -203,8 +205,69 @@ class MembersGetServiceTest {
         }
     }
 
-    @Test
-    void searchMembersByNickname() {
+    @Nested
+    @DisplayName("멤버 닉네임 검색 테스트")
+    class SearchMembersByNickname {
+        @DisplayName("멤버 닉네임 검색 성공 테스트")
+        @Test
+        void searchMembersByNickname_success() {
+            // given
+            String nickname = "be";
+            List<Members> membersList = new ArrayList<>();
+            Members member1 = Members.builder().nickname("been1118").build();
+            Members member2 = Members.builder().nickname("bean1118").build();
+            membersList.add(member1);
+            membersList.add(member2);
+
+            List<MemberSimpleResponseDto> memberSimpleResponseDtoList = new ArrayList<>();
+            MemberSimpleResponseDto memberSimpleResponseDto1 = new MemberSimpleResponseDto(member1, true, false);
+            MemberSimpleResponseDto memberSimpleResponseDto2 = new MemberSimpleResponseDto(member2, false, true);
+            memberSimpleResponseDtoList.add(memberSimpleResponseDto1);
+            memberSimpleResponseDtoList.add(memberSimpleResponseDto2);
+
+            when(membersRepository.findByNicknameLike(nickname)).thenReturn(membersList);
+            when(membersServiceUtilMethod.checkFriend(member, member1)).thenReturn(true);
+            when(membersServiceUtilMethod.checkFriend(member, member2)).thenReturn(false);
+            when(membersServiceUtilMethod.checkFriendStatus(member, member1)).thenReturn(false);
+            when(membersServiceUtilMethod.checkFriendStatus(member, member2)).thenReturn(true);
+
+            // when
+            ResponseEntity<Message> response = membersGetService.searchMembersByNickname(nickname, member);
+
+            // then
+            List<MemberSimpleResponseDto> memberSimpleResponseDtos = (List<MemberSimpleResponseDto>) response.getBody().getData();
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "멤버 검색 성공");
+            assertEquals(memberSimpleResponseDtos.size(), memberSimpleResponseDtoList.size());
+        }
+
+        @DisplayName("닉네임 검색 빈 입력값 테스트")
+        @Test
+        void searchMembersByNickname_void() {
+            // given
+            String nickname = "";
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, () -> membersGetService.searchMembersByNickname(nickname, member));
+            assertEquals(customException.getErrorCode(), PLZ_INPUT_CONTENT);
+        }
+
+        @DisplayName("닉네임 검색 결과 없음 테스트")
+        @Test
+        void searchMembersByNickname_noSearchResults() {
+            // given
+            String nickname = "be";
+            List<Members> membersList = new ArrayList<>();
+
+            when(membersRepository.findByNicknameLike(nickname)).thenReturn(membersList);
+
+            // when
+            ResponseEntity<Message> response = membersGetService.searchMembersByNickname(nickname, member);
+
+            // then
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "검색된 멤버가 없습니다.");
+        }
     }
 
     @Test
