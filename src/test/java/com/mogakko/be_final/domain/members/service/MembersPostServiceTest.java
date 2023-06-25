@@ -100,7 +100,7 @@ class MembersPostServiceTest {
             String email = duplicatedRequestDto.getEmail();
 
             // when & then
-            when(membersRepository.findByEmail(email)).thenThrow(new CustomException(ALREADY_JOIN_USER));
+            when(membersRepository.findByEmail(email)).thenReturn(Optional.of(member));
             CustomException exception = assertThrows(CustomException.class, () -> membersPostService.signup(duplicatedRequestDto));
             assertEquals(exception.getErrorCode(), ALREADY_JOIN_USER);
         }
