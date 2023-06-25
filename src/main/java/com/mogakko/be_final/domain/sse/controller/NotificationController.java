@@ -41,11 +41,13 @@ public class NotificationController {
         return notificationSearchService.getMyNotification(userDetails);
     }
 
+    @Operation(summary = "SSE 알림 읽음 처리 API", description = "SSE 알림을 읽음 처리 하는 메서드입니다.")
     @PostMapping("/notification/read/{notificationId}")
     public ResponseEntity<Message> readNotification(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable UUID notificationId){
         return notificationSearchService.readNotification(userDetails.getMember().getId(), notificationId);
     }
 
+    @Operation(summary = "SSE 알림 전체 읽음 처리 API", description = "SSE 알림을 전체 읽음 처리 하는 메서드입니다.")
     @PostMapping("/notification/read/all")
     public ResponseEntity<Message> readAllNotification(@AuthenticationPrincipal UserDetailsImpl userDetails){
         return notificationSearchService.readAllNotification(userDetails.getMember().getId());
