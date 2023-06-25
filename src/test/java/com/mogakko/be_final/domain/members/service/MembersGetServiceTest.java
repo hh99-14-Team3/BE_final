@@ -1,9 +1,11 @@
 package com.mogakko.be_final.domain.members.service;
 
+import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.LanguageDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberPageResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberSimpleResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
+import com.mogakko.be_final.domain.members.entity.MemberWeekStatistics;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
@@ -13,6 +15,7 @@ import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLanguageStatisticsRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
+import jnr.a64asm.Mem;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -278,7 +281,7 @@ class MembersGetServiceTest {
 
     @Nested
     @DisplayName("멤버 친구코드 검색 테스트")
-    class searchMemberByFriendsCode {
+    class SearchMemberByFriendsCode {
         @DisplayName("멤버 친구코드 검색 성공 테스트")
         @Test
         void searchMemberByFriendsCode_success() {
@@ -353,7 +356,89 @@ class MembersGetServiceTest {
         }
     }
 
-    @Test
-    void readBestMembers() {
+    @Nested
+    @DisplayName("오늘의 유저 조회 테스트")
+    class ReadBestMembers {
+        @DisplayName("오늘의 유저 조회 성공 테스트")
+        @Test
+        void readBestMembers() {
+            // given
+            List<MemberWeekStatistics> topMembers = new ArrayList<>();
+            MemberWeekStatistics memberWeekStatistics1 = MemberWeekStatistics.builder().email("test@test.com1").build();
+            MemberWeekStatistics memberWeekStatistics2 = MemberWeekStatistics.builder().email("test@test.com2").build();
+            MemberWeekStatistics memberWeekStatistics3 = MemberWeekStatistics.builder().email("test@test.com3").build();
+            MemberWeekStatistics memberWeekStatistics4 = MemberWeekStatistics.builder().email("test@test.com4").build();
+            MemberWeekStatistics memberWeekStatistics5 = MemberWeekStatistics.builder().email("test@test.com5").build();
+            MemberWeekStatistics memberWeekStatistics6 = MemberWeekStatistics.builder().email("test@test.com6").build();
+            MemberWeekStatistics memberWeekStatistics7 = MemberWeekStatistics.builder().email("test@test.com7").build();
+            MemberWeekStatistics memberWeekStatistics8 = MemberWeekStatistics.builder().email("test@test.com8").build();
+            topMembers.add(memberWeekStatistics1);
+            topMembers.add(memberWeekStatistics2);
+            topMembers.add(memberWeekStatistics3);
+            topMembers.add(memberWeekStatistics4);
+            topMembers.add(memberWeekStatistics5);
+            topMembers.add(memberWeekStatistics6);
+            topMembers.add(memberWeekStatistics7);
+            topMembers.add(memberWeekStatistics8);
+            List<Members> membersList = new ArrayList<>();
+            Members member1 = Members.builder().email("test@test.com1").build();
+            Members member2 = Members.builder().email("test@test.com2").build();
+            Members member3 = Members.builder().email("test@test.com3").build();
+            Members member4 = Members.builder().email("test@test.com4").build();
+            Members member5 = Members.builder().email("test@test.com5").build();
+            Members member6 = Members.builder().email("test@test.com6").build();
+            Members member7 = Members.builder().email("test@test.com7").build();
+            Members member8 = Members.builder().email("test@test.com8").build();
+            membersList.add(member1);
+            membersList.add(member2);
+            membersList.add(member3);
+            membersList.add(member4);
+            membersList.add(member5);
+            membersList.add(member6);
+            membersList.add(member7);
+            membersList.add(member8);
+
+            Map<String, String> weekMap = new HashMap<>();
+            weekMap.put("weekTotal", "32H22M");
+
+            List<BestMembersResponseDto> responseDtos = new ArrayList<>();
+            BestMembersResponseDto bestMembersResponseDto1 = new BestMembersResponseDto(member1, weekMap);
+            BestMembersResponseDto bestMembersResponseDto2 = new BestMembersResponseDto(member2, weekMap);
+            BestMembersResponseDto bestMembersResponseDto3 = new BestMembersResponseDto(member3, weekMap);
+            BestMembersResponseDto bestMembersResponseDto4 = new BestMembersResponseDto(member4, weekMap);
+            BestMembersResponseDto bestMembersResponseDto5 = new BestMembersResponseDto(member5, weekMap);
+            BestMembersResponseDto bestMembersResponseDto6 = new BestMembersResponseDto(member6, weekMap);
+            BestMembersResponseDto bestMembersResponseDto7 = new BestMembersResponseDto(member7, weekMap);
+            BestMembersResponseDto bestMembersResponseDto8 = new BestMembersResponseDto(member8, weekMap);
+            responseDtos.add(bestMembersResponseDto1);
+            responseDtos.add(bestMembersResponseDto2);
+            responseDtos.add(bestMembersResponseDto3);
+            responseDtos.add(bestMembersResponseDto4);
+            responseDtos.add(bestMembersResponseDto5);
+            responseDtos.add(bestMembersResponseDto6);
+            responseDtos.add(bestMembersResponseDto7);
+            responseDtos.add(bestMembersResponseDto8);
+
+            when(memberWeekStatisticsRepository.findTop8ByOrderByWeekTotalTimeDesc()).thenReturn(topMembers);
+
+            for (int i = 0; i < 8; i++) {
+                Members member = membersList.get(i);
+                when(membersRepository.findByEmail(membersList.get(i).getEmail())).thenReturn(Optional.of(membersList.get(i)));
+                when(membersServiceUtilMethod.weekTimeParse(member.getEmail())).thenReturn(weekMap);
+            }
+
+            // when
+            ResponseEntity<Message> response = membersGetService.readBestMembers();
+
+            // then
+            List<BestMembersResponseDto> bestMembersResponseDtoList = (List<BestMembersResponseDto>) response.getBody().getData();
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "최고의 ON:s 조회 성공");
+            for (int i = 0; i < 8; i++) {
+                assertEquals(bestMembersResponseDtoList.get(i).getMember().getEmail(), responseDtos.get(i).getMember().getEmail());
+                assertEquals(bestMembersResponseDtoList.get(i).getTotalTimer(), responseDtos.get(i).getTotalTimer());
+            }
+        }
+
     }
 }
