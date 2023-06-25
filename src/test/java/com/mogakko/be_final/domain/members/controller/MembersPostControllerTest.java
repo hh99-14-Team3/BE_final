@@ -80,4 +80,16 @@ public class MembersPostControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(message, response.getBody());
     }
+
+    @DisplayName("[POST] 로그인 테스트")
+    @Test
+    public void testLogin() {
+        Message message = new Message("로그인 성공", new MemberResponseDto(member.getNickname(), member.getProfileImage(), member.isTutorialCheck(), member.getRole()));
+        when(membersPostService.login(any(LoginRequestDto.class), any(HttpServletResponse.class))).thenReturn(ResponseEntity.ok(message));
+
+        ResponseEntity<Message> response = membersPostController.login(loginRequestDto, httpServletResponse);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+    }
 }
