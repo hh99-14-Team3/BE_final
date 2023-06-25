@@ -92,4 +92,17 @@ public class MembersPostControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(message, response.getBody());
     }
+
+    @DisplayName("[POST] 로그아웃 테스트")
+    @Test
+    public void testLogout() {
+        Message message = new Message("로그아웃 성공", member.getEmail());
+        when(membersPostService.logout(any(), any(HttpServletRequest.class))).thenReturn(ResponseEntity.ok(message));
+
+        ResponseEntity<Message> response = membersPostController.logout(userDetails, httpServletRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+    }
+
 }
