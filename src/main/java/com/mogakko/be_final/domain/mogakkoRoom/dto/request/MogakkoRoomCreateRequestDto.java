@@ -1,17 +1,17 @@
 package com.mogakko.be_final.domain.mogakkoRoom.dto.request;
 
 import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
-@Setter
-@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
 public class MogakkoRoomCreateRequestDto {
 
     @NotBlank(message = "제목을 입력해 주세요!")
