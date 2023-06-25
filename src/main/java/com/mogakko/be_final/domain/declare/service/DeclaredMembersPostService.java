@@ -4,8 +4,8 @@ import com.mogakko.be_final.domain.declare.dto.request.DeclareRequestDto;
 import com.mogakko.be_final.domain.declare.entity.DeclaredMembers;
 import com.mogakko.be_final.domain.declare.entity.DeclaredReason;
 import com.mogakko.be_final.domain.declare.repository.DeclaredMembersRepository;
-import com.mogakko.be_final.domain.declare.util.DeclaredMembersServiceUtilMethod;
 import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.domain.members.util.MembersServiceUtilMethod;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import static com.mogakko.be_final.exception.ErrorCode.PLZ_INPUT_REASON_OF_REPOR
 @RequiredArgsConstructor
 public class DeclaredMembersPostService {
     private final DeclaredMembersRepository declaredMembersRepository;
-    private final DeclaredMembersServiceUtilMethod declaredMembersServiceUtilMethod;
+    private final MembersServiceUtilMethod membersServiceUtilMethod;
 
     // 회원 신고
     @Transactional
@@ -30,7 +30,7 @@ public class DeclaredMembersPostService {
         DeclaredReason declaredReason = declareRequestDto.getDeclaredReason();
         String reason = declareRequestDto.getReason();
 
-        Members findMember = declaredMembersServiceUtilMethod.findMember(declaredNickname);
+        Members findMember = membersServiceUtilMethod.findMemberByNickname(declaredNickname);
 
         String reportedMemberNickname = member.getNickname();
 

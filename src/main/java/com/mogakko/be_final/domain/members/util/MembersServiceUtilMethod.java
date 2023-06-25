@@ -5,6 +5,7 @@ import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.entity.MemberWeekStatistics;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
+import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +23,25 @@ public class MembersServiceUtilMethod {
 
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
     private final FriendshipRepository friendshipRepository;
+    private final MembersRepository membersRepository;
 
     public MemberWeekStatistics findMemberWeekStatistics(String email) {
         MemberWeekStatistics memberWeekStatistic = memberWeekStatisticsRepository.findById(email).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
         return memberWeekStatistic;
+    }
+
+    public Members findMemberByNickname(String memberNickname) {
+        return membersRepository.findByNickname(memberNickname).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+    }
+
+    public Members findMemberByFriendCode(Integer friendCode) {
+        return membersRepository.findByFriendCode(friendCode).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
     }
 
     public Map<String, String> weekTimeParse(String email) {
