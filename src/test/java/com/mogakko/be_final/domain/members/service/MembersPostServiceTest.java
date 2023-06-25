@@ -214,7 +214,40 @@ class MembersPostServiceTest {
         }
     }
 
-    @Test
-    void addGithub() {
+    @Nested
+    @DisplayName("깃허브 아이디 등록 테스트")
+    class addGithub {
+        @DisplayName("깃허브 아이드 등록 성공 테스트")
+        @Test
+        void addGithub_success() {
+            // given
+            GithubIdRequestDto githubIdRequestDto = GithubIdRequestDto.builder().githubId("been1118").build();
+            String githubId = githubIdRequestDto.getGithubId();
+
+            when(membersRepository.findByGithubId(githubId)).thenReturn(Optional.empty());
+
+            // when
+            ResponseEntity<Message> response = membersPostService.addGithub(githubIdRequestDto, member);
+
+            // then
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "깃허브 아이디 등록 성공");
+            assertEquals(response.getBody().getData(), githubId);
+            assertEquals(member.getGithubId(), githubId);
+        }
+
+        @DisplayName("중복된 깃허브 아이디 등록 테스트")
+        @Test
+        void addGithub_duplication() {
+            // given
+            GithubIdRequestDto githubIdRequestDto = GithubIdRequestDto.builder().githubId("been1118").build();
+            String githubId = githubIdRequestDto.getGithubId();
+
+            when(membersRepository.findByGithubId(githubId)).thenReturn(Optional.of("been1118"));
+
+            // when & then
+            CustomException exception = assertThrows(CustomException.class, () -> membersPostService.addGithub(githubIdRequestDto, member));
+            assertEquals(exception.getErrorCode(), DUPLICATE_GITHUB_ID);
+        }
     }
 }
