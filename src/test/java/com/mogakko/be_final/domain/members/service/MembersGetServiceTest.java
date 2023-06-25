@@ -12,7 +12,6 @@ import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLanguageStatisticsRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
-import com.mogakko.be_final.util.TimeUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,8 +24,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
-import static com.mogakko.be_final.exception.ErrorCode.DUPLICATE_IDENTIFIER;
-import static com.mogakko.be_final.exception.ErrorCode.DUPLICATE_NICKNAME;
+import static com.mogakko.be_final.exception.ErrorCode.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -46,6 +44,7 @@ class MembersGetServiceTest {
     MembersGetService membersGetService;
 
     Members member = Members.builder()
+            .id(1L)
             .email("test@example.com")
             .nickname("nickname")
             .password("password1!")
@@ -158,8 +157,50 @@ class MembersGetServiceTest {
             assertEquals(memberPageResponseDto.getLanguageList(), languageList);
         }
     }
-    @Test
-    void getMemberProfile() {
+
+    @Nested
+    @DisplayName("유저 페이지 조회 테스트")
+    class GetMemberProfile {
+        @DisplayName("유저 페이지 조회 성공 테스트")
+        @Test
+        void getMemberProfile_success() {
+            // given
+            String email = member.getEmail();
+            List<LanguageDto> languageList = new ArrayList<>();
+            LanguageDto languageDtoC = new LanguageDto(LanguageEnum.C, 3, 6);
+            LanguageDto languageDtoJ = new LanguageDto(LanguageEnum.JAVA, 3, 6);
+            languageList.add(languageDtoC);
+            languageList.add(languageDtoJ);
+
+            Map<String, String> weekMap = new HashMap<>();
+            weekMap.put("sun", "20H32H");
+
+            when(membersRepository.findById(member.getId())).thenReturn(Optional.of(member));
+            when(membersServiceUtilMethod.weekTimeParse(email)).thenReturn(weekMap);
+            when(mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email)).thenReturn(languageList);
+
+            // when
+            ResponseEntity<Message> response = membersGetService.getMemberProfile(member, 1L);
+
+            // then
+            MemberPageResponseDto memberPageResponseDto = (MemberPageResponseDto) response.getBody().getData();
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "프로필 조회 성공");
+            assertEquals(memberPageResponseDto.getMember(), member);
+            assertEquals(memberPageResponseDto.getTotalTimer(), "00H00M");
+            assertEquals(memberPageResponseDto.getTimeOfWeek(), weekMap);
+            assertEquals(memberPageResponseDto.getLanguageList(), languageList);
+        }
+        @DisplayName("없는 유저 페이지 조회 테스트")
+        @Test
+        void getMemberProfile_notFoundMember() {
+            // given
+            when(membersRepository.findById(2L)).thenReturn(Optional.empty());
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, () -> membersGetService.getMemberProfile(member, 2L));
+            assertEquals(customException.getErrorCode(), USER_NOT_FOUND);
+        }
     }
 
     @Test
