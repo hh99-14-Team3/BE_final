@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.mogakko.be_final.domain.members.entity.Role.PROHIBITION;
-import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
+import static com.mogakko.be_final.exception.ErrorCode.NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +25,8 @@ public class DeclaredMembersPutService {
     // 관리자 페이지 연결 (신고 적용)
     @Transactional
     public ResponseEntity<Message> handleReport(Long id, Members member) {
-        DeclaredMembers findMember = declaredMembersRepository.findByDeclaredMemberId(id).orElseThrow(
-                () -> new CustomException(USER_NOT_FOUND)
+        DeclaredMembers findMember = declaredMembersRepository.findById(id).orElseThrow(
+                () -> new CustomException(NOT_FOUND)
         );
         Members foundMember = findMember.getDeclaredMember();
         foundMember.declare();
