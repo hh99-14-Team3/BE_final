@@ -28,6 +28,7 @@ import java.util.*;
 import static com.mogakko.be_final.exception.ErrorCode.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
@@ -238,7 +239,12 @@ class MembersGetServiceTest {
             List<MemberSimpleResponseDto> memberSimpleResponseDtos = (List<MemberSimpleResponseDto>) response.getBody().getData();
             assertEquals(response.getStatusCode(), HttpStatus.OK);
             assertEquals(response.getBody().getMessage(), "멤버 검색 성공");
-            assertEquals(memberSimpleResponseDtos.size(), memberSimpleResponseDtoList.size());
+            assertEquals(memberSimpleResponseDtos.get(0).getNickname(), "been1118");
+            assertEquals(memberSimpleResponseDtos.get(0).isFriend(), true);
+            assertEquals(memberSimpleResponseDtos.get(0).isPending(), false);
+            assertEquals(memberSimpleResponseDtos.get(1).getNickname(), "bean1118");
+            assertEquals(memberSimpleResponseDtos.get(1).isFriend(), false);
+            assertEquals(memberSimpleResponseDtos.get(1).isPending(), true);
         }
 
         @DisplayName("닉네임 검색 빈 입력값 테스트")
@@ -270,8 +276,81 @@ class MembersGetServiceTest {
         }
     }
 
-    @Test
-    void searchMemberByFriendsCode() {
+    @Nested
+    @DisplayName("멤버 친구코드 검색 테스트")
+    class searchMemberByFriendsCode {
+        @DisplayName("멤버 친구코드 검색 성공 테스트")
+        @Test
+        void searchMemberByFriendsCode_success() {
+            // given
+            String friendCode = "123456";
+
+            when(membersRepository.findByFriendCode(anyInt())).thenReturn(Optional.of(member));
+            when(membersServiceUtilMethod.checkFriend(member, member)).thenReturn(false);
+            when(membersServiceUtilMethod.checkFriendStatus(member, member)).thenReturn(false);
+
+            // when
+            ResponseEntity<Message> response = membersGetService.searchMemberByFriendsCode(friendCode, member);
+
+            // then
+            List<MemberSimpleResponseDto> memberSimpleResponseDtoList = (List<MemberSimpleResponseDto>) response.getBody().getData();
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "멤버 검색 성공");
+            assertEquals(memberSimpleResponseDtoList.get(0).getId(), member.getId());
+            assertEquals(memberSimpleResponseDtoList.get(0).getNickname(), member.getNickname());
+            assertEquals(memberSimpleResponseDtoList.get(0).getProfileImage(), member.getProfileImage());
+            assertEquals(memberSimpleResponseDtoList.get(0).isFriend(), false);
+            assertEquals(memberSimpleResponseDtoList.get(0).isPending(), false);
+        }
+
+        @DisplayName("친구 코드 빈 입력값 검색 테스트")
+        @Test
+        void searchMemberByFriendsCode_void() {
+            // given
+            String friendCode = "";
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, () -> membersGetService.searchMemberByFriendsCode(friendCode, member));
+            assertEquals(customException.getErrorCode(), PLZ_INPUT_CONTENT);
+        }
+
+        @DisplayName("친구 코드 길이 유효성 검사 실패 테스트")
+        @Test
+        void searchMemberByFriendsCode_invalidLength() {
+            // given
+            String friendCode = "222";
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, () -> membersGetService.searchMemberByFriendsCode(friendCode, member));
+            assertEquals(customException.getErrorCode(), INVALID_FRIEND_CODE);
+        }
+
+        @DisplayName("친구 코드 유형 유효성 검사 실패 테스트")
+        @Test
+        void searchMemberByFriendsCode_invalidCode() {
+            // given
+            String friendCode = "friend";
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, () -> membersGetService.searchMemberByFriendsCode(friendCode, member));
+            assertEquals(customException.getErrorCode(), INVALID_FRIEND_CODE);
+        }
+
+        @DisplayName("멤버 친구코드 검색 결과 없음 테스트")
+        @Test
+        void searchMemberByFriendsCode_notFound() {
+            // given
+            String friendCode = "555555";
+
+            when(membersRepository.findByFriendCode(anyInt())).thenReturn(Optional.empty());
+
+            // when
+            ResponseEntity<Message> response = membersGetService.searchMemberByFriendsCode(friendCode, member);
+
+            // then
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "검색된 멤버가 없습니다.");
+        }
     }
 
     @Test
