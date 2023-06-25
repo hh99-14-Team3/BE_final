@@ -37,6 +37,8 @@ public class DeclaredMembersPutService {
             foundMember.changeMemberStatusCode(MemberStatusCode.BAD3);
             foundMember.changeRole(PROHIBITION);
         }
+        findMember.setChecked();
+        declaredMembersRepository.save(findMember);
         membersRepository.save(foundMember);
         return new ResponseEntity<>(new Message("신고 처리 완료", null), HttpStatus.OK);
     }

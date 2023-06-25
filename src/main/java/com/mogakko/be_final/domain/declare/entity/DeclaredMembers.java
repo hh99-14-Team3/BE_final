@@ -32,4 +32,11 @@ public class DeclaredMembers {
     @Column
     private String reason;
 
+    @Column
+    @Builder.Default
+    private boolean isChecked = false;
+
+    public void setChecked() {
+        this.isChecked = true;
+    }
 }
