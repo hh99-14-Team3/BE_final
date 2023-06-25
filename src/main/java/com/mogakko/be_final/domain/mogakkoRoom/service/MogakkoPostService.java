@@ -40,7 +40,7 @@ import static com.mogakko.be_final.exception.ErrorCode.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MogakkPostService {
+public class MogakkoPostService {
 
     private final PasswordEncoder passwordEncoder;
     private final BadWordFiltering badWordFiltering;
