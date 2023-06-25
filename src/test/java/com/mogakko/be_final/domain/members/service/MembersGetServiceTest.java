@@ -1,14 +1,18 @@
 package com.mogakko.be_final.domain.members.service;
 
+import com.mogakko.be_final.domain.members.dto.response.LanguageDto;
+import com.mogakko.be_final.domain.members.dto.response.MemberPageResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.domain.members.util.MembersServiceUtilMethod;
+import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLanguageStatisticsRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
+import com.mogakko.be_final.util.TimeUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Optional;
+import java.util.*;
 
 import static com.mogakko.be_final.exception.ErrorCode.DUPLICATE_IDENTIFIER;
 import static com.mogakko.be_final.exception.ErrorCode.DUPLICATE_NICKNAME;
@@ -121,10 +125,39 @@ class MembersGetServiceTest {
         }
     }
 
-    @Test
-    void readMyPage() {
-    }
+    @Nested
+    @DisplayName("마이페이지 조회 테스트")
+    class ReadMyPage {
+        @DisplayName("마이페이지 조회 성공 테스트")
+        @Test
+        void readMyPage_success() {
+            // given
+            String email = member.getEmail();
+            List<LanguageDto> languageList = new ArrayList<>();
+            LanguageDto languageDtoC = new LanguageDto(LanguageEnum.C, 3, 6);
+            LanguageDto languageDtoJ = new LanguageDto(LanguageEnum.JAVA, 3, 6);
+            languageList.add(languageDtoC);
+            languageList.add(languageDtoJ);
 
+            Map<String, String> weekMap = new HashMap<>();
+            weekMap.put("sun", "20H32H");
+
+            when(membersServiceUtilMethod.weekTimeParse(email)).thenReturn(weekMap);
+            when(mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email)).thenReturn(languageList);
+
+            // when
+            ResponseEntity<Message> response = membersGetService.readMyPage(member);
+
+            // then
+            MemberPageResponseDto memberPageResponseDto = (MemberPageResponseDto) response.getBody().getData();
+            assertEquals(response.getStatusCode(), HttpStatus.OK);
+            assertEquals(response.getBody().getMessage(), "마이페이지 조회 성공");
+            assertEquals(memberPageResponseDto.getMember(), member);
+            assertEquals(memberPageResponseDto.getTotalTimer(), "00H00M");
+            assertEquals(memberPageResponseDto.getTimeOfWeek(), weekMap);
+            assertEquals(memberPageResponseDto.getLanguageList(), languageList);
+        }
+    }
     @Test
     void getMemberProfile() {
     }
