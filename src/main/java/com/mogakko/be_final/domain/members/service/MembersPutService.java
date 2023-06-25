@@ -1,27 +1,21 @@
 package com.mogakko.be_final.domain.members.service;
 
 import com.mogakko.be_final.S3.S3Uploader;
-import com.mogakko.be_final.domain.directMessage.repository.DirectMessageRepository;
-import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
-import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersLanguageStatisticsRepository;
-import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepository;
-import com.mogakko.be_final.redis.util.RedisUtil;
-import com.mogakko.be_final.security.jwt.JwtProvider;
-import com.mogakko.be_final.util.BadWordFiltering;
+import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+
+import static com.mogakko.be_final.exception.ErrorCode.DUPLICATE_NICKNAME;
 
 @Service
 @RequiredArgsConstructor
@@ -37,14 +31,15 @@ public class MembersPutService {
             member.changeMemberStatusCode(MemberStatusCode.NORMAL);
         }
 
-        if (imageFile != null && !imageFile.isEmpty()) {
+        if (imageFile != null) {
             s3Uploader.delete(member.getProfileImage());
             String profileImage = s3Uploader.uploadFile(imageFile);
             member.updateProfileImage(profileImage);
         }
 
-        if (nickname != null && !nickname.isEmpty()) {
-            member.updateNickname(nickname);
+        if (nickname != null) {
+            if (membersRepository.findByNickname(nickname).isPresent()) throw new CustomException(DUPLICATE_NICKNAME);
+            else member.updateNickname(nickname);
         }
 
         membersRepository.save(member);

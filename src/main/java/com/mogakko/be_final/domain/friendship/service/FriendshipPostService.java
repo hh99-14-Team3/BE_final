@@ -6,12 +6,13 @@ import com.mogakko.be_final.domain.friendship.entity.Friendship;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.entity.RejectedFriendship;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
-import com.mogakko.be_final.domain.friendship.util.FriendshipServiceUtilMethod;
 import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.domain.members.util.MembersServiceUtilMethod;
 import com.mogakko.be_final.domain.sse.service.NotificationSendService;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.util.Message;
+import com.mogakko.be_final.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,23 +31,23 @@ public class FriendshipPostService {
     private final FriendshipRepository friendshipRepository;
     private final NotificationSendService notificationSendService;
     private final RedisUtil redisUtil;
-    private final FriendshipServiceUtilMethod friendshipServiceUtilMethod;
+    private final MembersServiceUtilMethod membersServiceUtilMethod;
 
     // 친구 요청 (닉네임)
     public ResponseEntity<Message> friendRequest(String receiverNickname, Members member) {
-        Members receiver = friendshipServiceUtilMethod.findMemberByNickname(receiverNickname);
+        Members receiver = membersServiceUtilMethod.findMemberByNickname(receiverNickname);
         return friendRequestMethod(member, receiver);
     }
 
     // 친구 요청 (친구 코드)
     public ResponseEntity<Message> friendRequestByCode(Integer code, Members member) {
-        Members receiver = friendshipServiceUtilMethod.findMemberByFriendCode(code);
+        Members receiver = membersServiceUtilMethod.findMemberByFriendCode(code);
         return friendRequestMethod(member, receiver);
     }
 
     // 친구 요청 결정
     public ResponseEntity<Message> determineRequest(DetermineRequestDto determineRequestDto, Members member) {
-        Members requestSender = friendshipServiceUtilMethod.findMemberByNickname(determineRequestDto.getRequestSenderNickname());
+        Members requestSender = membersServiceUtilMethod.findMemberByNickname(determineRequestDto.getRequestSenderNickname());
         Friendship findFriendRequest = friendshipRepository.findBySenderAndReceiverAndStatus(requestSender, member, FriendshipStatus.PENDING).orElseThrow(
                 () -> new CustomException(NOT_FOUND)
         );
@@ -83,7 +84,7 @@ public class FriendshipPostService {
         List<String> receiverNicknameList = deleteFriendRequestDto.getReceiverNickname();
         List<Members> deleteMemberList = new ArrayList<>();
         for (String receiverNickname : receiverNicknameList) {
-            Members deleteMember = friendshipServiceUtilMethod.findMemberByNickname(receiverNickname);
+            Members deleteMember = membersServiceUtilMethod.findMemberByNickname(receiverNickname);
             deleteMemberList.add(deleteMember);
         }
 
@@ -114,7 +115,7 @@ public class FriendshipPostService {
 
         if (redisUtil.hasKeyFriendship(rejectedKey)) {
             Long remainingTime = redisUtil.getExpire(rejectedKey, TimeUnit.SECONDS);
-            String formattedTime = friendshipServiceUtilMethod.formatSeconds(remainingTime);
+            String formattedTime = TimeUtil.formatSeconds(remainingTime);
 
             return new ResponseEntity<>(new Message("친구 요청이 거절된 상태입니다.", "남은 시간: " + formattedTime), HttpStatus.OK);
         } else if (findRequest.isPresent()) {
