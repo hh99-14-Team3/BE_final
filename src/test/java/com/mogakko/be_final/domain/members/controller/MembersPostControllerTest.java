@@ -105,4 +105,17 @@ public class MembersPostControllerTest {
         assertEquals(message, response.getBody());
     }
 
+
+    @DisplayName("[POST] 깃허브 아이디 등록 테스트")
+    @Test
+    public void testAddGithub() {
+        Message message = new Message("깃허브 아이디 등록 성공", member.getGithubId());
+        when(membersPostService.addGithub(any(GithubIdRequestDto.class), any())).thenReturn(ResponseEntity.ok(message));
+
+        ResponseEntity<Message> response = membersPostController.addGithub(githubIdRequestDto, userDetails);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+    }
+
 }
