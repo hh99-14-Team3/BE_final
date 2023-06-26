@@ -79,4 +79,10 @@ class DeclaredMembersGetServiceTest {
         assertEquals(response.getBody().getMessage(), "신고된 멤버 조회 성공");
     }
 
+    @DisplayName("신고된 유저 확인 실패 테스트 - 관리자가 아님")
+    @Test
+    void getReportedMembers_NotAdmin() {
+        CustomException customException = assertThrows(CustomException.class, () -> declaredMembersGetService.getReportedMembers(notAdminMember));
+        assertEquals(customException.getErrorCode(), NOT_ADMIN);
+    }
 }
