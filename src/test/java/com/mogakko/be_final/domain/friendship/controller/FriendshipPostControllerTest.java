@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.friendship.controller;
 
+import com.mogakko.be_final.domain.friendship.dto.request.DetermineRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestByCodeDto;
 import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestDto;
 import com.mogakko.be_final.domain.friendship.service.FriendshipPostService;
@@ -39,6 +40,8 @@ class FriendshipPostControllerTest {
     private FriendRequestDto friendRequestDto;
     @Mock
     private FriendRequestByCodeDto friendRequestByCodeDto;
+    @Mock
+    private DetermineRequestDto determineRequestDto;
     @InjectMocks
     private FriendshipPostController friendshipPostController;
     private MockMvc mockMvc;
@@ -82,6 +85,19 @@ class FriendshipPostControllerTest {
         when(friendshipPostService.friendRequestByCode(any(FriendRequestByCodeDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
 
         ResponseEntity<Message> response = friendshipPostController.friendRequestByCode(friendRequestByCodeDto, userDetails);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+    }
+
+    @DisplayName("[POST] 친구 요청 결정 테스트")
+    @Test
+    void determineRequest() {
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        Message message = new Message("친구요청을 수락하였습니다.", null);
+        when(friendshipPostService.determineRequest(any(DetermineRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
+
+        ResponseEntity<Message> response = friendshipPostController.determineRequest(determineRequestDto, userDetails);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(message, response.getBody());
