@@ -81,4 +81,20 @@ class MembersGetControllerTest {
         verify(membersGetService, Mockito.times(1)).checkEmail(email);
     }
 
+    @DisplayName("[GET] 닉네임 중복 체크 테스트")
+    @Test
+    void checkNickname() throws Exception {
+        String nickname = "testuser";
+        Message expectedMessage = new Message("중복 확인 성공", null);
+
+        when(membersGetService.checkNickname(Mockito.anyString())).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/members/signup/checkNickname")
+                        .param("nickname", nickname))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        verify(membersGetService, Mockito.times(1)).checkNickname(nickname);
+    }
+
 }
