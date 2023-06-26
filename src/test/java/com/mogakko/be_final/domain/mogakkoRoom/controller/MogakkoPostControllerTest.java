@@ -39,7 +39,7 @@ class MogakkoPostControllerTest {
     private MogakkoRoomEnterDataRequestDto mogakkoRoomEnterDataRequestDto;
     @InjectMocks
     private MogakkoPostController mogakkoPostController;
-    
+
     private MockMvc mockMvc;
 
     @BeforeEach
