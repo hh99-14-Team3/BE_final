@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.friendship.controller;
 
+import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestByCodeDto;
 import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestDto;
 import com.mogakko.be_final.domain.friendship.service.FriendshipPostService;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
@@ -36,6 +37,8 @@ class FriendshipPostControllerTest {
     private FriendshipPostService friendshipPostService;
     @Mock
     private FriendRequestDto friendRequestDto;
+    @Mock
+    private FriendRequestByCodeDto friendRequestByCodeDto;
     @InjectMocks
     private FriendshipPostController friendshipPostController;
     private MockMvc mockMvc;
@@ -60,12 +63,25 @@ class FriendshipPostControllerTest {
 
     @DisplayName("[POST] 닉네임으로 친구 요청 테스트")
     @Test
-    void friendRequest() throws Exception {
+    void friendRequest() {
         UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
         Message message = new Message("친구 요청 완료", null);
         when(friendshipPostService.friendRequest(any(FriendRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
 
         ResponseEntity<Message> response = friendshipPostController.friendRequest(friendRequestDto, userDetails);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+    }
+
+    @DisplayName("[POST] 친구코드로 친구 요청 테스트")
+    @Test
+    void friendRequestByCode() {
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        Message message = new Message("친구 요청 완료", null);
+        when(friendshipPostService.friendRequestByCode(any(FriendRequestByCodeDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
+
+        ResponseEntity<Message> response = friendshipPostController.friendRequestByCode(friendRequestByCodeDto, userDetails);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(message, response.getBody());
