@@ -28,14 +28,14 @@ public class FriendshipPostController {
     @PostMapping
     public ResponseEntity<Message> friendRequest(@RequestBody FriendRequestDto friendRequestDto,
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return friendshipPostService.friendRequest(friendRequestDto.getRequestReceiverNickname(), userDetails.getMember());
+        return friendshipPostService.friendRequest(friendRequestDto, userDetails.getMember());
     }
 
     @Operation(summary = "친구 요청 API", description = "친구 요청을 보내는 메서드입니다. 수신자의 friendCode 를 보내면 요청이 완료됩니다.")
     @PostMapping("/code")
     public ResponseEntity<Message> friendRequestByCode(@RequestBody FriendRequestByCodeDto friendRequestByCodeDto,
                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return friendshipPostService.friendRequestByCode(friendRequestByCodeDto.getRequestReceiverFriendCode(), userDetails.getMember());
+        return friendshipPostService.friendRequestByCode(friendRequestByCodeDto, userDetails.getMember());
     }
 
     @Operation(summary = "친구 요청 결정 API", description = "친구 요청을 결정하는 메서드입니다. determineRequest 의 값이 true면 수락, false면 거절 입니다.")
