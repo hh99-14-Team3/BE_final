@@ -83,7 +83,7 @@ public class MembersGetService {
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPage), HttpStatus.OK);
     }
 
-    // 멤버 검색 (닉네임 / 친구 코드)
+    // 멤버 검색 (닉네임)
     @Transactional
     public ResponseEntity<Message> searchMembersByNickname(String nickname, Members member) {
         if (nickname.equals("")) throw new CustomException(PLZ_INPUT_CONTENT);
@@ -99,7 +99,7 @@ public class MembersGetService {
         return new ResponseEntity<>(new Message("멤버 검색 성공", members), HttpStatus.OK);
     }
 
-    // 멤버 검색
+    // 멤버 검색 (친구코드)
     @Transactional
     public ResponseEntity<Message> searchMemberByFriendsCode(String friendCode, Members member) {
         if (friendCode.equals("")) throw new CustomException(PLZ_INPUT_CONTENT);
