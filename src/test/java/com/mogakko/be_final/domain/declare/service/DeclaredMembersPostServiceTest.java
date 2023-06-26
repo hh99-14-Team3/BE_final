@@ -80,20 +80,24 @@ class DeclaredMembersPostServiceTest {
         assertEquals(response.getBody().getMessage(), "멤버 신고 성공");
     }
 
-    @DisplayName("[POST] 회원 신고 실패 테스트 - 자기 자신은 신고할 수 없음")
+
+    @DisplayName("[POST] 회원 신고 성공 테스트 - 기타 사유 입력함")
     @Test
-    void declareMember_cannotReportMyself() {
+    void declareMember_doWriteReason() {
         DeclareRequestDto declareRequestDto = DeclareRequestDto.builder()
-                .declaredNickname(reporter.getNickname())
+                .declaredNickname(declared.getNickname())
                 .declaredReason(DeclaredReason.ETC)
                 .reason("")
                 .build();
-        when(membersServiceUtilMethod.findMemberByNickname(reporter.getNickname())).thenReturn(reporter);
+
+        when(membersServiceUtilMethod.findMemberByNickname(declared.getNickname())).thenReturn(declared);
 
         CustomException customException = assertThrows(CustomException.class, () ->
                 declaredMembersPostService.declareMember(declareRequestDto, reporter));
 
-        assertEquals(CANNOT_REQUEST, customException.getErrorCode());
+        assertEquals(PLZ_INPUT_REASON_OF_REPORT, customException.getErrorCode());
+        assertEquals(declareRequestDto.getDeclaredReason(), DeclaredReason.ETC);
+        assertEquals(declareRequestDto.getReason(), "");
     }
 
     @DisplayName("[POST] 회원 신고 실패 테스트 - 기타 사유 입력 안함")
@@ -111,5 +115,22 @@ class DeclaredMembersPostServiceTest {
 
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         assertEquals(response.getBody().getMessage(), "멤버 신고 성공");
+    }
+
+
+    @DisplayName("[POST] 회원 신고 실패 테스트 - 자기 자신은 신고할 수 없음")
+    @Test
+    void declareMember_cannotReportMyself() {
+        DeclareRequestDto declareRequestDto = DeclareRequestDto.builder()
+                .declaredNickname(reporter.getNickname())
+                .declaredReason(DeclaredReason.ETC)
+                .reason("")
+                .build();
+        when(membersServiceUtilMethod.findMemberByNickname(reporter.getNickname())).thenReturn(reporter);
+
+        CustomException customException = assertThrows(CustomException.class, () ->
+                declaredMembersPostService.declareMember(declareRequestDto, reporter));
+
+        assertEquals(CANNOT_REQUEST, customException.getErrorCode());
     }
 }
