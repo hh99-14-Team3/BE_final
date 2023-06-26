@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
 
-    INTERNAL_SERER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR"),
     NOT_ADMIN(HttpStatus.BAD_REQUEST, "관리자 회원이 아닙니다."),
     ALREADY_JOIN_USER(HttpStatus.BAD_REQUEST, "이미 가입한 회원입니다. 로그인해주세요"),
     DUPLICATE_IDENTIFIER(HttpStatus.BAD_REQUEST, "중복된 이메일 입니다."),
@@ -41,7 +40,10 @@ public enum ErrorCode {
 
 
     //인증
-    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다.");
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다."),
+
+    //serverError
+    INTERNAL_SERER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR");
 
     private final HttpStatus httpStatus;
     private final String data;
