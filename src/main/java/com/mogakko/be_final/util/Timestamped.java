@@ -19,4 +19,7 @@ public class Timestamped {
     @LastModifiedDate
     private LocalDateTime modifiedAt;
 
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
