@@ -112,5 +112,21 @@ class MembersGetControllerTest {
 
         verify(membersGetService, Mockito.times(1)).readMyPage(member);
     }
-    
+
+    @DisplayName("[GET] 다른 유저 프로필 조회 테스트")
+    @Test
+    void getMemberProfile() throws Exception {
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        Long memberId = 1L;
+        Message expectedMessage = new Message("프로필 조회 성공", memberPageResponseDto);
+
+        when(membersGetService.getMemberProfile(any(Members.class), Mockito.eq(memberId))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/members/{memberId}", memberId)
+                        .principal(userDetails))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        Mockito.verify(membersGetService, Mockito.times(1)).getMemberProfile(userDetails.getMember(), memberId);
+    }
 }
