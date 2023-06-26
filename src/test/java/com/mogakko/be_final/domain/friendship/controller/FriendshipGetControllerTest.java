@@ -69,4 +69,21 @@ class FriendshipGetControllerTest {
 
         verify(friendshipGetService, times(1)).getMyFriend(userDetails.getMember());
     }
+
+    @DisplayName("[GET] 친구 목록 조회 테스트")
+    @Test
+    void getMyFriendRequest() throws Exception {
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        List<FriendResponseDto> friendRequestSenderList = new ArrayList<>();
+        Message expectedMessage = new Message("친구 요청 목록 조회 성공", friendRequestSenderList);
+
+        when(friendshipGetService.getMyFriendRequest(userDetails.getMember())).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/friendship/requests/pending")
+                        .principal(userDetails))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        verify(friendshipGetService, times(1)).getMyFriendRequest(userDetails.getMember());
+    }
 }
