@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.friendship.controller;
 
+import com.mogakko.be_final.domain.friendship.dto.request.DeleteFriendRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.request.DetermineRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestByCodeDto;
 import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestDto;
@@ -42,6 +43,8 @@ class FriendshipPostControllerTest {
     private FriendRequestByCodeDto friendRequestByCodeDto;
     @Mock
     private DetermineRequestDto determineRequestDto;
+    @Mock
+    private DeleteFriendRequestDto deleteFriendRequestDto;
     @InjectMocks
     private FriendshipPostController friendshipPostController;
     private MockMvc mockMvc;
@@ -103,4 +106,16 @@ class FriendshipPostControllerTest {
         assertEquals(message, response.getBody());
     }
 
+    @DisplayName("[POST] 친구 삭제 테스트")
+    @Test
+    void deleteFriend() {
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        Message message = new Message("친구 삭제 완료", null);
+        when(friendshipPostService.deleteFriend(any(DeleteFriendRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
+
+        ResponseEntity<Message> response = friendshipPostController.deleteFriend(deleteFriendRequestDto, userDetails);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+    }
 }
