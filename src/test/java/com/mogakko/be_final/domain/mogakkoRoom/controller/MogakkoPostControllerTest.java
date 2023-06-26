@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.mogakkoRoom.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
@@ -33,18 +32,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Mogakko Controller - [POST] 테스트")
 class MogakkoPostControllerTest {
-    @Mock
-    private ObjectMapper objectMapper;
+
     @Mock
     private MogakkoPostService mogakkoPostService;
     @Mock
-    private MogakkoRoomCreateRequestDto mogakkoRoomCreateRequestDto;
-    @Mock
     private MogakkoRoomEnterDataRequestDto mogakkoRoomEnterDataRequestDto;
-    @Mock
-    private Mogakko12kmRequestDto mogakko12kmRequestDto;
     @InjectMocks
     private MogakkoPostController mogakkoPostController;
+    
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -109,22 +104,15 @@ class MogakkoPostControllerTest {
     @DisplayName("[POST] 모각코 방 입장 테스트")
     @Test
     void enterMogakko() throws Exception {
-        /**
-         *  MogakkoPostController 에서 enterMogakko 메소드에
-         *  MgakkoRoomEnterDataRequestDto nullable 허용으로 테스트 시 오류 있음
-         *  TODO: 수정 예정
-         */
-//        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
-//        String token = "wss://mogakko.store?sessionId=ses_UX9flaS0tW&token=tok_E6WpKdTdKJ8Uv6IX";
-//        Message expectedMessage = new Message("모각코방 입장 성공", token);
-//
-//        when(mogakkoPostService.enterMogakko(anyString(), any(MogakkoRoomEnterDataRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
-//
-//        mockMvc.perform(MockMvcRequestBuilders.post("/mogakko/{sessionId}", mogakkoRoom.getSessionId())
-//                        .principal(userDetails))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
-//        verify(mogakkoPostService, times(1)).enterMogakko(mogakkoRoom.getSessionId(), mogakkoRoomEnterDataRequestDto, userDetails.getMember());
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        String token = "wss://mogakko.store?sessionId=ses_UX9flaS0tW&token=tok_E6WpKdTdKJ8Uv6IX";
+        Message expectedMessage = new Message("모각코방 입장 성공", token);
+
+        when(mogakkoPostService.enterMogakko(anyString(), any(MogakkoRoomEnterDataRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        ResponseEntity<Message> response = mogakkoPostController.enterMogakko(mogakkoRoom.getSessionId(), mogakkoRoomEnterDataRequestDto, userDetails);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedMessage, response.getBody());
     }
 
     @DisplayName("[POST] 주변 12km 모각코 목록 조회 / 검색 테스트")
