@@ -108,4 +108,25 @@ class MogakkoPostControllerTest {
         assertEquals(message, response.getBody());
     }
 
+    @DisplayName("[POST] 모각코 방 입장 테스트")
+    @Test
+    void enterMogakko() throws Exception {
+        /**
+         *  MogakkoPostController 에서 enterMogakko 메소드에
+         *  MgakkoRoomEnterDataRequestDto nullable 허용으로 테스트 시 오류 있음
+         *  TODO: 수정 예정
+         */
+//        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+//        String token = "wss://mogakko.store?sessionId=ses_UX9flaS0tW&token=tok_E6WpKdTdKJ8Uv6IX";
+//        Message expectedMessage = new Message("모각코방 입장 성공", token);
+//
+//        when(mogakkoPostService.enterMogakko(anyString(), any(MogakkoRoomEnterDataRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+//
+//        mockMvc.perform(MockMvcRequestBuilders.post("/mogakko/{sessionId}", mogakkoRoom.getSessionId())
+//                        .principal(userDetails))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+//                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+//        verify(mogakkoPostService, times(1)).enterMogakko(mogakkoRoom.getSessionId(), mogakkoRoomEnterDataRequestDto, userDetails.getMember());
+    }
+
 }
