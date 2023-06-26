@@ -30,8 +30,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.security.Principal;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MembersGetControllerTest {
@@ -97,4 +96,21 @@ class MembersGetControllerTest {
         verify(membersGetService, Mockito.times(1)).checkNickname(nickname);
     }
 
+    @DisplayName("[GET] 마이페이지 조회 테스트")
+    @Test
+    void myPage() throws Exception {
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+
+        Message expectedMessage = new Message("마이페이지 조회 성공", memberPageResponseDto);
+
+        when(membersGetService.readMyPage(any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/members/mypage")
+                        .principal(userDetails))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        verify(membersGetService, Mockito.times(1)).readMyPage(member);
+    }
+    
 }
