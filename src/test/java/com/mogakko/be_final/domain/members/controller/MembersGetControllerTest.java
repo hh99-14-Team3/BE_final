@@ -1,6 +1,7 @@
 package com.mogakko.be_final.domain.members.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberPageResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberSimpleResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
@@ -23,6 +24,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -35,6 +39,8 @@ class MembersGetControllerTest {
     private MemberPageResponseDto memberPageResponseDto;
     @Mock
     private MemberSimpleResponseDto memberSimpleResponseDto;
+    @Mock
+    private BestMembersResponseDto bestMembersResponseDto;
 
     @InjectMocks
     private MembersGetController membersGetController;
@@ -162,4 +168,18 @@ class MembersGetControllerTest {
         Mockito.verify(membersGetService, Mockito.times(1)).searchMemberByFriendsCode(String.valueOf(friendcode), userDetails.getMember());
     }
 
+    @DisplayName("[GET] 최고의 유저 조회 테스트")
+    @Test
+    void readBestMembers() throws Exception {
+        List<BestMembersResponseDto> bestMembersList = new ArrayList<>();
+        Message expectedMessage = new Message("최고의 ON:s 조회 성공", bestMembersList);
+
+        when(membersGetService.readBestMembers()).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/members/best"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        Mockito.verify(membersGetService, Mockito.times(1)).readBestMembers();
+    }
 }
