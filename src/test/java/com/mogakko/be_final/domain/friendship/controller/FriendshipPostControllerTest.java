@@ -8,10 +8,6 @@ import com.mogakko.be_final.domain.friendship.service.FriendshipPostService;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
-import com.mogakko.be_final.domain.mogakkoRoom.controller.MogakkoGetController;
-import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
-import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
-import com.mogakko.be_final.domain.mogakkoRoom.service.MogakkoGetService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,6 +49,7 @@ class FriendshipPostControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(friendshipPostController).build();
     }
 
+    Message message;
     Members member = Members.builder()
             .email("test@example.com")
             .nickname("nickname")
@@ -67,11 +63,12 @@ class FriendshipPostControllerTest {
             .isTutorialCheck(false)
             .build();
 
+    UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+
     @DisplayName("[POST] 닉네임으로 친구 요청 테스트")
     @Test
     void friendRequest() {
-        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
-        Message message = new Message("친구 요청 완료", null);
+        message = new Message("친구 요청 완료", null);
         when(friendshipPostService.friendRequest(any(FriendRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
 
         ResponseEntity<Message> response = friendshipPostController.friendRequest(friendRequestDto, userDetails);
@@ -83,8 +80,7 @@ class FriendshipPostControllerTest {
     @DisplayName("[POST] 친구코드로 친구 요청 테스트")
     @Test
     void friendRequestByCode() {
-        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
-        Message message = new Message("친구 요청 완료", null);
+        message = new Message("친구 요청 완료", null);
         when(friendshipPostService.friendRequestByCode(any(FriendRequestByCodeDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
 
         ResponseEntity<Message> response = friendshipPostController.friendRequestByCode(friendRequestByCodeDto, userDetails);
@@ -96,8 +92,7 @@ class FriendshipPostControllerTest {
     @DisplayName("[POST] 친구 요청 결정 테스트")
     @Test
     void determineRequest() {
-        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
-        Message message = new Message("친구요청을 수락하였습니다.", null);
+        message = new Message("친구요청을 수락하였습니다.", null);
         when(friendshipPostService.determineRequest(any(DetermineRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
 
         ResponseEntity<Message> response = friendshipPostController.determineRequest(determineRequestDto, userDetails);
@@ -109,8 +104,7 @@ class FriendshipPostControllerTest {
     @DisplayName("[POST] 친구 삭제 테스트")
     @Test
     void deleteFriend() {
-        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
-        Message message = new Message("친구 삭제 완료", null);
+        message = new Message("친구 삭제 완료", null);
         when(friendshipPostService.deleteFriend(any(DeleteFriendRequestDto.class), any(Members.class))).thenReturn(ResponseEntity.ok(message));
 
         ResponseEntity<Message> response = friendshipPostController.deleteFriend(deleteFriendRequestDto, userDetails);
