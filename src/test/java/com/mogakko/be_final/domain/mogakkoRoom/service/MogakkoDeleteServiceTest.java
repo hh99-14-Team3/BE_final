@@ -11,7 +11,6 @@ import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomMembersRepo
 import com.mogakko.be_final.domain.mogakkoRoom.repository.MogakkoRoomRepository;
 import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -138,7 +137,7 @@ class MogakkoDeleteServiceTest {
             when(mogakkoRoomRepository.findBySessionId(sessionId)).thenReturn(Optional.empty());
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoDeleteService.outMogakko(sessionId, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoDeleteService.outMogakko(sessionId, member));
             assertEquals(customException.getErrorCode(), MOGAKKO_NOT_FOUND);
         }
 
@@ -152,7 +151,7 @@ class MogakkoDeleteServiceTest {
             when(mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, true)).thenReturn(Optional.empty());
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoDeleteService.outMogakko(sessionId, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoDeleteService.outMogakko(sessionId, member));
             assertEquals(customException.getErrorCode(), NOT_MOGAKKO_MEMBER);
         }
 
@@ -170,7 +169,7 @@ class MogakkoDeleteServiceTest {
             when(mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, true)).thenReturn(Optional.of(mogakkoRoomMembers));
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoDeleteService.outMogakko(sessionId, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoDeleteService.outMogakko(sessionId, member));
             assertEquals(customException.getErrorCode(), ALREADY_OUT_MEMBER);
         }
     }
