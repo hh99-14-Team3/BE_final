@@ -13,12 +13,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.multipart.MultipartFile;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -52,28 +57,16 @@ class MembersPutControllerTest {
     @DisplayName("[PUT] 프로필 정보 수정 테스트")
     @Test
     void profilePhotoUpdate() throws Exception {
-        /**
-         * 아래 테스트 코드는
-         * org.mockito.exceptions.misusing.PotentialStubbingProblem 이라는 에러를 만남
-         * 추측컨대, controller 에서 required = false 설정 때문에 nullable이 허용되어서 인듯.
-         * 추가적으로 더 찾아보고 다시 작성 예정
-         */
-//        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
-//        Message expectedMessage = new Message("프로필 정보 변경 성공", null);
-//        // MockMultipartFile 생성
-//        MockMultipartFile imageFile = new MockMultipartFile("imageFile", "image.jpg", MediaType.IMAGE_JPEG_VALUE, "test image".getBytes());
-//
-//        when(membersPutService.profileUpdate(any(MultipartFile.class), anyString(), any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
-//
-//        mockMvc.perform(MockMvcRequestBuilders.put("/members/mypage")
-//                        .contentType(MediaType.MULTIPART_FORM_DATA)
-//                        .content("imageFile")
-//                        .param("nickname", "testNickname")
-//                        .principal(userDetails))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
-//
-//        verify(membersPutService, times(1)).profileUpdate(eq(imageFile), eq("testNickname"), eq(userDetails.getMember()));
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        Message expectedMessage = new Message("프로필 정보 변경 성공", null);
+        // MockMultipartFile 생성
+        MockMultipartFile imageFile = new MockMultipartFile("imageFile", "image.jpg", MediaType.IMAGE_JPEG_VALUE, "test image".getBytes());
+
+        when(membersPutService.profileUpdate(any(MultipartFile.class), anyString(), any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        ResponseEntity<Message> response = membersPutController.profileUpdate(imageFile, member.getNickname(), userDetails);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedMessage, response.getBody());
     }
 
     @DisplayName("[PUT] 마이페이지 프로필사진 삭제 테스트")
