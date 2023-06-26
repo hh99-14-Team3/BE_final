@@ -159,18 +159,13 @@ public class MogakkoPostService {
         double lat = mogakko12KmRequestDto.getLat();
         double lon = mogakko12KmRequestDto.getLon();
         List<MogakkoRoom> mogakkoList;
-        if (language == null && searchKeyword == null) {
-            mogakkoList = mogakkoRoomRepository.findAllByLatAndLon(lat, lon);
-        } else if (searchKeyword == null) {
-            mogakkoList = mogakkoRoomRepository.findAllByLatAndLonAndLanguage(lat, lon, LanguageEnum.valueOf(language));
-        } else if (language == null) {
-            mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLatAndLon(searchKeyword, lat, lon);
-        } else {
-            mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLanguageAndLatAndLon(searchKeyword, LanguageEnum.valueOf(language), lat, lon);
-        }
-        if (mogakkoList.size() == 0) {
-            return new ResponseEntity<>(new Message("근처에 모각코가 없습니다.", null), HttpStatus.OK);
-        }
+        if (language == null && searchKeyword == null) mogakkoList = mogakkoRoomRepository.findAllByLatAndLon(lat, lon);
+        else if (searchKeyword == null) mogakkoList = mogakkoRoomRepository.findAllByLatAndLonAndLanguage(lat, lon, LanguageEnum.valueOf(language));
+        else if (language == null) mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLatAndLon(searchKeyword, lat, lon);
+        else mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLanguageAndLatAndLon(searchKeyword, LanguageEnum.valueOf(language), lat, lon);
+
+        if (mogakkoList.size() == 0) return new ResponseEntity<>(new Message("근처에 모각코가 없습니다.", null), HttpStatus.OK);
+
         // 모각코 방 생성으로부터 경과시간 나타내기 위한 코드
         List<MogakkoRoomReadResponseDto> responseDtoList = new ArrayList<>();
         for (MogakkoRoom mr : mogakkoList) {

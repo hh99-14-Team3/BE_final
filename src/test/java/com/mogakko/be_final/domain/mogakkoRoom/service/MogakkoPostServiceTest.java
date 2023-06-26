@@ -4,9 +4,11 @@ import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.entity.SocialType;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomCreateResponseDto;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomReadResponseDto;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoom;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.MogakkoRoomMembers;
@@ -30,6 +32,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
@@ -53,7 +58,6 @@ class MogakkoPostServiceTest {
     MogakkoRoomMembersLanguageStatisticsRepository mogakkoRoomMembersLanguageStatisticsRepository;
     @Mock
     MogakkoServiceUtilMethod mogakkoServiceUtilMethod;
-
     @InjectMocks
     MogakkoPostService mogakkoPostService;
     Members member = Members.builder()
@@ -83,6 +87,7 @@ class MogakkoPostServiceTest {
             .cntMembers(2L)
             .masterMemberId(3L)
             .build();
+
     @Nested
     @DisplayName("모각코 방 생성 테스트")
     class CreateMogakko {
@@ -122,7 +127,7 @@ class MogakkoPostServiceTest {
 
     @Nested
     @DisplayName("모각코 방 입장 테스트")
-    class EnterMogakko{
+    class EnterMogakko {
         @DisplayName("모각코 방 입장 성공 테스트")
         @Test
         void enterMogakko_success() throws OpenViduJavaClientException, OpenViduHttpException {
@@ -215,7 +220,7 @@ class MogakkoPostServiceTest {
             when(mogakkoRoomRepository.findBySessionId("sessionId")).thenReturn(Optional.empty());
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
             assertEquals(customException.getErrorCode(), MOGAKKO_NOT_FOUND);
         }
 
@@ -229,7 +234,7 @@ class MogakkoPostServiceTest {
             when(mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, true)).thenReturn(Optional.of(new MogakkoRoomMembers()));
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
             assertEquals(customException.getErrorCode(), ALREADY_ENTER_MEMBER);
         }
 
@@ -256,7 +261,7 @@ class MogakkoPostServiceTest {
             when(mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, true)).thenReturn(Optional.empty());
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
             assertEquals(customException.getErrorCode(), MOGAKKO_IS_FULL);
         }
 
@@ -269,7 +274,7 @@ class MogakkoPostServiceTest {
 
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoPostService.enterMogakko("sessionId", null, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoPostService.enterMogakko("sessionId", null, member));
             assertEquals(customException.getErrorCode(), PLZ_INPUT_PASSWORD);
         }
 
@@ -284,9 +289,10 @@ class MogakkoPostServiceTest {
 
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
             assertEquals(customException.getErrorCode(), PLZ_INPUT_PASSWORD);
         }
+
         @DisplayName("비밀번호 입력 안한 후 모각코 방 입장 테스트 3")
         @Test
         void enterMogakko_notInputPassword3() {
@@ -298,7 +304,7 @@ class MogakkoPostServiceTest {
 
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
             assertEquals(customException.getErrorCode(), PLZ_INPUT_PASSWORD);
         }
 
@@ -314,7 +320,7 @@ class MogakkoPostServiceTest {
             when(passwordEncoder.matches(requestDto.getPassword(), mogakkoRoom.getPassword())).thenReturn(false);
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoPostService.enterMogakko("sessionId", requestDto, member));
             assertEquals(customException.getErrorCode(), INVALID_PASSWORD);
         }
 
@@ -344,5 +350,143 @@ class MogakkoPostServiceTest {
             assertEquals(mogakkoRoomMembers.isEntered(), true);
         }
 
+        @Nested
+        @DisplayName("위치기반 모각코 조회 테스트")
+        class GetAllMogakkoOrSearch {
+            @DisplayName("위치 기준 모각코 조회 성공 테스트")
+            @Test
+            void getAllMogakkosOrSearch_successOnlyLatAndLon() {
+                // given
+                Mogakko12kmRequestDto requestDto = Mogakko12kmRequestDto.builder()
+                        .lat(34.33333)
+                        .lon(125.333344)
+                        .build();
+                mogakkoRoom.setCreatedAt(LocalDateTime.now());
+                List<MogakkoRoom> mogakkoRoomList = new ArrayList<>();
+                mogakkoRoomList.add(mogakkoRoom);
+
+                when(mogakkoRoomRepository.findAllByLatAndLon(requestDto.getLat(), requestDto.getLon())).thenReturn(mogakkoRoomList);
+
+                // when
+                ResponseEntity<Message> response = mogakkoPostService.getAllMogakkosOrSearch(null, null, requestDto);
+
+                // then
+                List<MogakkoRoomReadResponseDto> responseDtoList = (List<MogakkoRoomReadResponseDto>) response.getBody().getData();
+                assertEquals(response.getStatusCode(), HttpStatus.OK);
+                assertEquals(response.getBody().getMessage(), "조회 완료");
+                for (MogakkoRoomReadResponseDto responseDto : responseDtoList) {
+                    assertEquals(responseDto.getMogakkoRoom().getTitle(), "코딩킹");
+                    assertEquals(responseDto.getElapsedTime(), "00H00M");
+                }
+            }
+
+            @DisplayName("위치 기준 모각코 제목 검색 성공 테스트")
+            @Test
+            void getAllMogakkosOrSearch_successWithSearchKeyword() {
+                // given
+                String searchKeyword = "코";
+                Mogakko12kmRequestDto requestDto = Mogakko12kmRequestDto.builder()
+                        .lat(34.33333)
+                        .lon(125.333344)
+                        .build();
+                mogakkoRoom.setCreatedAt(LocalDateTime.now());
+                List<MogakkoRoom> mogakkoRoomList = new ArrayList<>();
+                mogakkoRoomList.add(mogakkoRoom);
+
+                when(mogakkoRoomRepository.findAllBySearchKeywordAndLatAndLon(searchKeyword, requestDto.getLat(), requestDto.getLon())).thenReturn(mogakkoRoomList);
+
+                // when
+                ResponseEntity<Message> response = mogakkoPostService.getAllMogakkosOrSearch(searchKeyword, null, requestDto);
+
+                // then
+                List<MogakkoRoomReadResponseDto> responseDtoList = (List<MogakkoRoomReadResponseDto>) response.getBody().getData();
+                assertEquals(response.getStatusCode(), HttpStatus.OK);
+                assertEquals(response.getBody().getMessage(), "조회 완료");
+                for (MogakkoRoomReadResponseDto responseDto : responseDtoList) {
+                    assertEquals(responseDto.getMogakkoRoom().getTitle(), "코딩킹");
+                    assertEquals(responseDto.getElapsedTime(), "00H00M");
+                }
+            }
+
+            @DisplayName("위치 기준 모각코 언어 검색 성공 테스트")
+            @Test
+            void getAllMogakkosOrSearch_successWithLanguage() {
+                // given
+                String language = "JAVA";
+                Mogakko12kmRequestDto requestDto = Mogakko12kmRequestDto.builder()
+                        .lat(34.33333)
+                        .lon(125.333344)
+                        .build();
+                mogakkoRoom.setCreatedAt(LocalDateTime.now());
+                List<MogakkoRoom> mogakkoRoomList = new ArrayList<>();
+                mogakkoRoomList.add(mogakkoRoom);
+
+                when(mogakkoRoomRepository.findAllByLatAndLonAndLanguage(requestDto.getLat(), requestDto.getLon(), LanguageEnum.valueOf(language))).thenReturn(mogakkoRoomList);
+
+                // when
+                ResponseEntity<Message> response = mogakkoPostService.getAllMogakkosOrSearch(null, language, requestDto);
+
+                // then
+                List<MogakkoRoomReadResponseDto> responseDtoList = (List<MogakkoRoomReadResponseDto>) response.getBody().getData();
+                assertEquals(response.getStatusCode(), HttpStatus.OK);
+                assertEquals(response.getBody().getMessage(), "조회 완료");
+                for (MogakkoRoomReadResponseDto responseDto : responseDtoList) {
+                    assertEquals(responseDto.getMogakkoRoom().getTitle(), "코딩킹");
+                    assertEquals(responseDto.getElapsedTime(), "00H00M");
+                }
+            }
+
+            @DisplayName("위치 기준 모각코 제목 & 언어 검색 성공 테스트")
+            @Test
+            void getAllMogakkosOrSearch_successWithSearchKeywordAndLanguage() {
+                // given
+                String searchKeyword = "코";
+                String language = "JAVA";
+                Mogakko12kmRequestDto requestDto = Mogakko12kmRequestDto.builder()
+                        .lat(34.33333)
+                        .lon(125.333344)
+                        .build();
+                mogakkoRoom.setCreatedAt(LocalDateTime.now());
+                List<MogakkoRoom> mogakkoRoomList = new ArrayList<>();
+                mogakkoRoomList.add(mogakkoRoom);
+
+                when(mogakkoRoomRepository.findAllBySearchKeywordAndLanguageAndLatAndLon(searchKeyword, LanguageEnum.valueOf(language), requestDto.getLat(), requestDto.getLon())).thenReturn(mogakkoRoomList);
+
+                // when
+                ResponseEntity<Message> response = mogakkoPostService.getAllMogakkosOrSearch(searchKeyword, language, requestDto);
+
+                // then
+                List<MogakkoRoomReadResponseDto> responseDtoList = (List<MogakkoRoomReadResponseDto>) response.getBody().getData();
+                assertEquals(response.getStatusCode(), HttpStatus.OK);
+                assertEquals(response.getBody().getMessage(), "조회 완료");
+                for (MogakkoRoomReadResponseDto responseDto : responseDtoList) {
+                    assertEquals(responseDto.getMogakkoRoom().getTitle(), "코딩킹");
+                    assertEquals(responseDto.getElapsedTime(), "00H00M");
+                }
+            }
+
+            @DisplayName("검색 결과 없음 테스트")
+            @Test
+            void getAllMogakkosOrSearch_noSearchList() {
+                // given
+                String searchKeyword = "코";
+                String language = "JAVA";
+                Mogakko12kmRequestDto requestDto = Mogakko12kmRequestDto.builder()
+                        .lat(34.33333)
+                        .lon(125.333344)
+                        .build();
+                mogakkoRoom.setCreatedAt(LocalDateTime.now());
+                List<MogakkoRoom> mogakkoRoomList = new ArrayList<>();
+
+                when(mogakkoRoomRepository.findAllBySearchKeywordAndLanguageAndLatAndLon(searchKeyword, LanguageEnum.valueOf(language), requestDto.getLat(), requestDto.getLon())).thenReturn(mogakkoRoomList);
+
+                // when
+                ResponseEntity<Message> response = mogakkoPostService.getAllMogakkosOrSearch(searchKeyword, language, requestDto);
+
+                // then
+                assertEquals(response.getStatusCode(), HttpStatus.OK);
+                assertEquals(response.getBody().getMessage(), "근처에 모각코가 없습니다.");
+            }
+        }
     }
 }
