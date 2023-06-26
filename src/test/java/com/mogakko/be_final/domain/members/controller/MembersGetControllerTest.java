@@ -129,4 +129,23 @@ class MembersGetControllerTest {
 
         Mockito.verify(membersGetService, Mockito.times(1)).getMemberProfile(userDetails.getMember(), memberId);
     }
+
+    @DisplayName("[GET] 다른 유저 닉네임으로 검색 테스트")
+    @Test
+    void searchMembersByNickname() throws Exception{
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        String nickname = "testuser";
+        Message expectedMessage = new Message("멤버 검색 성공", member);
+
+        Mockito.when(membersGetService.searchMembersByNickname(anyString(), Mockito.any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/members/search/nickname")
+                        .param("nickname", nickname)
+                        .principal(userDetails))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        Mockito.verify(membersGetService, Mockito.times(1)).searchMembersByNickname(nickname, userDetails.getMember());
+    }
+
 }
