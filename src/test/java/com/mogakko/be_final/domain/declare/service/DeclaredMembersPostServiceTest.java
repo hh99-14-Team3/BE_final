@@ -80,4 +80,36 @@ class DeclaredMembersPostServiceTest {
         assertEquals(response.getBody().getMessage(), "멤버 신고 성공");
     }
 
+    @DisplayName("[POST] 회원 신고 실패 테스트 - 자기 자신은 신고할 수 없음")
+    @Test
+    void declareMember_cannotReportMyself() {
+        DeclareRequestDto declareRequestDto = DeclareRequestDto.builder()
+                .declaredNickname(reporter.getNickname())
+                .declaredReason(DeclaredReason.ETC)
+                .reason("")
+                .build();
+        when(membersServiceUtilMethod.findMemberByNickname(reporter.getNickname())).thenReturn(reporter);
+
+        CustomException customException = assertThrows(CustomException.class, () ->
+                declaredMembersPostService.declareMember(declareRequestDto, reporter));
+
+        assertEquals(CANNOT_REQUEST, customException.getErrorCode());
+    }
+
+    @DisplayName("[POST] 회원 신고 실패 테스트 - 기타 사유 입력 안함")
+    @Test
+    void declareMember_doNotWriteReason() {
+        DeclareRequestDto declareRequestDto = DeclareRequestDto.builder()
+                .declaredNickname(declared.getNickname())
+                .declaredReason(DeclaredReason.ETC)
+                .reason("신고 사유 입니다.")
+                .build();
+        when(membersServiceUtilMethod.findMemberByNickname(declared.getNickname())).thenReturn(declared);
+        when(declaredMembersRepository.save(any(DeclaredMembers.class))).thenReturn(null);
+
+        ResponseEntity<Message> response = declaredMembersPostService.declareMember(declareRequestDto, reporter);
+
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(response.getBody().getMessage(), "멤버 신고 성공");
+    }
 }
