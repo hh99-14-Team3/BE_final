@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.members.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberPageResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberSimpleResponseDto;
@@ -31,22 +30,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Members Controller - [GET] 테스트")
 class MembersGetControllerTest {
-
     @Mock
     private MembersGetService membersGetService;
     @Mock
     private MemberPageResponseDto memberPageResponseDto;
     @Mock
     private MemberSimpleResponseDto memberSimpleResponseDto;
-    @Mock
-    private BestMembersResponseDto bestMembersResponseDto;
-
     @InjectMocks
     private MembersGetController membersGetController;
 
     private MockMvc mockMvc;
-    ObjectMapper objectMapper = new ObjectMapper();
 
     Members member = Members.builder()
             .email("test@example.com")
@@ -79,7 +74,7 @@ class MembersGetControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
 
-        verify(membersGetService, Mockito.times(1)).checkEmail(email);
+        verify(membersGetService, times(1)).checkEmail(email);
     }
 
     @DisplayName("[GET] 닉네임 중복 체크 테스트")
@@ -95,7 +90,7 @@ class MembersGetControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
 
-        verify(membersGetService, Mockito.times(1)).checkNickname(nickname);
+        verify(membersGetService, times(1)).checkNickname(nickname);
     }
 
     @DisplayName("[GET] 마이페이지 조회 테스트")
@@ -112,7 +107,7 @@ class MembersGetControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
 
-        verify(membersGetService, Mockito.times(1)).readMyPage(member);
+        verify(membersGetService, times(1)).readMyPage(member);
     }
 
     @DisplayName("[GET] 다른 유저 프로필 조회 테스트")
@@ -122,14 +117,14 @@ class MembersGetControllerTest {
         Long memberId = 1L;
         Message expectedMessage = new Message("프로필 조회 성공", memberPageResponseDto);
 
-        when(membersGetService.getMemberProfile(any(Members.class), Mockito.eq(memberId))).thenReturn(ResponseEntity.ok(expectedMessage));
+        when(membersGetService.getMemberProfile(any(Members.class), eq(memberId))).thenReturn(ResponseEntity.ok(expectedMessage));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/members/{memberId}", memberId)
                         .principal(userDetails))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
 
-        Mockito.verify(membersGetService, Mockito.times(1)).getMemberProfile(userDetails.getMember(), memberId);
+        verify(membersGetService, times(1)).getMemberProfile(userDetails.getMember(), memberId);
     }
 
     @DisplayName("[GET] 다른 유저 닉네임으로 검색 테스트")
@@ -139,7 +134,7 @@ class MembersGetControllerTest {
         String nickname = "testuser";
         Message expectedMessage = new Message("멤버 검색 성공", member);
 
-        Mockito.when(membersGetService.searchMembersByNickname(anyString(), Mockito.any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+        when(membersGetService.searchMembersByNickname(anyString(), any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/members/search/nickname")
                         .param("nickname", nickname)
@@ -147,7 +142,7 @@ class MembersGetControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
 
-        Mockito.verify(membersGetService, Mockito.times(1)).searchMembersByNickname(nickname, userDetails.getMember());
+        verify(membersGetService, times(1)).searchMembersByNickname(nickname, userDetails.getMember());
     }
 
     @DisplayName("[GET] 다른 유저 친구코드로 검색 테스트")
@@ -165,7 +160,7 @@ class MembersGetControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
 
-        Mockito.verify(membersGetService, Mockito.times(1)).searchMemberByFriendsCode(String.valueOf(friendcode), userDetails.getMember());
+        verify(membersGetService, times(1)).searchMemberByFriendsCode(String.valueOf(friendcode), userDetails.getMember());
     }
 
     @DisplayName("[GET] 최고의 유저 조회 테스트")
@@ -180,6 +175,6 @@ class MembersGetControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
 
-        Mockito.verify(membersGetService, Mockito.times(1)).readBestMembers();
+        verify(membersGetService, times(1)).readBestMembers();
     }
 }
