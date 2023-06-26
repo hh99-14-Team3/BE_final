@@ -1,11 +1,10 @@
 package com.mogakko.be_final.domain.mogakkoRoom.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mogakko.be_final.domain.members.controller.MembersPostController;
-import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
+import com.mogakko.be_final.domain.mogakkoRoom.dto.request.Mogakko12kmRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomCreateRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.request.MogakkoRoomEnterDataRequestDto;
 import com.mogakko.be_final.domain.mogakkoRoom.entity.LanguageEnum;
@@ -21,18 +20,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Mogakko Controller - [POST] 테스트")
@@ -45,6 +41,8 @@ class MogakkoPostControllerTest {
     private MogakkoRoomCreateRequestDto mogakkoRoomCreateRequestDto;
     @Mock
     private MogakkoRoomEnterDataRequestDto mogakkoRoomEnterDataRequestDto;
+    @Mock
+    private Mogakko12kmRequestDto mogakko12kmRequestDto;
     @InjectMocks
     private MogakkoPostController mogakkoPostController;
     private MockMvc mockMvc;
@@ -129,4 +127,15 @@ class MogakkoPostControllerTest {
 //        verify(mogakkoPostService, times(1)).enterMogakko(mogakkoRoom.getSessionId(), mogakkoRoomEnterDataRequestDto, userDetails.getMember());
     }
 
+    @DisplayName("[POST] 주변 12km 모각코 목록 조회 / 검색 테스트")
+    @Test
+    void getAllMogakkos() {
+        Mogakko12kmRequestDto requestDto = Mogakko12kmRequestDto.builder().lon(11.111111).lat(11.111111).build();
+        Message expectedMessage = new Message("주변 12km 모각코 목록 조회 성공", null);
+        when(mogakkoPostService.getAllMogakkosOrSearch(anyString(), anyString(), any(Mogakko12kmRequestDto.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        ResponseEntity<Message> response = mogakkoPostController.getAllMogakkos("searchKeyword", "JAVA", requestDto);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedMessage, response.getBody());
+    }
 }
