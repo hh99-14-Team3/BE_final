@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.declare.controller;
 
-import com.mogakko.be_final.domain.declare.dto.request.DeclareRequestDto;
 import com.mogakko.be_final.domain.declare.entity.DeclaredMembers;
 import com.mogakko.be_final.domain.declare.service.DeclaredMembersPutService;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
