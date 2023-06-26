@@ -49,6 +49,7 @@ class MembersPutControllerTest {
             .isTutorialCheck(false)
             .build();
 
+
     @DisplayName("[PUT] 마이페이지 프로필사진 삭제 테스트")
     @Test
     void profileDelete() throws Exception {
@@ -64,4 +65,18 @@ class MembersPutControllerTest {
         verify(membersPutService, times(1)).profileDelete(userDetails.getMember());
     }
 
+    @DisplayName("[PUT] 튜토리얼 체크 메서드 테스트")
+    @Test
+    void tutorialCheck() throws Exception {
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        Message expectedMessage = new Message("튜토리얼 확인 요청 성공", null);
+
+        when(membersPutService.tutorialCheck(any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/members/tutorial-check")
+                        .principal(userDetails))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+        verify(membersPutService, times(1)).tutorialCheck(userDetails.getMember());
+    }
 }
