@@ -17,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.sql.Time;
-import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.INTERNAL_SERER_ERROR;
@@ -118,7 +115,7 @@ class MogakkoPutServiceTest {
             when(memberWeekStatisticsRepository.findById(member.getEmail())).thenReturn(Optional.empty());
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> mogakkoPutService.mogakkoTimer(mogakkoTimerRequestDto, member));
+            CustomException customException = assertThrows(CustomException.class, () -> mogakkoPutService.mogakkoTimer(mogakkoTimerRequestDto, member));
             assertEquals(USER_NOT_FOUND, customException.getErrorCode());
         }
 
@@ -161,7 +158,9 @@ class MogakkoPutServiceTest {
             assertEquals(Time.valueOf("20:00:00"), response.getBody().getData());
             assertEquals(member.getCodingTem(), 100.0);
             assertEquals(member.getMemberStatusCode(), MemberStatusCode.EMOTICON);
-        }@DisplayName("모각코 타이머 멤버 스테이터스 코드 전환 (SPECIAL_ANGEL) 테스트")
+        }
+
+        @DisplayName("모각코 타이머 멤버 스테이터스 코드 전환 (SPECIAL_ANGEL) 테스트")
         @Test
         void mogakkoTimer_SPECIAL_ANGEL() {
             // given
@@ -323,6 +322,196 @@ class MogakkoPutServiceTest {
             assertEquals(Time.valueOf("20:00:00"), response.getBody().getData());
             assertEquals(member.getCodingTem(), 100.0);
             assertEquals(member.getMemberStatusCode(), MemberStatusCode.EMOTICON);
+        }
+
+
+        @Nested
+        @DisplayName("요일별 타이머 기록 메서드 테스트")
+        class AddTimeToWeek {
+            @DisplayName("월요일 타이머 기록 테스트")
+            @Test
+            void addTimeToWeek_mon() {
+                // given
+                int mon = 1;
+                long timeToSec = 30L;
+
+                MemberWeekStatistics memberWeekStatistics = MemberWeekStatistics.builder()
+                        .email("test@example.com")
+                        .sun(0).mon(0).tue(0).sat(0).fri(0).wed(0).thu(0)
+                        .build();
+                // when
+                mogakkoPutService.addTimeToWeek(mon, timeToSec, memberWeekStatistics);
+
+                // then
+                assertEquals(memberWeekStatistics.getMon(), 30L);
+                assertEquals(memberWeekStatistics.getTue(), 0L);
+                assertEquals(memberWeekStatistics.getWed(), 0L);
+                assertEquals(memberWeekStatistics.getThu(), 0L);
+                assertEquals(memberWeekStatistics.getFri(), 0L);
+                assertEquals(memberWeekStatistics.getSat(), 0L);
+                assertEquals(memberWeekStatistics.getSun(), 0L);
+            }
+
+            @DisplayName("화요일 타이머 기록 테스트")
+            @Test
+            void addTimeToWeek_Tue() {
+                // given
+                int tue = 2;
+                long timeToSec = 30L;
+
+                MemberWeekStatistics memberWeekStatistics = MemberWeekStatistics.builder()
+                        .email("test@example.com")
+                        .sun(0).mon(0).tue(0).sat(0).fri(0).wed(0).thu(0)
+                        .build();
+                // when
+                mogakkoPutService.addTimeToWeek(tue, timeToSec, memberWeekStatistics);
+
+                // then
+                assertEquals(memberWeekStatistics.getMon(), 0L);
+                assertEquals(memberWeekStatistics.getTue(), 30L);
+                assertEquals(memberWeekStatistics.getWed(), 0L);
+                assertEquals(memberWeekStatistics.getThu(), 0L);
+                assertEquals(memberWeekStatistics.getFri(), 0L);
+                assertEquals(memberWeekStatistics.getSat(), 0L);
+                assertEquals(memberWeekStatistics.getSun(), 0L);
+            }
+
+            @DisplayName("수요일 타이머 기록 테스트")
+            @Test
+            void addTimeToWeek_wed() {
+                // given
+                int wed = 3;
+                long timeToSec = 30L;
+
+                MemberWeekStatistics memberWeekStatistics = MemberWeekStatistics.builder()
+                        .email("test@example.com")
+                        .sun(0).mon(0).tue(0).sat(0).fri(0).wed(0).thu(0)
+                        .build();
+                // when
+                mogakkoPutService.addTimeToWeek(wed, timeToSec, memberWeekStatistics);
+
+                // then
+                assertEquals(memberWeekStatistics.getMon(), 0L);
+                assertEquals(memberWeekStatistics.getTue(), 0L);
+                assertEquals(memberWeekStatistics.getWed(), 30L);
+                assertEquals(memberWeekStatistics.getThu(), 0L);
+                assertEquals(memberWeekStatistics.getFri(), 0L);
+                assertEquals(memberWeekStatistics.getSat(), 0L);
+                assertEquals(memberWeekStatistics.getSun(), 0L);
+            }
+
+            @DisplayName("목요일 타이머 기록 테스트")
+            @Test
+            void addTimeToWeek_thu() {
+                // given
+                int thu = 4;
+                long timeToSec = 30L;
+
+                MemberWeekStatistics memberWeekStatistics = MemberWeekStatistics.builder()
+                        .email("test@example.com")
+                        .sun(0).mon(0).tue(0).sat(0).fri(0).wed(0).thu(0)
+                        .build();
+                // when
+                mogakkoPutService.addTimeToWeek(thu, timeToSec, memberWeekStatistics);
+
+                // then
+                assertEquals(memberWeekStatistics.getMon(), 0L);
+                assertEquals(memberWeekStatistics.getTue(), 0L);
+                assertEquals(memberWeekStatistics.getWed(), 0L);
+                assertEquals(memberWeekStatistics.getThu(), 30L);
+                assertEquals(memberWeekStatistics.getFri(), 0L);
+                assertEquals(memberWeekStatistics.getSat(), 0L);
+                assertEquals(memberWeekStatistics.getSun(), 0L);
+            }
+
+            @DisplayName("금요일 타이머 기록 테스트")
+            @Test
+            void addTimeToWeek_fri() {
+                // given
+                int fri = 5;
+                long timeToSec = 30L;
+
+                MemberWeekStatistics memberWeekStatistics = MemberWeekStatistics.builder()
+                        .email("test@example.com")
+                        .sun(0).mon(0).tue(0).sat(0).fri(0).wed(0).thu(0)
+                        .build();
+                // when
+                mogakkoPutService.addTimeToWeek(fri, timeToSec, memberWeekStatistics);
+
+                // then
+                assertEquals(memberWeekStatistics.getMon(), 0L);
+                assertEquals(memberWeekStatistics.getTue(), 0L);
+                assertEquals(memberWeekStatistics.getWed(), 0L);
+                assertEquals(memberWeekStatistics.getThu(), 0L);
+                assertEquals(memberWeekStatistics.getFri(), 30L);
+                assertEquals(memberWeekStatistics.getSat(), 0L);
+                assertEquals(memberWeekStatistics.getSun(), 0L);
+            }
+
+            @DisplayName("토요일 타이머 기록 테스트")
+            @Test
+            void addTimeToWeek_sat() {
+                // given
+                int sat = 6;
+                long timeToSec = 30L;
+
+                MemberWeekStatistics memberWeekStatistics = MemberWeekStatistics.builder()
+                        .email("test@example.com")
+                        .sun(0).mon(0).tue(0).sat(0).fri(0).wed(0).thu(0)
+                        .build();
+                // when
+                mogakkoPutService.addTimeToWeek(sat, timeToSec, memberWeekStatistics);
+
+                // then
+                assertEquals(memberWeekStatistics.getMon(), 0L);
+                assertEquals(memberWeekStatistics.getTue(), 0L);
+                assertEquals(memberWeekStatistics.getWed(), 0L);
+                assertEquals(memberWeekStatistics.getThu(), 0L);
+                assertEquals(memberWeekStatistics.getFri(), 0L);
+                assertEquals(memberWeekStatistics.getSat(), 30L);
+                assertEquals(memberWeekStatistics.getSun(), 0L);
+            }
+
+            @DisplayName("일요일 타이머 기록 테스트")
+            @Test
+            void addTimeToWeek_sun() {
+                // given
+                int sun = 7;
+                long timeToSec = 30L;
+
+                MemberWeekStatistics memberWeekStatistics = MemberWeekStatistics.builder()
+                        .email("test@example.com")
+                        .sun(0).mon(0).tue(0).sat(0).fri(0).wed(0).thu(0)
+                        .build();
+                // when
+                mogakkoPutService.addTimeToWeek(sun, timeToSec, memberWeekStatistics);
+
+                // then
+                assertEquals(memberWeekStatistics.getMon(), 0L);
+                assertEquals(memberWeekStatistics.getTue(), 0L);
+                assertEquals(memberWeekStatistics.getWed(), 0L);
+                assertEquals(memberWeekStatistics.getThu(), 0L);
+                assertEquals(memberWeekStatistics.getFri(), 0L);
+                assertEquals(memberWeekStatistics.getSat(), 0L);
+                assertEquals(memberWeekStatistics.getSun(), 30L);
+            }
+
+            @DisplayName("요일별 타이머 기록 예외 테스트")
+            @Test
+            void addTimeToWeek_fail() {
+                // given
+                int num = 11;
+                long timeToSec = 30L;
+
+                MemberWeekStatistics memberWeekStatistics = MemberWeekStatistics.builder()
+                        .email("test@example.com")
+                        .sun(0).mon(0).tue(0).sat(0).fri(0).wed(0).thu(0)
+                        .build();
+
+                // when & then
+                IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> mogakkoPutService.addTimeToWeek(num, timeToSec, memberWeekStatistics));
+                assertEquals(String.valueOf(INTERNAL_SERER_ERROR), illegalArgumentException.getMessage());
+            }
         }
     }
 }
