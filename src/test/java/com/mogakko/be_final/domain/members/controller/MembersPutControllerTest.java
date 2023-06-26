@@ -48,7 +48,7 @@ class MembersPutControllerTest {
             .friendCode(123456)
             .isTutorialCheck(false)
             .build();
-    
+
     @DisplayName("[PUT] 프로필 정보 수정 테스트")
     @Test
     void profilePhotoUpdate() throws Exception {
