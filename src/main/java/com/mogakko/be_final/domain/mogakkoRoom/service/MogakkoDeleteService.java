@@ -24,7 +24,7 @@ public class MogakkoDeleteService {
 
     // 모각코 방 퇴장
     @Transactional
-    public ResponseEntity<Message> outMogakko(String sessionId, Members members) {
+    public ResponseEntity<Message> outMogakko(String sessionId, Members member) {
 
         // 모각코 방 존재 확인
         MogakkoRoom mogakkoRoom = mogakkoRoomRepository.findBySessionId(sessionId).orElseThrow(
@@ -32,7 +32,7 @@ public class MogakkoDeleteService {
         );
 
         // 방에 멤버가 존재하는지 확인
-        MogakkoRoomMembers mogakkoRoomMembers = mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(members.getId(), mogakkoRoom, true).orElseThrow(
+        MogakkoRoomMembers mogakkoRoomMembers = mogakkoRoomMembersRepository.findByMemberIdAndMogakkoRoomAndIsEntered(member.getId(), mogakkoRoom, true).orElseThrow(
                 () -> new CustomException(NOT_MOGAKKO_MEMBER)
         );
 
@@ -49,7 +49,6 @@ public class MogakkoDeleteService {
         synchronized (mogakkoRoom) {
             // 방 인원 카운트 - 1
             mogakkoRoom.updateCntMembers(mogakkoRoom.getCntMembers() - 1);
-            mogakkoRoomMembers.isEntered();
             if (mogakkoRoom.getCntMembers() <= 0) {
                 // 모각코 삭제처리
                 mogakkoRoom.deleteRoom();
