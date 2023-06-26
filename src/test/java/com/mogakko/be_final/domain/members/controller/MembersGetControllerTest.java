@@ -2,6 +2,7 @@ package com.mogakko.be_final.domain.members.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogakko.be_final.domain.members.dto.response.MemberPageResponseDto;
+import com.mogakko.be_final.domain.members.dto.response.MemberSimpleResponseDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
@@ -15,19 +16,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.security.Principal;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -39,6 +33,8 @@ class MembersGetControllerTest {
     private MembersGetService membersGetService;
     @Mock
     private MemberPageResponseDto memberPageResponseDto;
+    @Mock
+    private MemberSimpleResponseDto memberSimpleResponseDto;
 
     @InjectMocks
     private MembersGetController membersGetController;
@@ -132,7 +128,7 @@ class MembersGetControllerTest {
 
     @DisplayName("[GET] 다른 유저 닉네임으로 검색 테스트")
     @Test
-    void searchMembersByNickname() throws Exception{
+    void searchMembersByNickname() throws Exception {
         UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
         String nickname = "testuser";
         Message expectedMessage = new Message("멤버 검색 성공", member);
@@ -146,6 +142,24 @@ class MembersGetControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
 
         Mockito.verify(membersGetService, Mockito.times(1)).searchMembersByNickname(nickname, userDetails.getMember());
+    }
+
+    @DisplayName("[GET] 다른 유저 친구코드로 검색 테스트")
+    @Test
+    void searchMemberByFriendsCode() throws Exception {
+        UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
+        int friendcode = 123456;
+        Message expectedMessage = new Message("멤버 검색 성공", memberSimpleResponseDto);
+
+        when(membersGetService.searchMemberByFriendsCode(anyString(), any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/members/search/friend-code")
+                        .param("friendCode", String.valueOf(friendcode))
+                        .principal(userDetails))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        Mockito.verify(membersGetService, Mockito.times(1)).searchMemberByFriendsCode(String.valueOf(friendcode), userDetails.getMember());
     }
 
 }
