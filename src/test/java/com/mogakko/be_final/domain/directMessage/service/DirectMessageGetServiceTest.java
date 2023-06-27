@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -69,6 +70,7 @@ class DirectMessageGetServiceTest {
             .build();
 
     DirectMessage directMessage = DirectMessage.builder()
+            .id(1L)
             .receiver(member1)
             .sender(member2)
             .content("content")
@@ -164,19 +166,23 @@ class DirectMessageGetServiceTest {
         }
     }
 
-    @Test
-    void readDirectMessage() {
-    }
+    @Nested
+    @DisplayName("쪽지 상세 조회 테스트")
+    class ReadDirectMessage {
+        @DisplayName("쪽지 상세조회 성공 테스트")
+        @Test
+        void readDirectMessage() {
+            // given
+            Long messageId = 1L;
 
-    @Test
-    void testSearchReceivedMessage() {
-    }
+            when(directMessageServiceUtilMethod.findDirectMessageById(messageId)).thenReturn(directMessage);
 
-    @Test
-    void testSearchSentMessage() {
-    }
+            // when
+            ResponseEntity<Message> response = directMessageGetService.readDirectMessage(member1, 1L);
 
-    @Test
-    void testReadDirectMessage() {
+            // then
+            DirectMessage responseDirectMessage = (DirectMessage) response.getBody().getData();
+            assertEquals(directMessage, responseDirectMessage);
+        }
     }
 }
