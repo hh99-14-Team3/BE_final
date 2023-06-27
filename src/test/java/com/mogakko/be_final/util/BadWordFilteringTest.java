@@ -45,7 +45,21 @@ class BadWordFilteringTest {
         }
     }
 
-    @Test
-    void checkBadWordUUID() {
+    @Nested
+    @DisplayName("checkBadWord Method 테스트")
+    class CheckBadWordUUID {
+        @DisplayName("닉네임 필터링 테스트")
+        @Test
+        void checkBadWord_notBadWord() {
+            // given
+            String str = "시발";
+
+            // when
+            String filteringStr = badWordFiltering.checkBadWordUUID(str);
+
+            // then
+            assertNotEquals(str, filteringStr);
+            assertEquals(10, filteringStr.length());
+        }
     }
 }
