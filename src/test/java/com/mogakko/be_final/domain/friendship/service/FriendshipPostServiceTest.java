@@ -134,6 +134,20 @@ class FriendshipPostServiceTest {
         assertEquals("친구 요청이 거절된 상태입니다.", response.getBody().getMessage());
     }
 
+    @DisplayName("[POST] 친구 요청 성공 테스트 - 요청이 한 번 거절 된 후 다시 요청보냄")
+    @Test
+    void friendRequest_retry() {
+        // Given
+        FriendRequestDto requestDto = FriendRequestDto.builder().requestReceiverNickname("nickname1").build();
+        when(membersServiceUtilMethod.findMemberByNickname(requestDto.getRequestReceiverNickname())).thenReturn(receiver);
+        when(friendshipRepository.findBySenderAndReceiver(member, receiver)).thenReturn(Optional.of(refuseFriendship));
+        // When
+        ResponseEntity<Message> response = friendshipPostService.friendRequest(requestDto, member);
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("친구 요청 완료", response.getBody().getMessage());
+    }
+
     @DisplayName("[POST] 친구 요청 실패 테스트 - 이미 요청을 보냄")
     @Test
     void friendRequest_alreadyRequest() {
