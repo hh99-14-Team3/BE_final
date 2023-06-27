@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -25,7 +24,6 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 
@@ -109,7 +107,7 @@ class EmailPostServiceTest {
             when(membersRepository.findByEmail(email)).thenReturn(Optional.empty());
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> emailPostService.createMessage(email));
+            CustomException customException = assertThrows(CustomException.class, () -> emailPostService.createMessage(email));
             assertEquals(EMAIL_NOT_FOUND, customException.getErrorCode());
         }
     }
@@ -160,7 +158,7 @@ class EmailPostServiceTest {
             doThrow(mailException).when(emailSender).send(mimeMessageMock);
 
             // when & then
-            IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, ()-> emailPostService.sendSimpleMessage(emailConfirmRequestDto));
+            IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> emailPostService.sendSimpleMessage(emailConfirmRequestDto));
             assertNull(illegalArgumentException.getMessage());
         }
     }
@@ -211,7 +209,7 @@ class EmailPostServiceTest {
             when(membersRepository.findByEmail(confirmationToken.getEmail())).thenReturn(Optional.empty());
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> emailPostService.confirmEmailToFindPassword(token, changePwRequestDto));
+            CustomException customException = assertThrows(CustomException.class, () -> emailPostService.confirmEmailToFindPassword(token, changePwRequestDto));
             assertEquals(USER_NOT_FOUND, customException.getErrorCode());
         }
     }
