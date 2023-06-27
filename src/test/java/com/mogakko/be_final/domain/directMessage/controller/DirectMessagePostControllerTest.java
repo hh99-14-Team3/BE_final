@@ -60,4 +60,15 @@ class DirectMessagePostControllerTest {
         assertEquals(message, response.getBody());
     }
 
+    @DisplayName("[POST] 쪽지 삭제 테스트")
+    @Test
+    void deleteDirectMessage() {
+        Message message = new Message("쪽지 삭제가 완료되었습니다.", null);
+        when(directMessagePostService.deleteDirectMessage(any(Members.class), anyList())).thenReturn(ResponseEntity.ok(message));
+
+        ResponseEntity<Message> response = directMessagePostController.deleteDirectMessage(userDetails, directMessageDeleteRequestDto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
+    }
 }
