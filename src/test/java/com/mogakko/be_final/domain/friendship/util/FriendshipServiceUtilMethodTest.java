@@ -103,4 +103,49 @@ class FriendshipServiceUtilMethodTest {
         assertFalse(result);
     }
 
+    @DisplayName("친구 여부 상태 코드로 확인 메서드 테스트 - 내가 요청을 보낸 경우")
+    @Test
+    void checkFriendStatus_Sender() {
+        // Given
+        when(friendshipRepository.findBySenderAndReceiverAndStatus(member, stranger, FriendshipStatus.PENDING))
+                .thenReturn(Optional.of(new Friendship()));
+        // When
+        boolean result = friendshipServiceUtilMethod.checkFriendStatus(stranger, member);
+        // Then
+        assertTrue(result);
+    }
+
+    @DisplayName("친구 여부 상태 코드로 확인 메서드 테스트 - 내가 요청을 받은 경우")
+    @Test
+    void checkFriendStatus_Receiver() {
+        // Given
+        when(friendshipRepository.findBySenderAndReceiverAndStatus(stranger, member, FriendshipStatus.PENDING)).thenReturn(Optional.empty());
+        when(friendshipRepository.findBySenderAndReceiverAndStatus(member, stranger, FriendshipStatus.PENDING)).thenReturn(Optional.of(new Friendship()));
+        // When
+        boolean result = friendshipServiceUtilMethod.checkFriendStatus(member, stranger);
+        // Then
+        assertTrue(result);
+    }
+
+    @DisplayName("친구 여부 상태 코드로 확인 메서드 테스트 - 내가 나에게 요청을 보낸 경우")
+    @Test
+    void checkFriendStatus_Myself() {
+        // Given
+        boolean result;
+        // When
+        result = friendshipServiceUtilMethod.checkFriendStatus(member, member);
+        // Then
+        assertTrue(result);
+    }
+
+    @DisplayName("친구 여부 상태 코드로 확인 메서드 테스트 - 친구가 아닌 경우")
+    @Test
+    void checkFriendStatus_notFriend() {
+        when(friendshipRepository.findBySenderAndReceiverAndStatus(stranger, member, FriendshipStatus.PENDING)).thenReturn(Optional.empty());
+        when(friendshipRepository.findBySenderAndReceiverAndStatus(member, stranger, FriendshipStatus.PENDING)).thenReturn(Optional.empty());
+        // When
+        boolean result = friendshipServiceUtilMethod.checkFriendStatus(member, stranger);
+        // Then
+        assertFalse(result);
+    }
 }
