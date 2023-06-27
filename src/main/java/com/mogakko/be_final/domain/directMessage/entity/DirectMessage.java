@@ -42,6 +42,7 @@ public class DirectMessage extends Timestamped {
 
     private boolean isRead;
 
+    @Builder
     public DirectMessage(Members sender, Members receiver, String content, boolean isRead) {
         this.sender = sender;
         this.receiver = receiver;

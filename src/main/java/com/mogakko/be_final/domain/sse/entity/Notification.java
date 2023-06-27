@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.cassandra.core.cql.Ordering;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
-
-import javax.persistence.Column;
+import org.springframework.data.cassandra.core.mapping.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
@@ -29,10 +28,10 @@ public class Notification {
     @Column
     private String content;
 
-    @Column(name = "sender_nickname")
+    @Column("sendernickname")
     private String senderNickname;
 
-    @Column(name = "receiver_nickname")
+    @Column("receivernickname")
     private String receiverNickname;
 
     @Column

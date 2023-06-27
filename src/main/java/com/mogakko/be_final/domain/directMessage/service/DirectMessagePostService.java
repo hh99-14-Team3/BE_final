@@ -86,7 +86,11 @@ public class DirectMessagePostService {
                     directMessageRepository.save(directMessage);
                 }
             } else {
+                if(directMessage.getReceiver().getNickname().equals(member.getNickname())|| directMessage.getSender().getNickname().equals(member.getNickname())){
+                    throw new CustomException(MESSAGE_NOT_FOUND);
+                }else {
                 throw new CustomException(USER_MISMATCH_ERROR);
+                }
             }
         }
         return new ResponseEntity<>(new Message("쪽지 삭제가 완료되었습니다.", null), HttpStatus.OK);
