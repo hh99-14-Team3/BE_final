@@ -66,13 +66,15 @@ class FriendshipGetServiceTest {
             .isTutorialCheck(false)
             .build();
 
+    Friendship friendship1 = Friendship.builder().id(1L).sender(member).receiver(receiver).status(FriendshipStatus.ACCEPT).build();
+    Friendship friendship2 = Friendship.builder().id(2L).sender(receiver).receiver(member).status(FriendshipStatus.ACCEPT).build();
+
+
     @DisplayName("[GET] 친구 목록 조회 성공 테스트")
     @Test
     void getMyFriend() {
         // Given
         List<Friendship> friendshipList = new ArrayList<>();
-        Friendship friendship1 = Friendship.builder().id(1L).sender(member).receiver(receiver).status(FriendshipStatus.ACCEPT).build();
-        Friendship friendship2 = Friendship.builder().id(2L).sender(receiver).receiver(member).status(FriendshipStatus.ACCEPT).build();
         friendshipList.add(friendship1);
         friendshipList.add(friendship2);
         when(friendshipRepository.findAllByReceiverAndStatusOrSenderAndStatus(member, FriendshipStatus.ACCEPT, member, FriendshipStatus.ACCEPT)).thenReturn(friendshipList);
@@ -110,12 +112,6 @@ class FriendshipGetServiceTest {
     void getMyFriend_Fail() {
         // Given
         List<Friendship> friendshipList = new ArrayList<>();
-        Friendship friendship1 = Friendship.builder()
-                .id(1L)
-                .sender(member)
-                .receiver(receiver)
-                .status(FriendshipStatus.ACCEPT)
-                .build();
         friendshipList.add(friendship1);
         when(friendshipRepository.findAllByReceiverAndStatusOrSenderAndStatus(member, FriendshipStatus.ACCEPT, member, FriendshipStatus.ACCEPT)).thenReturn(friendshipList);
         List<FriendResponseDto> friendsList = new ArrayList<>();
@@ -126,6 +122,22 @@ class FriendshipGetServiceTest {
         CustomException customException = assertThrows(CustomException.class, () -> friendshipGetService.getMyFriend(member));
         assertEquals(customException.getErrorCode(), CANNOT_FOUND_FRIEND);
     }
+
+    @DisplayName("[GET] 친구 요청 조회 성공 테스트")
+    @Test
+    void getMyFriendRequest() {
+        // Given
+        List<Friendship> friendRequestSenderList = new ArrayList<>();
+        friendRequestSenderList.add(friendship1);
+        friendRequestSenderList.add(friendship2);
+        // When
+        when(friendshipRepository.findAllByReceiverAndStatus(member, FriendshipStatus.PENDING)).thenReturn(friendRequestSenderList);
+        ResponseEntity<Message> response = friendshipGetService.getMyFriendRequest(member);
+        // Then
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(response.getBody().getMessage(), "친구 요청 목록 조회 성공");
+    }
+
 
     @DisplayName("[GET] 친구 요청 조회 성공 테스트 - 수신된 요청 없음")
     @Test
