@@ -29,13 +29,12 @@ import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 public class EmailPostService {
     private final JavaMailSender emailSender;
     private final ConfirmationTokenRepository confirmationTokenRepository;
-    private final MembersRepository memberRepository;
     private final ConfirmationTokenService confirmationTokenService;
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
 
     protected MimeMessage createMessage(String receiverEmail) throws Exception {
-        Members findMember = memberRepository.findByEmail(receiverEmail).orElseThrow(
+        Members findMember = membersRepository.findByEmail(receiverEmail).orElseThrow(
                 () -> new CustomException(EMAIL_NOT_FOUND));
         MimeMessage message = emailSender.createMimeMessage();
         ConfirmationToken emailConfirmationToken = ConfirmationToken.createConfirmationToken(findMember.getEmail());
