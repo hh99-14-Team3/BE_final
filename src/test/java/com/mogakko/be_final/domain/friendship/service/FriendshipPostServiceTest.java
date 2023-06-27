@@ -112,6 +112,20 @@ class FriendshipPostServiceTest {
         assertEquals("친구요청을 수락하였습니다.", response.getBody().getMessage());
     }
 
+    @DisplayName("[POST] 친구 요청 거절 테스트")
+    @Test
+    void determineRequest_Refuse() {
+        // Given
+        DetermineRequestDto requestDto = DetermineRequestDto.builder().requestSenderNickname(receiver.getNickname()).determineRequest(false).build();
+        when(membersServiceUtilMethod.findMemberByNickname(requestDto.getRequestSenderNickname())).thenReturn(receiver);
+        when(friendshipRepository.findBySenderAndReceiverAndStatus(receiver, member, FriendshipStatus.PENDING)).thenReturn(Optional.of(new Friendship()));
+        // When
+        ResponseEntity<Message> response = friendshipPostService.determineRequest(requestDto, member);
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("친구요청을 거절하였습니다.", response.getBody().getMessage());
+    }
+
     @Test
     void deleteFriend() {
     }
