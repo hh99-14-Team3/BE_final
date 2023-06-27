@@ -127,5 +127,29 @@ class DeclaredMembersPutServiceTest {
         assertEquals(NOT_FOUND, customException.getErrorCode());
     }
 
+    @Test
+    @DisplayName("[PUT] 신고 횟수에 따른 상태코드 변경 테스트 - 신고 1회")
+    public void handleReport_ChangeStatus1() {
+        // Given
+        when(declaredMembersRepository.findById(declaredMembers1.getId())).thenReturn(Optional.of(declaredMembers1));
+        when(membersRepository.save(declaredMember1)).thenReturn(null);
+        // When
+        ResponseEntity<Message> response = declaredMembersPutService.handleReport(declaredMember1.getId(), member);
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("신고 처리 완료", response.getBody().getMessage());
+    }
 
+    @Test
+    @DisplayName("[PUT] 신고 횟수에 따른 상태코드 변경 테스트 - 신고 횟수 1 아닐 때")
+    public void handleReport_ChangeStatus2() {
+        // Given
+        when(declaredMembersRepository.findById(declaredMembers2.getId())).thenReturn(Optional.of(declaredMembers2));
+        when(membersRepository.save(declaredMember2)).thenReturn(null);
+        // When
+        ResponseEntity<Message> response = declaredMembersPutService.handleReport(declaredMember2.getId(), member);
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("신고 처리 완료", response.getBody().getMessage());
+    }
 }
