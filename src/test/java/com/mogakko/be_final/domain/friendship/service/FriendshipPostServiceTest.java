@@ -147,4 +147,42 @@ class FriendshipPostServiceTest {
         assertEquals("친구요청을 거절하였습니다.", response.getBody().getMessage());
     }
 
+    @DisplayName("[POST] 친구 삭제 성공 테스트")
+    @Test
+    void deleteFriend() {
+        // Given
+        List<String> names = new ArrayList<>();
+        names.add("nickname1");
+        DeleteFriendRequestDto requestDto = DeleteFriendRequestDto.builder().receiverNickname(names).build();
+        List<String> deleteMemberList = new ArrayList<>();
+        deleteMemberList.add("nickname1");
+
+        // When
+        when(membersServiceUtilMethod.findMemberByNickname("nickname1")).thenReturn(receiver);
+        when(friendshipRepository.findBySenderAndReceiver(member, receiver)).thenReturn(Optional.of(friendship1));
+        ResponseEntity<Message> response = friendshipPostService.deleteFriend(requestDto, member);
+
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("친구 삭제 완료", response.getBody().getMessage());
+    }
+
+    @DisplayName("[POST] 친구 삭제 실패 테스트 - 친구가 아님")
+    @Test
+    void deleteFriend_NotFriend() {
+        // Given
+        List<String> names = new ArrayList<>();
+        names.add("nickname1");
+        DeleteFriendRequestDto requestDto = DeleteFriendRequestDto.builder().receiverNickname(names).build();
+        List<String> deleteMemberList = new ArrayList<>();
+        deleteMemberList.add("nickname1");
+
+        // When
+        when(membersServiceUtilMethod.findMemberByNickname("nickname1")).thenReturn(receiver);
+        when(friendshipRepository.findBySenderAndReceiver(member, receiver)).thenReturn(Optional.empty());
+        CustomException customException = assertThrows(CustomException.class, () -> friendshipPostService.deleteFriend(requestDto, member));
+
+        // Then
+        assertEquals(customException.getErrorCode(), USER_NOT_FOUND);
+    }
 }
