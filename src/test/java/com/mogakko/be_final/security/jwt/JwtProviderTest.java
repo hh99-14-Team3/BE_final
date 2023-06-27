@@ -120,8 +120,46 @@ class JwtProviderTest {
         }
     }
 
-    @Test
-    void socketResolveToken() {
+    @Nested
+    @DisplayName("socketResolveToken Method 테스트")
+    class SocketResolveToken {
+        @DisplayName("socketResolveToken 성공 테스트")
+        @Test
+        void socketResolveToken_success() {
+            // given
+            String token = "Bearer token";
+
+            // when
+            String socketResolveToken = jwtProvider.socketResolveToken(token);
+
+            // then
+            assertEquals("token", socketResolveToken);
+        }
+
+        @DisplayName("socketResolveToken 토큰 유효성 테스트")
+        @Test
+        void socketResolveToken_failWithInvalidToken() {
+            // given
+            String token = "Bea token";
+
+            // when
+            String socketResolveToken = jwtProvider.socketResolveToken(token);
+
+            // then
+            assertNull(socketResolveToken);
+        }
+        @DisplayName("socketResolveToken 토큰 유효성 테스트")
+        @Test
+        void socketResolveToken_failWithInputNull() {
+            // given
+            String token = null;
+
+            // when
+            String socketResolveToken = jwtProvider.socketResolveToken(token);
+
+            // then
+            assertNull(socketResolveToken);
+        }
     }
 
     @Test
