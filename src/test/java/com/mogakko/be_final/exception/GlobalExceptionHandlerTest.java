@@ -39,4 +39,22 @@ class GlobalExceptionHandlerTest {
         assertEquals(exception.getErrorCode().getHttpStatus(), response.getStatusCode());
     }
 
+    @DisplayName("Valid 예외 핸들러 테스트")
+    @Test
+    void handleBindException() {
+        // Given
+        BindException bindException = new BindException(bindingResult);
+        String errorMessage = "Validation failed.";
+        when(bindingResult.getFieldErrors()).thenReturn(List.of(new FieldError("", "", errorMessage)));
+
+        // When
+        ResponseEntity<ErrorResponse> responseEntity = globalExceptionHandler.handleBindException(bindException);
+
+        // Then
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        ErrorResponse errorResponse = responseEntity.getBody();
+        Assertions.assertNotNull(errorResponse);
+        assertEquals(errorMessage, errorResponse.getMessage());
+    }
+
 }
