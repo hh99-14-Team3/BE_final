@@ -2,7 +2,6 @@ package com.mogakko.be_final.security.jwt;
 
 import com.mogakko.be_final.redis.util.RedisUtil;
 import com.mogakko.be_final.userDetails.UserDetailsServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,11 +13,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Key;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,28 +30,21 @@ class JwtProviderTest {
     public static final String REFRESH_KEY = "REFRESH_KEY";
     private static final long ACCESS_TIME = Duration.ofMinutes(30).toMillis();
     private static final long REFRESH_TIME = Duration.ofDays(7).toMillis();
-
-    @Value("${jwt.secret.key}")
-    private String secretKey;
     @Mock
     Key key;
     @Mock
     SignatureAlgorithm signatureAlgorithm;
     @Mock
     HttpServletRequest request;
-
     @Mock
     UserDetailsServiceImpl userDetailsService;
     @Mock
     RedisUtil redisUtil;
+    @Mock
+    HttpServletResponse response;
     @InjectMocks
     JwtProvider jwtProvider;
 
-
-//    @Nested
-//    @DisplayName("init 테스트")
-//    class init {
-//    }
 
     @Nested
     @DisplayName("resolveToken Method 테스트")
@@ -148,6 +142,7 @@ class JwtProviderTest {
             // then
             assertNull(socketResolveToken);
         }
+
         @DisplayName("socketResolveToken 토큰 유효성 테스트")
         @Test
         void socketResolveToken_failWithInputNull() {
@@ -162,43 +157,20 @@ class JwtProviderTest {
         }
     }
 
-    @Test
-    void createAllToken() {
-    }
+    @Nested
+    @DisplayName("setHeaderAccessToken 테스트")
+    class SetHeaderAccessToken {
+        @DisplayName("setHeaderAccessToken 성공 테스트")
+        @Test
+        void createAllToken_success() {
+            // given
+            String accessToken = "accessToken";
 
-    @Test
-    void createToken() {
-    }
+            // when
+            jwtProvider.setHeaderAccessToken(response, accessToken);
 
-    @Test
-    void createNewRefreshToken() {
-    }
-
-    @Test
-    void validateToken() {
-    }
-
-    @Test
-    void getUserInfoFromToken() {
-    }
-
-    @Test
-    void createAuthentication() {
-    }
-
-    @Test
-    void refreshTokenValid() {
-    }
-
-    @Test
-    void setHeaderAccessToken() {
-    }
-
-    @Test
-    void setHeaderRefreshToken() {
-    }
-
-    @Test
-    void getExpirationTime() {
+            // then
+            verify(response).setHeader(JwtProvider.ACCESS_KEY, accessToken);
+        }
     }
 }
