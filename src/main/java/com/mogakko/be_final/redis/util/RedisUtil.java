@@ -33,21 +33,9 @@ public class RedisUtil {
         redisTemplate.delete(token);
     }
 
-    public boolean hasKey(String key) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
-    }
-
     public void setBlackList(String key, String str, long minutes) {
         redisBlackListTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(str.getClass()));
         redisBlackListTemplate.opsForValue().set(key, str, minutes, TimeUnit.MINUTES);
-    }
-
-    public Object getBlackList(String key) {
-        return redisBlackListTemplate.opsForValue().get(key);
-    }
-
-    public boolean deleteBlackList(String key) {
-        return Boolean.TRUE.equals(redisBlackListTemplate.delete(key));
     }
 
     public boolean hasKeyBlackList(String key) {
