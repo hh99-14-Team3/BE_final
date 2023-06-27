@@ -22,7 +22,6 @@ import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 public class MembersServiceUtilMethod {
 
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
-    private final FriendshipRepository friendshipRepository;
     private final MembersRepository membersRepository;
 
     public MemberWeekStatistics findMemberWeekStatistics(String email) {
