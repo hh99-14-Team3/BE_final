@@ -35,12 +35,6 @@ class DeclarePostControllerTest {
     private DeclareRequestDto declareRequestDto;
     @InjectMocks
     private DeclarePostController declarePostController;
-    private MockMvc mockMvc;
-
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(declarePostController).build();
-    }
 
     Members member = Members.builder()
             .email("test@example.com")
