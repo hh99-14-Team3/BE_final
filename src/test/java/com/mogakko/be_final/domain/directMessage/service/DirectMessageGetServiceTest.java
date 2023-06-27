@@ -24,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.USER_MISMATCH_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,8 +81,8 @@ class DirectMessageGetServiceTest {
             .build();
 
     @BeforeEach
-    void setDirectMessageCreatedAt(){
-        directMessage.setCreatedAt(LocalDateTime.of(2023, 3, 3, 0,0));
+    void setDirectMessageCreatedAt() {
+        directMessage.setCreatedAt(LocalDateTime.of(2023, 3, 3, 0, 0));
     }
 
 
@@ -197,7 +196,7 @@ class DirectMessageGetServiceTest {
             when(directMessageServiceUtilMethod.findDirectMessageById(messageId)).thenReturn(directMessage);
 
             // when & then
-            CustomException customException = assertThrows(CustomException.class, ()-> directMessageGetService.readDirectMessage(member2, messageId));
+            CustomException customException = assertThrows(CustomException.class, () -> directMessageGetService.readDirectMessage(member2, messageId));
             assertEquals(USER_MISMATCH_ERROR, customException.getErrorCode());
         }
     }
