@@ -6,6 +6,8 @@ import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.mogakko.be_final.exception.ErrorCode.CANNOT_FOUND_FRIEND;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +45,7 @@ public class FriendshipGetService {
             Long friendId = receiverId.equals(member.getId()) ? senderId : receiverId;
 
             Members myFriend = membersRepository.findById(friendId)
-                    .orElseThrow(() -> new RuntimeException("친구를 찾을 수 없습니다."));
+                    .orElseThrow(() -> new CustomException(CANNOT_FOUND_FRIEND));
             FriendResponseDto responseDto = new FriendResponseDto(myFriend, false);
             friendsList.add(responseDto);
         }
