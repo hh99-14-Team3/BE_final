@@ -1,10 +1,8 @@
 package com.mogakko.be_final.security.jwt;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@Data
-@NoArgsConstructor
+@Getter
 public class TokenDto {
     private String accessToken;
     private String refreshToken;

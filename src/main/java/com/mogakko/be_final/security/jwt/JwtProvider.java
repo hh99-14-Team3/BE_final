@@ -58,7 +58,7 @@ public class JwtProvider {
     public String socketResolveToken(String bearerToken) {
         log.info("resolve socket Token ...");
 
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        if (bearerToken != null && bearerToken.startsWith(BEARER_PREFIX)) {
             // Bearer- 제외 토큰 값만 리턴
             return bearerToken.substring(7);
         }

@@ -72,15 +72,6 @@ public class Members extends Timestamped {
     @Builder.Default
     private boolean isTutorialCheck = false;
 
-    public Members(String email, String nickname, String password, Role role, MemberStatusCode memberStatusCode, Integer friendCode) {
-        this.email = email;
-        this.nickname = nickname;
-        this.password = password;
-        this.role = role;
-        this.memberStatusCode = memberStatusCode;
-        this.friendCode = friendCode;
-    }
-
     public void changePassword(String password) {
         this.password = password;
     }

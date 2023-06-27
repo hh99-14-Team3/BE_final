@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.members.service;
 
+import com.mogakko.be_final.domain.friendship.util.FriendshipServiceUtilMethod;
 import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.LanguageDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberPageResponseDto;
@@ -26,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
@@ -45,6 +47,8 @@ class MembersGetServiceTest {
     MemberWeekStatisticsRepository memberWeekStatisticsRepository;
     @Mock
     MembersServiceUtilMethod membersServiceUtilMethod;
+    @Mock
+    FriendshipServiceUtilMethod friendshipServiceUtilMethod;
     @InjectMocks
     MembersGetService membersGetService;
 
@@ -146,7 +150,7 @@ class MembersGetServiceTest {
             Map<String, String> weekMap = new HashMap<>();
             weekMap.put("sun", "20H32H");
 
-            when(membersServiceUtilMethod.weekTimeParse(email)).thenReturn(weekMap);
+            when(membersServiceUtilMethod.weekTimeParse(email, LocalDateTime.now().getDayOfWeek().getValue())).thenReturn(weekMap);
             when(mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email)).thenReturn(languageList);
 
             // when
@@ -181,7 +185,7 @@ class MembersGetServiceTest {
             weekMap.put("sun", "20H32H");
 
             when(membersRepository.findById(member.getId())).thenReturn(Optional.of(member));
-            when(membersServiceUtilMethod.weekTimeParse(email)).thenReturn(weekMap);
+            when(membersServiceUtilMethod.weekTimeParse(email, LocalDateTime.now().getDayOfWeek().getValue())).thenReturn(weekMap);
             when(mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email)).thenReturn(languageList);
 
             // when
@@ -230,10 +234,10 @@ class MembersGetServiceTest {
             memberSimpleResponseDtoList.add(memberSimpleResponseDto2);
 
             when(membersRepository.findByNicknameLike(nickname)).thenReturn(membersList);
-            when(membersServiceUtilMethod.checkFriend(member, member1)).thenReturn(true);
-            when(membersServiceUtilMethod.checkFriend(member, member2)).thenReturn(false);
-            when(membersServiceUtilMethod.checkFriendStatus(member, member1)).thenReturn(false);
-            when(membersServiceUtilMethod.checkFriendStatus(member, member2)).thenReturn(true);
+            when(friendshipServiceUtilMethod.checkFriend(member, member1)).thenReturn(true);
+            when(friendshipServiceUtilMethod.checkFriend(member, member2)).thenReturn(false);
+            when(friendshipServiceUtilMethod.checkFriendStatus(member, member1)).thenReturn(false);
+            when(friendshipServiceUtilMethod.checkFriendStatus(member, member2)).thenReturn(true);
 
             // when
             ResponseEntity<Message> response = membersGetService.searchMembersByNickname(nickname, member);
@@ -289,8 +293,8 @@ class MembersGetServiceTest {
             String friendCode = "123456";
 
             when(membersRepository.findByFriendCode(anyInt())).thenReturn(Optional.of(member));
-            when(membersServiceUtilMethod.checkFriend(member, member)).thenReturn(false);
-            when(membersServiceUtilMethod.checkFriendStatus(member, member)).thenReturn(false);
+            when(friendshipServiceUtilMethod.checkFriend(member, member)).thenReturn(false);
+            when(friendshipServiceUtilMethod.checkFriendStatus(member, member)).thenReturn(false);
 
             // when
             ResponseEntity<Message> response = membersGetService.searchMemberByFriendsCode(friendCode, member);
@@ -424,7 +428,7 @@ class MembersGetServiceTest {
             for (int i = 0; i < 8; i++) {
                 Members member = membersList.get(i);
                 when(membersRepository.findByEmail(membersList.get(i).getEmail())).thenReturn(Optional.of(membersList.get(i)));
-                when(membersServiceUtilMethod.weekTimeParse(member.getEmail())).thenReturn(weekMap);
+                when(membersServiceUtilMethod.weekTimeParse(member.getEmail(), LocalDateTime.now().getDayOfWeek().getValue())).thenReturn(weekMap);
             }
 
             // when
