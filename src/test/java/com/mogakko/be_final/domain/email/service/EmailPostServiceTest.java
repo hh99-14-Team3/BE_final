@@ -1,7 +1,9 @@
 package com.mogakko.be_final.domain.email.service;
 
 import com.mogakko.be_final.domain.email.dto.request.EmailConfirmRequestDto;
+import com.mogakko.be_final.domain.email.entity.ConfirmationToken;
 import com.mogakko.be_final.domain.email.repository.ConfirmationTokenRepository;
+import com.mogakko.be_final.domain.members.dto.request.ChangePwRequestDto;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
@@ -162,8 +164,33 @@ class EmailPostServiceTest {
         }
     }
 
-    @Test
-    void confirmEmailToFindPassword() {
+    @Nested
+    @DisplayName("이메일 검증 후 비밀번호 변경 테스트")
+    class ConfirmEmailToFindPassword {
+        @DisplayName("비밀번호 변경 성공 테스트")
+        @Test
+        void confirmEmailToFindPassword_success() {
+            // given
+            String token = "token";
+
+            ChangePwRequestDto changePwRequestDto = ChangePwRequestDto.builder()
+                    .password("password!")
+                    .build();
+
+            ConfirmationToken confirmationToken = ConfirmationToken.builder()
+                    .email("test@test.com")
+                    .build();
+
+            when(confirmationTokenService.findByIdAndExpired(token)).thenReturn(confirmationToken);
+            when(membersRepository.findByEmail(confirmationToken.getEmail())).thenReturn(Optional.of(member));
+
+            // when
+            ResponseEntity<Message> response = emailPostService.confirmEmailToFindPassword(token, changePwRequestDto);
+
+            // then
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("비밀번호 변경 성공", response.getBody().getMessage());
+        }
     }
 
 }

@@ -98,6 +98,7 @@ public class EmailPostService {
         findConfirmationToken.useToken();
 
         findMember.changePassword(password);
+        membersRepository.save(findMember);
         return new ResponseEntity<>(new Message("비밀번호 변경 성공", null), HttpStatus.OK);
     }
 }
