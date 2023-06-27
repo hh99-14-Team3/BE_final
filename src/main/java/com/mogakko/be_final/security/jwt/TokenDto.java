@@ -1,9 +1,9 @@
 package com.mogakko.be_final.security.jwt;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @NoArgsConstructor
 public class TokenDto {
     private String accessToken;

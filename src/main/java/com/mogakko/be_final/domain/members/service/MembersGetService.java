@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.members.service;
 
+import com.mogakko.be_final.domain.friendship.util.FriendshipServiceUtilMethod;
 import com.mogakko.be_final.domain.members.dto.response.BestMembersResponseDto;
 import com.mogakko.be_final.domain.members.dto.response.LanguageDto;
 import com.mogakko.be_final.domain.members.dto.response.MemberPageResponseDto;
@@ -33,6 +34,7 @@ public class MembersGetService {
     private final MogakkoRoomMembersLanguageStatisticsRepository mogakkoRoomMembersLanguageStatisticsRepository;
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
     private final MembersServiceUtilMethod membersServiceUtilMethod;
+    private final FriendshipServiceUtilMethod friendshipServiceUtilMethod;
 
     @Transactional(readOnly = true)
     public ResponseEntity<Message> checkEmail(String email) {
@@ -79,7 +81,7 @@ public class MembersGetService {
         List<LanguageDto> languagePercentage = mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email);
 
         MemberPageResponseDto userPage = new MemberPageResponseDto(findMember, allTimeTotal,
-                membersServiceUtilMethod.weekTimeParse(email), languagePercentage, membersServiceUtilMethod.checkFriend(member, findMember), membersServiceUtilMethod.checkFriendStatus(member, findMember));
+                membersServiceUtilMethod.weekTimeParse(email), languagePercentage, friendshipServiceUtilMethod.checkFriend(member, findMember), friendshipServiceUtilMethod.checkFriendStatus(member, findMember));
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPage), HttpStatus.OK);
     }
 
@@ -92,7 +94,7 @@ public class MembersGetService {
 
         List<MemberSimpleResponseDto> members = new ArrayList<>();
         for (Members mb : memberList) {
-            MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(mb, membersServiceUtilMethod.checkFriend(member, mb), membersServiceUtilMethod.checkFriendStatus(member, mb));
+            MemberSimpleResponseDto memberSimple = new MemberSimpleResponseDto(mb, friendshipServiceUtilMethod.checkFriend(member, mb), friendshipServiceUtilMethod.checkFriendStatus(member, mb));
             members.add(memberSimple);
         }
         if (members.size() == 0) return new ResponseEntity<>(new Message("검색된 멤버가 없습니다.", null), HttpStatus.OK);
@@ -119,7 +121,7 @@ public class MembersGetService {
 
         List<MemberSimpleResponseDto> memberSimple = new ArrayList<>();
 
-        memberSimple.add(new MemberSimpleResponseDto(foundMember, membersServiceUtilMethod.checkFriend(member, foundMember), membersServiceUtilMethod.checkFriendStatus(member, foundMember)));
+        memberSimple.add(new MemberSimpleResponseDto(foundMember, friendshipServiceUtilMethod.checkFriend(member, foundMember), friendshipServiceUtilMethod.checkFriendStatus(member, foundMember)));
         return new ResponseEntity<>(new Message("멤버 검색 성공", memberSimple), HttpStatus.OK);
     }
 
