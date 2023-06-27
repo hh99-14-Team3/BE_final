@@ -8,6 +8,7 @@ import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mogakko.be_final.exception.ErrorCode.CANNOT_FOUND_FRIEND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -101,4 +104,27 @@ class FriendshipGetServiceTest {
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         assertEquals(response.getBody().getMessage(), "조회된 친구가 없습니다.");
     }
+
+    @DisplayName("[GET] 친구 목록 조회 실패 테스트 - 유효하지 않은 id값")
+    @Test
+    void getMyFriend_Fail() {
+        List<Friendship> friendshipList = new ArrayList<>();
+        Friendship friendship1 = Friendship.builder()
+                .id(1L)
+                .sender(member)
+                .receiver(receiver)
+                .status(FriendshipStatus.ACCEPT)
+                .build();
+        friendshipList.add(friendship1);
+        when(friendshipRepository.findAllByReceiverAndStatusOrSenderAndStatus(member, FriendshipStatus.ACCEPT, member, FriendshipStatus.ACCEPT)).thenReturn(friendshipList);
+
+        List<FriendResponseDto> friendsList = new ArrayList<>();
+        FriendResponseDto responseDto = new FriendResponseDto(new Members(), false);
+        friendsList.add(responseDto);
+
+        CustomException customException = assertThrows(CustomException.class, () -> friendshipGetService.getMyFriend(member));
+
+        assertEquals(customException.getErrorCode(), CANNOT_FOUND_FRIEND);
+    }
+
 }
