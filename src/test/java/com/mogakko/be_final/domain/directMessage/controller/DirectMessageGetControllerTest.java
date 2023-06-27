@@ -70,4 +70,18 @@ class DirectMessageGetControllerTest {
         verify(directMessageGetService, times(1)).searchReceivedMessage(userDetails.getMember());
     }
 
+    @DisplayName("[GET] 보낸 쪽지 조회 테스트")
+    @Test
+    void sentDirectMessage() throws Exception {
+        Message expectedMessage = new Message("보낸 쪽지가 없습니다.", null);
+        Mockito.when(directMessageGetService.searchSentMessage(any(Members.class))).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/directMessage/sent")
+                        .principal(userDetails))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        verify(directMessageGetService, times(1)).searchSentMessage(userDetails.getMember());
+    }
+
 }
