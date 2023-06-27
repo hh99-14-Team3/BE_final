@@ -50,7 +50,7 @@ class BadWordFilteringTest {
     class CheckBadWordUUID {
         @DisplayName("닉네임 필터링 테스트")
         @Test
-        void checkBadWord_notBadWord() {
+        void checkBadWord_badNickname() {
             // given
             String str = "시발";
 
@@ -60,6 +60,19 @@ class BadWordFilteringTest {
             // then
             assertNotEquals(str, filteringStr);
             assertEquals(10, filteringStr.length());
+        }
+
+        @DisplayName("닉네임 필터링 테스트 2")
+        @Test
+        void checkBadWord_notBadWord() {
+            // given
+            String str = "하이";
+
+            // when
+            String filteringStr = badWordFiltering.checkBadWordUUID(str);
+
+            // then
+            assertEquals(str, filteringStr);
         }
     }
 }
