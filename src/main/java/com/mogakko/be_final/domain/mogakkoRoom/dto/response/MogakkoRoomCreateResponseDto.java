@@ -10,14 +10,11 @@ import java.time.LocalDateTime;
 @Builder
 public class MogakkoRoomCreateResponseDto {
 
-    // 실제 방 session id
     private String sessionId;
     private String title;
     private boolean isOpened;
     private LanguageEnum language;
     private String password;
-    private String masterName;
-    private boolean isRoomMaster;
 
 
     // 방 생성 시간
