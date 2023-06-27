@@ -105,6 +105,22 @@ class DirectMessageGetServiceTest {
             assertEquals(directMessageList.get(0).getSender().getNickname(), responseDtoList.get(0).getSenderNickname());
             assertEquals(directMessageList.get(0).getContent(), responseDtoList.get(0).getContent());
         }
+
+        @DisplayName("받은 쪽지 없음 테스트")
+        @Test
+        void searchReceivedMessage_noSearch() {
+            // given
+            List<DirectMessage> directMessageList = new ArrayList<>();
+
+            when(directMessageRepository.findAllByReceiverAndDeleteByReceiverFalse(member1)).thenReturn(directMessageList);
+
+            // when
+            ResponseEntity<Message> response = directMessageGetService.searchReceivedMessage(member1);
+
+            // then
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("도착한 쪽지가 없습니다.", response.getBody().getMessage());
+        }
     }
 
     @Test
