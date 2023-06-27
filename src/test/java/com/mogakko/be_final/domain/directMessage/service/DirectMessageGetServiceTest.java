@@ -123,8 +123,29 @@ class DirectMessageGetServiceTest {
         }
     }
 
-    @Test
-    void searchSentMessage() {
+    @Nested
+    @DisplayName("보낸 쪽지 조회 테스트")
+    class SearchSentMessage {
+        @DisplayName("보낸 쪽지 조회 성공 테스트")
+        @Test
+        void searchSentMessage_success() {
+            // given
+            List<DirectMessage> directMessageList = new ArrayList<>();
+            directMessageList.add(directMessage);
+
+            when(directMessageRepository.findAllBySenderAndDeleteBySenderFalse(member2)).thenReturn(directMessageList);
+
+            // when
+            ResponseEntity<Message> response = directMessageGetService.searchSentMessage(member2);
+
+            // then
+            List<DirectMessageSearchResponseDto> responseDtoList = (List<DirectMessageSearchResponseDto>) response.getBody().getData();
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("쪽지 목록 조회 완료", response.getBody().getMessage());
+            assertEquals(directMessageList.get(0).getReceiver().getNickname(), responseDtoList.get(0).getReceiverNickname());
+            assertEquals(directMessageList.get(0).getSender().getNickname(), responseDtoList.get(0).getSenderNickname());
+            assertEquals(directMessageList.get(0).getContent(), responseDtoList.get(0).getContent());
+        }
     }
 
     @Test
