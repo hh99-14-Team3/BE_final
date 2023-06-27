@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.servlet.FilterChain;
@@ -14,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import static org.mockito.Mockito.*;
 
@@ -125,6 +127,29 @@ class JwtAuthFilterTest {
 
             // when & then
             jwtAuthFilter.doFilterInternal(request, response, filterChain);
+        }
+    }
+
+    @Nested
+    @DisplayName("JwtExceptionHandler 테스트")
+    class JwtExceptionHandler {
+        @DisplayName("JwtExceptionHandler 성공 테스트")
+        @Test
+        void jwtExceptionHandler_success() throws IOException {
+            // given
+            String expectedMsg = "Test Message";
+
+            PrintWriter writer = Mockito.mock(PrintWriter.class);
+            when(response.getWriter()).thenReturn(writer);
+
+            // when
+            jwtAuthFilter.jwtExceptionHandler(response, expectedMsg);
+
+            // then
+            verify(response).setStatus(Mockito.eq(HttpServletResponse.SC_UNAUTHORIZED));
+            verify(response).setContentType(Mockito.eq("application/json"));
+            String expectedJson = "{\"message\":\"Test Message\",\"data\":null}";
+            verify(writer).write(expectedJson);
         }
     }
 }
