@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -62,7 +63,7 @@ public class MembersGetService {
         // 언어 선택 통계
         List<LanguageDto> languagePercentage = mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email);
 
-        MemberPageResponseDto mypage = new MemberPageResponseDto(member, allTimeTotal, membersServiceUtilMethod.weekTimeParse(email), languagePercentage);
+        MemberPageResponseDto mypage = new MemberPageResponseDto(member, allTimeTotal, membersServiceUtilMethod.weekTimeParse(email, LocalDateTime.now().getDayOfWeek().getValue()), languagePercentage);
         return new ResponseEntity<>(new Message("마이페이지 조회 성공", mypage), HttpStatus.OK);
     }
 
@@ -81,7 +82,7 @@ public class MembersGetService {
         List<LanguageDto> languagePercentage = mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email);
 
         MemberPageResponseDto userPage = new MemberPageResponseDto(findMember, allTimeTotal,
-                membersServiceUtilMethod.weekTimeParse(email), languagePercentage, friendshipServiceUtilMethod.checkFriend(member, findMember), friendshipServiceUtilMethod.checkFriendStatus(member, findMember));
+                membersServiceUtilMethod.weekTimeParse(email, LocalDateTime.now().getDayOfWeek().getValue()), languagePercentage, friendshipServiceUtilMethod.checkFriend(member, findMember), friendshipServiceUtilMethod.checkFriendStatus(member, findMember));
         return new ResponseEntity<>(new Message("프로필 조회 성공", userPage), HttpStatus.OK);
     }
 
@@ -133,7 +134,7 @@ public class MembersGetService {
         for (MemberWeekStatistics topMember : topMembers) {
             String email = topMember.getEmail();
             Members member = membersRepository.findByEmail(email).get();
-            BestMembersResponseDto responseMember = new BestMembersResponseDto(member, membersServiceUtilMethod.weekTimeParse(email));
+            BestMembersResponseDto responseMember = new BestMembersResponseDto(member, membersServiceUtilMethod.weekTimeParse(email, LocalDateTime.now().getDayOfWeek().getValue()));
             topMemberList.add(responseMember);
         }
         return new ResponseEntity<>(new Message("최고의 ON:s 조회 성공", topMemberList), HttpStatus.OK);

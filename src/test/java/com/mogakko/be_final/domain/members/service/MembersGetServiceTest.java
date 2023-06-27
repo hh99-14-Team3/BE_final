@@ -27,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
@@ -149,7 +150,7 @@ class MembersGetServiceTest {
             Map<String, String> weekMap = new HashMap<>();
             weekMap.put("sun", "20H32H");
 
-            when(membersServiceUtilMethod.weekTimeParse(email)).thenReturn(weekMap);
+            when(membersServiceUtilMethod.weekTimeParse(email, LocalDateTime.now().getDayOfWeek().getValue())).thenReturn(weekMap);
             when(mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email)).thenReturn(languageList);
 
             // when
@@ -184,7 +185,7 @@ class MembersGetServiceTest {
             weekMap.put("sun", "20H32H");
 
             when(membersRepository.findById(member.getId())).thenReturn(Optional.of(member));
-            when(membersServiceUtilMethod.weekTimeParse(email)).thenReturn(weekMap);
+            when(membersServiceUtilMethod.weekTimeParse(email, LocalDateTime.now().getDayOfWeek().getValue())).thenReturn(weekMap);
             when(mogakkoRoomMembersLanguageStatisticsRepository.countByEmailAndLanguage(email)).thenReturn(languageList);
 
             // when
@@ -427,7 +428,7 @@ class MembersGetServiceTest {
             for (int i = 0; i < 8; i++) {
                 Members member = membersList.get(i);
                 when(membersRepository.findByEmail(membersList.get(i).getEmail())).thenReturn(Optional.of(membersList.get(i)));
-                when(membersServiceUtilMethod.weekTimeParse(member.getEmail())).thenReturn(weekMap);
+                when(membersServiceUtilMethod.weekTimeParse(member.getEmail(), LocalDateTime.now().getDayOfWeek().getValue())).thenReturn(weekMap);
             }
 
             // when
