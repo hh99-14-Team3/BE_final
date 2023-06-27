@@ -5,6 +5,7 @@ import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 
+import static com.mogakko.be_final.exception.ErrorCode.EMAIL_NOT_FOUND;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +77,20 @@ class EmailPostServiceTest {
             // then
             verify(emailSender).createMimeMessage();
             verify(confirmationTokenRepository).save(any());
+        }
+
+        @DisplayName("createMessage 실패 테스트")
+        @Test
+        void createMessage_fail() throws Exception {
+            // given
+            String email = "test@test.com";
+
+            when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, ()-> emailPostService.createMessage(email));
+            assertEquals(EMAIL_NOT_FOUND, customException.getErrorCode());
+
         }
     }
 
