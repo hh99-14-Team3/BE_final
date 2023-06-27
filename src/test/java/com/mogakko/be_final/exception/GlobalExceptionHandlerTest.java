@@ -73,4 +73,17 @@ class GlobalExceptionHandlerTest {
         assertEquals(exception.getMessage(), errorResponse.getReasonPhrase());
     }
 
+    @DisplayName("런타임 예외 핸들러 테스트")
+    @Test
+    void handleRuntimeException() {
+        // Given
+        RuntimeException runtimeException = new RuntimeException("Internal Server Error");
+        // When
+        ResponseEntity<ErrorResponse> responseEntity = globalExceptionHandler.handleRuntimeException(runtimeException);
+        // Then
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        HttpStatus errorResponse = responseEntity.getStatusCode();
+        Assertions.assertNotNull(errorResponse);
+        assertEquals(runtimeException.getMessage(), errorResponse.getReasonPhrase());
+    }
 }
