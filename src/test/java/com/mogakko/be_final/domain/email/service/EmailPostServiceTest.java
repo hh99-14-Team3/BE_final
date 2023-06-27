@@ -30,6 +30,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.EMAIL_NOT_FOUND;
+import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -190,6 +191,28 @@ class EmailPostServiceTest {
             // then
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals("비밀번호 변경 성공", response.getBody().getMessage());
+        }
+
+        @DisplayName("비밀번호 변경 실패 테스트")
+        @Test
+        void confirmEmailToFindPassword_failWithMemberNotFound() {
+            // given
+            String token = "token";
+
+            ChangePwRequestDto changePwRequestDto = ChangePwRequestDto.builder()
+                    .password("password!")
+                    .build();
+
+            ConfirmationToken confirmationToken = ConfirmationToken.builder()
+                    .email("test@test.com")
+                    .build();
+
+            when(confirmationTokenService.findByIdAndExpired(token)).thenReturn(confirmationToken);
+            when(membersRepository.findByEmail(confirmationToken.getEmail())).thenReturn(Optional.empty());
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, ()-> emailPostService.confirmEmailToFindPassword(token, changePwRequestDto));
+            assertEquals(USER_NOT_FOUND, customException.getErrorCode());
         }
     }
 
