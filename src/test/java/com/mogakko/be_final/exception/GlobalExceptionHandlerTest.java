@@ -57,4 +57,20 @@ class GlobalExceptionHandlerTest {
         assertEquals(errorMessage, errorResponse.getMessage());
     }
 
+    @DisplayName("예외 핸들러 테스트")
+    @Test
+    void handleException() {
+        // Given
+        Exception exception = new Exception("Internal Server Error");
+
+        // When
+        ResponseEntity<ErrorResponse> responseEntity = globalExceptionHandler.handleException(exception);
+
+        // Then
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        HttpStatus errorResponse = responseEntity.getStatusCode();
+        Assertions.assertNotNull(errorResponse);
+        assertEquals(exception.getMessage(), errorResponse.getReasonPhrase());
+    }
+
 }
