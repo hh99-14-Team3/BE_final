@@ -1,7 +1,10 @@
 package com.mogakko.be_final.domain.friendship.service;
 
+import com.mogakko.be_final.domain.friendship.dto.request.DetermineRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestByCodeDto;
 import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestDto;
+import com.mogakko.be_final.domain.friendship.entity.Friendship;
+import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
@@ -19,6 +22,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -93,9 +98,18 @@ class FriendshipPostServiceTest {
         assertEquals("친구 요청 완료", response.getBody().getMessage());
     }
 
-
+    @DisplayName("[POST] 친구 요청 수락 테스트")
     @Test
     void determineRequest() {
+        // Given
+        DetermineRequestDto requestDto = DetermineRequestDto.builder().requestSenderNickname(receiver.getNickname()).determineRequest(true).build();
+        when(membersServiceUtilMethod.findMemberByNickname(requestDto.getRequestSenderNickname())).thenReturn(receiver);
+        when(friendshipRepository.findBySenderAndReceiverAndStatus(receiver, member, FriendshipStatus.PENDING)).thenReturn(Optional.of(new Friendship()));
+        // When
+        ResponseEntity<Message> response = friendshipPostService.determineRequest(requestDto, member);
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("친구요청을 수락하였습니다.", response.getBody().getMessage());
     }
 
     @Test
