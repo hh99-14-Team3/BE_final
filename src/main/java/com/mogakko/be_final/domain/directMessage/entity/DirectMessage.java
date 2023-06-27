@@ -3,6 +3,7 @@ package com.mogakko.be_final.domain.directMessage.entity;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -12,6 +13,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DirectMessage extends Timestamped {
