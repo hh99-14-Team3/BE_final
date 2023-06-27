@@ -115,4 +115,17 @@ class DeclaredMembersPutServiceTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("신고 처리 완료", response.getBody().getMessage());
     }
+
+    @DisplayName("[PUT] 관리자 페이지 연결 실패 테스트 - 신고 된 건수 없음")
+    @Test
+    void handleReport_cannotFoundReport() {
+        // Given
+        when(declaredMembersRepository.findById(declaredMembers.getId())).thenReturn(Optional.empty());
+        // When
+        CustomException customException = assertThrows(CustomException.class, () -> declaredMembersPutService.handleReport(declaredMember.getId(), member));
+        // Then
+        assertEquals(NOT_FOUND, customException.getErrorCode());
+    }
+
+
 }
