@@ -18,6 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -26,8 +28,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.EMAIL_NOT_FOUND;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -125,14 +126,39 @@ class EmailPostServiceTest {
             when(membersRepository.findByEmail(emailConfirmRequestDto.getEmail())).thenReturn(Optional.of(member2));
             when(emailSender.createMimeMessage()).thenReturn(mimeMessageMock);
 
-            doNothing().when(emailSender).send(mimeMessageMock);
-
             // when
             ResponseEntity<Message> response = emailPostService.sendSimpleMessage(emailConfirmRequestDto);
 
             // then
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals("이메일을 성공적으로 보냈습니다.", response.getBody().getMessage());
+        }
+
+        @DisplayName("이메일 전송 실패 테스트")
+        @Test
+        void sendSimpleMessage_fail() throws Exception {
+            // given
+            EmailConfirmRequestDto emailConfirmRequestDto = EmailConfirmRequestDto.builder()
+                    .email("tesTT@test.com")
+                    .build();
+
+            MimeMessage mimeMessageMock = mock(MimeMessage.class);
+            when(membersRepository.findByEmail(emailConfirmRequestDto.getEmail())).thenReturn(Optional.of(member2));
+            when(emailSender.createMimeMessage()).thenReturn(mimeMessageMock);
+
+            MailException mailException = new MailException("mail error") {
+                @Nullable
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
+
+            doThrow(mailException).when(emailSender).send(mimeMessageMock);
+
+            // when & then
+            IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, ()-> emailPostService.sendSimpleMessage(emailConfirmRequestDto));
+            assertNull(illegalArgumentException.getMessage());
         }
     }
 
