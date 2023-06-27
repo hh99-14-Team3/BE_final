@@ -34,7 +34,7 @@ public class EmailPostService {
     private final MembersRepository membersRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private MimeMessage createMessage(String receiverEmail) throws Exception {
+    protected MimeMessage createMessage(String receiverEmail) throws Exception {
         Members findMember = memberRepository.findByEmail(receiverEmail).orElseThrow(
                 () -> new CustomException(EMAIL_NOT_FOUND));
         MimeMessage message = emailSender.createMimeMessage();
