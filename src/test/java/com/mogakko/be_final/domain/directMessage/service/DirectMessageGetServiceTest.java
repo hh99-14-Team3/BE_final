@@ -8,6 +8,7 @@ import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.entity.SocialType;
+import com.mogakko.be_final.exception.CustomException;
 import com.mogakko.be_final.util.Message;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mogakko.be_final.exception.ErrorCode.USER_MISMATCH_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 
@@ -171,18 +174,31 @@ class DirectMessageGetServiceTest {
     class ReadDirectMessage {
         @DisplayName("쪽지 상세조회 성공 테스트")
         @Test
-        void readDirectMessage() {
+        void readDirectMessage_success() {
             // given
             Long messageId = 1L;
 
             when(directMessageServiceUtilMethod.findDirectMessageById(messageId)).thenReturn(directMessage);
 
             // when
-            ResponseEntity<Message> response = directMessageGetService.readDirectMessage(member1, 1L);
+            ResponseEntity<Message> response = directMessageGetService.readDirectMessage(member1, messageId);
 
             // then
             DirectMessage responseDirectMessage = (DirectMessage) response.getBody().getData();
             assertEquals(directMessage, responseDirectMessage);
+        }
+
+        @DisplayName("쪽지 상세조회 실패 테스트")
+        @Test
+        void readDirectMessage_fail() {
+            // given
+            Long messageId = 1L;
+
+            when(directMessageServiceUtilMethod.findDirectMessageById(messageId)).thenReturn(directMessage);
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, ()-> directMessageGetService.readDirectMessage(member2, messageId));
+            assertEquals(USER_MISMATCH_ERROR, customException.getErrorCode());
         }
     }
 }
