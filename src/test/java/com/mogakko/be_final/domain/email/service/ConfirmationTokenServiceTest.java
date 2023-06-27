@@ -2,6 +2,7 @@ package com.mogakko.be_final.domain.email.service;
 
 import com.mogakko.be_final.domain.email.entity.ConfirmationToken;
 import com.mogakko.be_final.domain.email.repository.ConfirmationTokenRepository;
+import com.mogakko.be_final.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.mogakko.be_final.exception.ErrorCode.INVALID_TOKEN;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -43,6 +45,19 @@ class ConfirmationTokenServiceTest {
 
             // then
             assertEquals(confirmationToken, response);
+        }
+
+        @DisplayName("findByIdAndExpired 실패 테스트")
+        @Test
+        void findByIdAndExpired_fail() {
+            // given
+            String confirmationTokenId = "confirmationTokenId";
+
+            when(confirmationTokenRepository.findByIdAndExpired(confirmationTokenId, false)).thenReturn(Optional.empty());
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, ()-> confirmationTokenService.findByIdAndExpired(confirmationTokenId));
+            assertEquals(INVALID_TOKEN, customException.getErrorCode());
         }
     }
 }
