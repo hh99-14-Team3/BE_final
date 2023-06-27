@@ -108,6 +108,7 @@ class FriendshipGetServiceTest {
     @DisplayName("[GET] 친구 목록 조회 실패 테스트 - 유효하지 않은 id값")
     @Test
     void getMyFriend_Fail() {
+        // Given
         List<Friendship> friendshipList = new ArrayList<>();
         Friendship friendship1 = Friendship.builder()
                 .id(1L)
@@ -117,13 +118,12 @@ class FriendshipGetServiceTest {
                 .build();
         friendshipList.add(friendship1);
         when(friendshipRepository.findAllByReceiverAndStatusOrSenderAndStatus(member, FriendshipStatus.ACCEPT, member, FriendshipStatus.ACCEPT)).thenReturn(friendshipList);
-
         List<FriendResponseDto> friendsList = new ArrayList<>();
         FriendResponseDto responseDto = new FriendResponseDto(new Members(), false);
         friendsList.add(responseDto);
 
+        // When, Then
         CustomException customException = assertThrows(CustomException.class, () -> friendshipGetService.getMyFriend(member));
-
         assertEquals(customException.getErrorCode(), CANNOT_FOUND_FRIEND);
     }
 
