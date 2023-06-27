@@ -18,7 +18,7 @@ class BadWordFilteringTest {
     @Nested
     @DisplayName("checkBadWord Method 테스트")
     class CheckBadWord {
-        @DisplayName("욕설 필터링 케이스")
+        @DisplayName("욕설 필터링 테스트")
         @Test
         void checkBadWord_filteringBadWord() {
             // given
@@ -29,6 +29,19 @@ class BadWordFilteringTest {
 
             // then
             assertEquals("******.", filteringStr);
+        }
+
+        @DisplayName("욕설 필터링 테스트 2")
+        @Test
+        void checkBadWord_notBadWord() {
+            // given
+            String str = "안녕하셈.";
+
+            // when
+            String filteringStr = badWordFiltering.checkBadWord(str);
+
+            // then
+            assertEquals(str, filteringStr);
         }
     }
 
