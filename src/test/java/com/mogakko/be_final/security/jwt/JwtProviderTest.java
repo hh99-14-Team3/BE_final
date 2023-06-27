@@ -173,4 +173,23 @@ class JwtProviderTest {
             verify(response).setHeader(JwtProvider.ACCESS_KEY, accessToken);
         }
     }
+
+
+
+    @Nested
+    @DisplayName("setHeaderRefreshToken 테스트")
+    class SetHeaderRefreshToken {
+        @DisplayName("setHeaderRefreshToken 성공 테스트")
+        @Test
+        void createAllToken_success() {
+            // given
+            String refreshToken = "refreshToken";
+
+            // when
+            jwtProvider.setHeaderRefreshToken(response, refreshToken);
+
+            // then
+            verify(response).setHeader(JwtProvider.REFRESH_KEY, refreshToken);
+        }
+    }
 }
