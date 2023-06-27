@@ -3,6 +3,7 @@ package com.mogakko.be_final.domain.friendship.entity;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -11,8 +12,9 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
+@Builder
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
 public class Friendship extends Timestamped {
 
