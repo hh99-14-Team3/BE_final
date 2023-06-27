@@ -127,4 +127,16 @@ class FriendshipGetServiceTest {
         assertEquals(customException.getErrorCode(), CANNOT_FOUND_FRIEND);
     }
 
+    @DisplayName("[GET] 친구 요청 조회 성공 테스트 - 수신된 요청 없음")
+    @Test
+    void getMyFriendRequest_NoRequest() {
+        // Given
+        List<Friendship> friendRequestSenderList = new ArrayList<>();
+        // When
+        when(friendshipRepository.findAllByReceiverAndStatus(member, FriendshipStatus.PENDING)).thenReturn(friendRequestSenderList);
+        ResponseEntity<Message> response = friendshipGetService.getMyFriendRequest(member);
+        // Then
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals(response.getBody().getMessage(), "수신된 친구 요청이 없습니다");
+    }
 }
