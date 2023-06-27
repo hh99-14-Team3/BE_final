@@ -84,4 +84,18 @@ class DirectMessageGetControllerTest {
         verify(directMessageGetService, times(1)).searchSentMessage(userDetails.getMember());
     }
 
+    @DisplayName("[GET] 쪽지 조회 테스트")
+    @Test
+    void readDirectMessage() throws Exception {
+        Long messageId = 1L;
+        Message expectedMessage = new Message("쪽지 조회 완료", new DirectMessage());
+        Mockito.when(directMessageGetService.readDirectMessage(any(Members.class), anyLong())).thenReturn(ResponseEntity.ok(expectedMessage));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/directMessage/read/{messageId}", messageId)
+                        .principal(userDetails))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value(expectedMessage.getMessage()));
+
+        verify(directMessageGetService, times(1)).readDirectMessage(userDetails.getMember(), messageId);
+    }
 }
