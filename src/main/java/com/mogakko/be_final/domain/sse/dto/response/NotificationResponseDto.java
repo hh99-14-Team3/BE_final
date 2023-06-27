@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -26,9 +27,10 @@ public class NotificationResponseDto {
 
 
     public NotificationResponseDto(Notification notification, String senderProfileUrl) {
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        Instant time = notification.getCreatedAt();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(time, ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = time.format(formatter);
+        String formattedNow = formatter.format(localDateTime);
         this.receiverId = notification.getReceiverId();
         this.content = notification.getContent();
         this.url = notification.getUrl();
@@ -41,9 +43,10 @@ public class NotificationResponseDto {
     }
 
     public NotificationResponseDto(Notification notification) {
-        LocalDateTime time = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        Instant time = notification.getCreatedAt();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(time, ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedNow = time.format(formatter);
+        String formattedNow = formatter.format(localDateTime);
         this.receiverId = notification.getReceiverId();
         this.content = notification.getContent();
         this.url = notification.getUrl();
