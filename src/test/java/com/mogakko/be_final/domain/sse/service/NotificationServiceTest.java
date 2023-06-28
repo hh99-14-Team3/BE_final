@@ -315,7 +315,7 @@ class NotificationServiceTest {
     class SendHeartbeat {
         @DisplayName("sendHeartbeat 성공 테스트")
         @Test
-        void sendHeartbeat() throws IOException {
+        void sendHeartbeat_success() throws IOException {
             // given
             SseEmitter sseEmitter = mock(SseEmitter.class);
 
@@ -332,6 +332,26 @@ class NotificationServiceTest {
             // then
             verify(sseEmitter, times(2)).send(any());
             verify(emitterRepository, times(0)).deleteById(anyString());
+        }
+
+        @DisplayName("sendHeartbeat 예외 테스트")
+        @Test
+        void sendHeartbeat_failWithIOException() throws IOException {
+            // given
+            SseEmitter sseEmitter = mock(SseEmitter.class);
+
+            Map<String, SseEmitter> sseEmitters = new HashMap<>();
+            sseEmitters.put("1", sseEmitter);
+            sseEmitters.put("2", sseEmitter);
+
+            when(emitterRepository.findAllEmitter()).thenReturn(sseEmitters);
+            doThrow(new IOException()).when(sseEmitter).send(any());
+
+            // when
+            notificationService.sendHeartbeat();
+
+            // then
+            verify(emitterRepository, times(2)).deleteById(any());
         }
     }
 }
