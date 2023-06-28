@@ -80,6 +80,8 @@ dependencies {
 	//cassandra
 	implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
 	implementation 'com.datastax.oss:java-driver-core:4.11.1'
+
+	testImplementation 'io.projectreactor:reactor-test:3.4.2'
 }
 
 tasks.named('test') {
