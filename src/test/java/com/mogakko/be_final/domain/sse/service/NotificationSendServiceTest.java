@@ -104,7 +104,18 @@ class NotificationSendServiceTest {
         }
     }
 
-    @Test
-    void sendMessageReceivedNotification() {
+    @Nested
+    @DisplayName("sendMessageReceivedNotification Method 테스트")
+    class SendMessageReceivedNotification {
+        @DisplayName("sendMessageReceivedNotification 성공 테스트")
+        @Test
+        void sendAcceptNotification() {
+            // when
+            notificationSendService.sendMessageReceivedNotification(sender, receiver);
+
+            // then
+            verify(notificationService)
+                    .send(sender, receiver, NotificationType.MESSAGE, sender.getNickname() + "님으로부터 쪽지가 도착했습니다.", SERVER_URL + "/directMessage/received");
+        }
     }
 }
