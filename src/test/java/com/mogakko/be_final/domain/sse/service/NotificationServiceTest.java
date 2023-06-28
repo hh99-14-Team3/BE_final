@@ -4,7 +4,6 @@ import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
-import com.mogakko.be_final.domain.sse.dto.response.NotificationResponseDto;
 import com.mogakko.be_final.domain.sse.entity.Notification;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepository;
@@ -17,13 +16,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
+import static com.mogakko.be_final.exception.ErrorCode.NOTIFICATION_SENDING_FAILED;
 import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -251,8 +251,24 @@ class NotificationServiceTest {
         }
     }
 
-    @Test
-    void sendToClient() {
+    @Nested
+    @DisplayName("sendToClient Method 테스트")
+    class SendToClient {
+        @DisplayName("sendToClient 예외 테스트")
+        @Test
+        void sendToClient() throws IOException {
+            // given
+            String emitterId = "emitter1";
+            Object data = "Test data";
+
+            SseEmitter sseEmitter = mock(SseEmitter.class);
+            doThrow(new IOException()).when(sseEmitter).send(any());
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, ()-> notificationService.sendToClient(sseEmitter, emitterId, data));
+            verify(emitterRepository).deleteById(emitterId);
+            assertEquals(NOTIFICATION_SENDING_FAILED, customException.getErrorCode());
+        }
     }
 
     @Test

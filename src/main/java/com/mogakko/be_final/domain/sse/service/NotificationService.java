@@ -21,6 +21,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
+import static com.mogakko.be_final.exception.ErrorCode.NOTIFICATION_SENDING_FAILED;
 import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
@@ -99,7 +100,7 @@ public class NotificationService {
             }
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);
-            throw new CustomException(ErrorCode.NOTIFICATION_SENDING_FAILED);
+            throw new CustomException(NOTIFICATION_SENDING_FAILED);
         }
     }
 
@@ -110,7 +111,7 @@ public class NotificationService {
                     .data(data));
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);
-            throw new CustomException(ErrorCode.NOTIFICATION_SENDING_FAILED);
+            throw new CustomException(NOTIFICATION_SENDING_FAILED);
         }
     }
 
