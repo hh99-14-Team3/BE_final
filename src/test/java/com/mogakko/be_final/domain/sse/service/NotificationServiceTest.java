@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -288,6 +289,24 @@ class NotificationServiceTest {
             CustomException customException = assertThrows(CustomException.class, ()-> notificationService.sendToClient(sseEmitter, emitterId, data, notification));
             verify(emitterRepository).deleteById(emitterId);
             assertEquals(NOTIFICATION_SENDING_FAILED, customException.getErrorCode());
+        }
+
+        @DisplayName("sendToClient(Two) instanceof 반례 테스트")
+        @Test
+        void sendToClientTwo_ifFalse() throws IOException {
+            // given
+            String emitterId = "emitter1";
+            Object data = new Object();
+
+            SseEmitter sseEmitter = mock(SseEmitter.class);
+
+            NotificationService service = mock(NotificationService.class);
+
+            // when
+            notificationService.sendToClient(sseEmitter, emitterId, data, notification);
+
+            // then
+            verify(service, never()).markAsRead(notification);
         }
     }
 
