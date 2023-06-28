@@ -184,11 +184,46 @@ class NotificationServiceTest {
             doNothing().when(emitterRepository).deleteById(anyString());
 
             // when
-            notificationService.subscribe(1L, "lastEventId");
+            notificationService.subscribe(memberId1, "lastEventId");
 
             // then
             Runnable completionTask = completionCaptor.getValue();
             completionTask.run();
+            verify(emitterRepository, times(1)).deleteById(anyString());
+        }
+
+        @DisplayName("subscribe Method sseEmitter TimeOut 테스트")
+        @Test
+        void subscribe_emitterOnTimeOut() {
+            // given
+            Long memberId = 1L;
+            SseEmitter sseEmitter = mock(SseEmitter.class);
+
+            List<Notification> notificationList = new ArrayList<>();
+            notificationList.add(notification);
+
+            List<Members> membersList = new ArrayList<>();
+            membersList.add(member2);
+
+            when(emitterRepository.save(any(), any())).thenReturn(sseEmitter);
+            when(membersRepository.findById(memberId)).thenReturn(Optional.of(member1));
+            when(notificationRepository.findAllByReceiverIdAndReadStatusAndCreatedAtLessThan(any(), eq(false), any()))
+                    .thenReturn(notificationList);
+            for (int i = 0; i < notificationList.size(); i++) {
+                when(membersRepository.findByNickname(notificationList.get(i).getSenderNickname()))
+                        .thenReturn(Optional.of(membersList.get(i)));
+            }
+
+            ArgumentCaptor<Runnable> timeoutCaptor = ArgumentCaptor.forClass(Runnable.class);
+            doNothing().when(sseEmitter).onTimeout(timeoutCaptor.capture());
+            doNothing().when(emitterRepository).deleteById(anyString());
+
+            // when
+            notificationService.subscribe(memberId, "lastEventId");
+
+            //then
+            Runnable timeoutTask = timeoutCaptor.getValue();
+            timeoutTask.run();
             verify(emitterRepository, times(1)).deleteById(anyString());
         }
     }
