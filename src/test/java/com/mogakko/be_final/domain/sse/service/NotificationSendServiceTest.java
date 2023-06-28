@@ -74,8 +74,19 @@ class NotificationSendServiceTest {
         }
     }
 
-    @Test
-    void sendAcceptNotification() {
+    @Nested
+    @DisplayName("sendAcceptNotification Method 테스트")
+    class SendAcceptNotification {
+        @DisplayName("sendAcceptNotification 성공 테스트")
+        @Test
+        void sendAcceptNotification() {
+            // when
+            notificationSendService.sendAcceptNotification(sender, receiver);
+
+            // then
+            verify(notificationService)
+                    .send(sender, receiver, NotificationType.FRIEND_REQUEST, sender.getNickname() + "님이 친구요청을 수락하셨습니다.", SERVER_URL + "/friendship/requests/accepted");
+        }
     }
 
     @Test
