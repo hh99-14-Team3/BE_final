@@ -85,5 +85,21 @@ class NotificationSearchServiceTest {
                 assertEquals(notificationList.get(i).getSenderNickname(), responseDtoList.get(i).getSenderNickname());
             }
         }
+
+        @DisplayName("받은 알람 조회 결과 없음 테스트")
+        @Test
+        void getMyNotification_successWithEmptyResult() {
+            // given
+            List<Notification> notificationList = new ArrayList<>();
+
+            when(notificationRepository.findAllByReceiverId(receiver.getId())).thenReturn(notificationList);
+
+            // when
+            ResponseEntity<Message> response = notificationSearchService.getMyNotification(receiver);
+
+            // then
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("알림이 없습니다.", response.getBody().getMessage());
+        }
     }
 }
