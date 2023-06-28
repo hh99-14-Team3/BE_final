@@ -2,6 +2,8 @@ package com.mogakko.be_final.domain.friendship.service;
 
 import com.mogakko.be_final.domain.friendship.dto.request.DeleteFriendRequestDto;
 import com.mogakko.be_final.domain.friendship.dto.request.DetermineRequestDto;
+import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestByCodeDto;
+import com.mogakko.be_final.domain.friendship.dto.request.FriendRequestDto;
 import com.mogakko.be_final.domain.friendship.entity.Friendship;
 import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.friendship.entity.RejectedFriendship;
@@ -34,14 +36,14 @@ public class FriendshipPostService {
     private final MembersServiceUtilMethod membersServiceUtilMethod;
 
     // 친구 요청 (닉네임)
-    public ResponseEntity<Message> friendRequest(String receiverNickname, Members member) {
-        Members receiver = membersServiceUtilMethod.findMemberByNickname(receiverNickname);
+    public ResponseEntity<Message> friendRequest(FriendRequestDto requestDto, Members member) {
+        Members receiver = membersServiceUtilMethod.findMemberByNickname(requestDto.getRequestReceiverNickname());
         return friendRequestMethod(member, receiver);
     }
 
     // 친구 요청 (친구 코드)
-    public ResponseEntity<Message> friendRequestByCode(Integer code, Members member) {
-        Members receiver = membersServiceUtilMethod.findMemberByFriendCode(code);
+    public ResponseEntity<Message> friendRequestByCode(FriendRequestByCodeDto requestDto, Members member) {
+        Members receiver = membersServiceUtilMethod.findMemberByFriendCode(requestDto.getRequestReceiverFriendCode());
         return friendRequestMethod(member, receiver);
     }
 

@@ -33,6 +33,7 @@ import java.util.Optional;
 import static com.mogakko.be_final.exception.ErrorCode.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
@@ -76,10 +77,22 @@ class MembersPostServiceTest {
         @Test
         void signup_success() {
             // given
-            SignupRequestDto requestDto = new SignupRequestDto();
-            requestDto.setEmail("test@example.com");
-            requestDto.setPassword("Password1!");
-            requestDto.setNickname("nickname");
+            SignupRequestDto requestDto = SignupRequestDto.builder().email("test@example.com").password("password1").nickname("nickname").build();
+
+            // when
+            ResponseEntity<Message> response = membersPostService.signup(requestDto);
+
+            // then
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("회원 가입 성공", response.getBody().getMessage());
+        }
+
+        @DisplayName("친구 코드 중복 테스트")
+        @Test
+        void signup_friendCodeDuplication() {
+            // given
+            SignupRequestDto requestDto = SignupRequestDto.builder().email("test@example.com").password("password1").nickname("nickname").build();
+            when(membersRepository.existsByFriendCode(anyInt())).thenReturn(true, false);
 
             // when
             ResponseEntity<Message> response = membersPostService.signup(requestDto);
@@ -93,10 +106,7 @@ class MembersPostServiceTest {
         @Test
         void signup_alreadyJoinedEmail() {
             // given
-            SignupRequestDto duplicatedRequestDto = new SignupRequestDto();
-            duplicatedRequestDto.setEmail("test@example.com");
-            duplicatedRequestDto.setPassword("Password1!");
-            duplicatedRequestDto.setNickname("nicknameEX");
+            SignupRequestDto duplicatedRequestDto = SignupRequestDto.builder().email("test@example.com").password("password1").nickname("nickname").build();
             String email = duplicatedRequestDto.getEmail();
 
             // when & then

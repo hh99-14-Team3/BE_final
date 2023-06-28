@@ -38,7 +38,7 @@ public class NotificationController {
     @Operation(summary = "SSE 알림 조회 API", description = "SSE 생성된 알림을 조회 하는 메서드입니다.")
     @GetMapping("/notification")
     public ResponseEntity<Message> getAllNotification(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return notificationSearchService.getMyNotification(userDetails);
+        return notificationSearchService.getMyNotification(userDetails.getMember());
     }
 
     @Operation(summary = "SSE 알림 읽음 처리 API", description = "SSE 알림을 읽음 처리 하는 메서드입니다.")

@@ -39,7 +39,7 @@ public class DirectMessageGetService {
 
 
         if (messageList.isEmpty()) {
-            return new ResponseEntity<>(new Message("도착한 쪽지가 없습니다.", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new Message("도착한 쪽지가 없습니다.", null), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new Message("쪽지 목록 조회 완료", messageList), HttpStatus.OK);
         }

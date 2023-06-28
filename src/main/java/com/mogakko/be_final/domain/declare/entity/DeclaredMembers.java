@@ -1,6 +1,7 @@
 package com.mogakko.be_final.domain.declare.entity;
 
 import com.mogakko.be_final.domain.members.entity.Members;
+import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeclaredMembers {
+public class DeclaredMembers extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

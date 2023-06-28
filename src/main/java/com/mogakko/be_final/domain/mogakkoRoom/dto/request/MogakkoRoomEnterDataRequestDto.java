@@ -1,10 +1,11 @@
 package com.mogakko.be_final.domain.mogakkoRoom.dto.request;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Getter
-@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MogakkoRoomEnterDataRequestDto {
     private String password;
 }

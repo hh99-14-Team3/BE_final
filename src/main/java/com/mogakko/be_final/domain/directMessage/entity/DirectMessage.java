@@ -3,6 +3,7 @@ package com.mogakko.be_final.domain.directMessage.entity;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.util.Timestamped;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -12,6 +13,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DirectMessage extends Timestamped {
@@ -40,6 +42,7 @@ public class DirectMessage extends Timestamped {
 
     private boolean isRead;
 
+    @Builder
     public DirectMessage(Members sender, Members receiver, String content, boolean isRead) {
         this.sender = sender;
         this.receiver = receiver;
@@ -53,10 +56,5 @@ public class DirectMessage extends Timestamped {
 
     public void markRead() {
         this.isRead = true;
-    }
-
-    public void deleteMember(Members member){
-        if (member.getEmail().equals(this.receiver.getEmail())) this.receiver = null;
-        else this.sender = null;
     }
 }
