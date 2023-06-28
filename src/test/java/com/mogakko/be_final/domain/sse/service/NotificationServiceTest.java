@@ -8,6 +8,7 @@ import com.mogakko.be_final.domain.sse.entity.Notification;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepository;
 import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
+import com.mogakko.be_final.exception.CustomException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -107,6 +111,23 @@ class NotificationServiceTest {
 
             // when & then
             notificationService.subscribe(memberId, lastEventId);
+        }
+
+        @DisplayName("subscribe 실패 (eventReceiverNotFound) 테스트")
+        @Test
+        void subscribe_failWithEventReceiverNotFound() {
+            // given
+            Long memberId = 1L;
+            String lastEventId = "lastEventId";
+
+            SseEmitter sseEmitter = mock(SseEmitter.class);
+
+            when(emitterRepository.save(any(), any())).thenReturn(sseEmitter);
+            when(membersRepository.findById(memberId)).thenReturn(Optional.empty());
+
+            // when & then
+            CustomException customException =  assertThrows(CustomException.class, ()-> notificationService.subscribe(memberId, lastEventId));
+            assertEquals(USER_NOT_FOUND, customException.getErrorCode());
         }
     }
 
