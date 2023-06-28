@@ -310,19 +310,28 @@ class NotificationServiceTest {
         }
     }
 
-    @Test
-    void testSendToClient() {
-    }
+    @Nested
+    @DisplayName("sendHeartbeat Method 테스트")
+    class SendHeartbeat {
+        @DisplayName("sendHeartbeat 성공 테스트")
+        @Test
+        void sendHeartbeat() throws IOException {
+            // given
+            SseEmitter sseEmitter = mock(SseEmitter.class);
 
-    @Test
-    void markAsRead() {
-    }
+            Map<String, SseEmitter> sseEmitters = new HashMap<>();
+            sseEmitters.put("1", sseEmitter);
+            sseEmitters.put("2", sseEmitter);
 
-    @Test
-    void sendHeartbeat() {
-    }
+            when(emitterRepository.findAllEmitter()).thenReturn(sseEmitters);
+            doNothing().when(sseEmitter).send(any());
 
-    @Test
-    void findUnreadNotificationList() {
+            // when
+            notificationService.sendHeartbeat();
+
+            // then
+            verify(sseEmitter, times(2)).send(any());
+            verify(emitterRepository, times(0)).deleteById(anyString());
+        }
     }
 }
