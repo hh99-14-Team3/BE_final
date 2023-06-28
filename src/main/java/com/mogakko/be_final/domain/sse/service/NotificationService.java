@@ -21,10 +21,12 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
+import static com.mogakko.be_final.exception.ErrorCode.NOTIFICATION_SENDING_FAILED;
+import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-    //= new EmitterRepositoryImpl()
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
     private final MembersRepository membersRepository;
@@ -33,7 +35,7 @@ public class NotificationService {
 
     public SseEmitter subscribe(Long memberId, String lastEventId) {
         String emitterId = memberId + "_" + System.currentTimeMillis();
-        System.out.println(emitterId);
+
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
         emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
@@ -42,29 +44,18 @@ public class NotificationService {
         sendToClient(emitter, emitterId, "EventStream Created. [memberId=" + memberId + "]");
 
         Members eventReceiver = membersRepository.findById(memberId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+                () -> new CustomException(USER_NOT_FOUND)
         );
         List<Notification> missedNotifications = findUnreadNotificationList(eventReceiver.getId());
 
         for (Notification missedNotification : missedNotifications) {
             String senderNickname = missedNotification.getSenderNickname();
-            Members sender = membersRepository.findByNickname(senderNickname).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            Members sender = membersRepository.findByNickname(senderNickname).orElseThrow(
+                    () -> new CustomException(USER_NOT_FOUND)
+            );
             String senderProfileUrl = sender.getProfileImage();
             sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification, senderProfileUrl), missedNotification);
         }
-
-
-//        if (!lastEventId.isEmpty()) {
-//            Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
-//            events.entrySet().stream()
-//                    .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-//                    .forEach(entry ->{
-//                        NotificationResponseDto responseDto = new NotificationResponseDto((Notification)entry.getValue(), entry.getKey());
-//                        sendToClient(emitter, entry.getKey(), responseDto);
-//                            });
-//
-//        }
-
         return emitter;
     }
 
@@ -109,7 +100,7 @@ public class NotificationService {
             }
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);
-            throw new CustomException(ErrorCode.NOTIFICATION_SENDING_FAILED);
+            throw new CustomException(NOTIFICATION_SENDING_FAILED);
         }
     }
 
@@ -120,7 +111,7 @@ public class NotificationService {
                     .data(data));
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);
-            throw new CustomException(ErrorCode.NOTIFICATION_SENDING_FAILED);
+            throw new CustomException(NOTIFICATION_SENDING_FAILED);
         }
     }
 
