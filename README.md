@@ -48,7 +48,7 @@
 ## 🖥️ 기술 아키텍쳐
 
 <div align = center>
-<img width="900" alt="architecture" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/f7267c92-c23f-4f65-9d2b-3d095edeb2cf">
+<img width="900" alt="architecture" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/1b33e2cd-d970-4e3c-8822-0299335dad5e">
 </div>
 <br>
 <br>
