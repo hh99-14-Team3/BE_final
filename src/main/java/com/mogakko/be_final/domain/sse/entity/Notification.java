@@ -14,6 +14,7 @@ import java.time.Instant;
 
 @Table
 @Getter
+@Builder
 @NoArgsConstructor
 public class Notification {
     @PrimaryKeyColumn(name = "receiver_id", type = PrimaryKeyType.PARTITIONED, ordinal = 0)
