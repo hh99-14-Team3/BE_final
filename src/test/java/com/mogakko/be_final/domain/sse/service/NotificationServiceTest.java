@@ -256,7 +256,7 @@ class NotificationServiceTest {
     class SendToClient {
         @DisplayName("sendToClient 예외 테스트")
         @Test
-        void sendToClient() throws IOException {
+        void sendToClient_fail() throws IOException {
             // given
             String emitterId = "emitter1";
             Object data = "Test data";
@@ -266,6 +266,26 @@ class NotificationServiceTest {
 
             // when & then
             CustomException customException = assertThrows(CustomException.class, ()-> notificationService.sendToClient(sseEmitter, emitterId, data));
+            verify(emitterRepository).deleteById(emitterId);
+            assertEquals(NOTIFICATION_SENDING_FAILED, customException.getErrorCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("sendToClient(Two) Method 테스트")
+    class SendToClientTwo {
+        @DisplayName("sendToClient(Two) 예외 테스트")
+        @Test
+        void sendToClientTwo_fail() throws IOException {
+            // given
+            String emitterId = "emitter1";
+            Object data = "Test data";
+
+            SseEmitter sseEmitter = mock(SseEmitter.class);
+            doThrow(new IOException()).when(sseEmitter).send(any());
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, ()-> notificationService.sendToClient(sseEmitter, emitterId, data, notification));
             verify(emitterRepository).deleteById(emitterId);
             assertEquals(NOTIFICATION_SENDING_FAILED, customException.getErrorCode());
         }
