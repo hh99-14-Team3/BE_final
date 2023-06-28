@@ -71,6 +71,17 @@ class NotificationServiceTest {
             .isTutorialCheck(false)
             .build();
 
+    Notification notification = Notification.builder()
+            .senderNickname("nickname")
+            .receiverId(1L)
+            .content("content")
+            .url("url")
+            .receiverNickname("receiverNickname")
+            .type(NotificationType.LOGIN)
+            .createdAt(Instant.ofEpochSecond(1_000_000_000))
+            .readStatus(false)
+            .build();
+
     @Nested
     @DisplayName("subscribe Method 테스트")
     class Subscribe {
@@ -84,17 +95,6 @@ class NotificationServiceTest {
             SseEmitter sseEmitter = mock(SseEmitter.class);
 
             List<Notification> notificationList = new ArrayList<>();
-            Notification notification = Notification.builder()
-                    .senderNickname("nickname")
-                    .receiverId(1L)
-                    .content("content")
-                    .url("url")
-                    .receiverNickname("receiverNickname")
-                    .type(NotificationType.LOGIN)
-                    .createdAt(Instant.ofEpochSecond(1_000_000_000))
-                    .readStatus(false)
-                    .build();
-
             notificationList.add(notification);
 
             List<Members> membersList = new ArrayList<>();
@@ -124,6 +124,33 @@ class NotificationServiceTest {
 
             when(emitterRepository.save(any(), any())).thenReturn(sseEmitter);
             when(membersRepository.findById(memberId)).thenReturn(Optional.empty());
+
+            // when & then
+            CustomException customException =  assertThrows(CustomException.class, ()-> notificationService.subscribe(memberId, lastEventId));
+            assertEquals(USER_NOT_FOUND, customException.getErrorCode());
+        }
+
+        @DisplayName("subscribe 실패 (senderNotFound) 테스트")
+        @Test
+        void subscribe_failWithSenderNotFound() {
+            // given
+            Long memberId = 1L;
+            String lastEventId = "lastEventId";
+
+            SseEmitter sseEmitter = mock(SseEmitter.class);
+
+            List<Notification> notificationList = new ArrayList<>();
+            notificationList.add(notification);
+
+            List<Members> membersList = new ArrayList<>();
+            membersList.add(member2);
+
+            when(emitterRepository.save(any(), any())).thenReturn(sseEmitter);
+            when(membersRepository.findById(memberId)).thenReturn(Optional.of(member1));
+            when(notificationRepository.findAllByReceiverIdAndReadStatusAndCreatedAtLessThan(any(), eq(false), any()))
+                    .thenReturn(notificationList);
+                when(membersRepository.findByNickname(notification.getSenderNickname())).thenReturn(Optional.empty());
+
 
             // when & then
             CustomException customException =  assertThrows(CustomException.class, ()-> notificationService.subscribe(memberId, lastEventId));
