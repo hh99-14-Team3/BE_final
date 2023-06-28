@@ -1,10 +1,12 @@
-package com.mogakko.be_final.domain.sse.service;
+package com.mogakko.be_final.domain.sse.service.emitter;
 
 import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.entity.SocialType;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;
+import com.mogakko.be_final.domain.sse.service.NotificationSendService;
+import com.mogakko.be_final.domain.sse.service.NotificationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
