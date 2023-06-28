@@ -10,6 +10,8 @@ import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.NotificationReactiveRepository;
 import com.mogakko.be_final.domain.sse.service.NotificationProcessor;
 import com.mogakko.be_final.domain.sse.service.NotificationService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -75,112 +77,137 @@ public class NotificationServiceUsingFluxTest {
             .readStatus(false)
             .build();
 
-    @Test
-    void testSubscribeWithSuccessMessage() {
-        when(notificationProcessor.stream()).thenReturn(Flux.empty());
-        when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(anyLong(), anyBoolean()))
-                .thenReturn(Flux.just(notification));
+    @Nested
+    @DisplayName("Flux 를 활용한 NotificationService 의 subscribe Method 테스트")
+    class TestSubscribe{
 
-        StepVerifier.create(notificationService.subscribeWithSuccessMessage(sender))
-                .expectNextMatches(serverSentEvent -> serverSentEvent.data().toString().contains("연결에 성공했습니다. 사용자 닉네임: nickname"))
-                .expectNextCount(1)
-                .expectComplete()
-                .verify();
-    }
+        @Test
+        @DisplayName("subscribe 연결 후 메세지 전송 성공 테스트")
+        void testSubscribeWithSuccessMessage() {
+            when(notificationProcessor.stream()).thenReturn(Flux.empty());
+            when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(anyLong(), anyBoolean()))
+                    .thenReturn(Flux.just(notification));
 
-    @Test
-    void testSubscribe() {
-        NotificationResponseDto notificationResponseDto = new NotificationResponseDto(notification);
-        when(notificationProcessor.stream()).thenReturn(Flux.just(notificationResponseDto));
-        when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(anyLong(), anyBoolean()))
-                .thenReturn(Flux.empty());
+            StepVerifier.create(notificationService.subscribeWithSuccessMessage(sender))
+                    .expectNextMatches(serverSentEvent -> serverSentEvent.data().toString().contains("연결에 성공했습니다. 사용자 닉네임: nickname"))
+                    .expectNextCount(1)
+                    .expectComplete()
+                    .verify();
+        }
 
-        StepVerifier.create(notificationService.subscribe(sender.getId()))
-                .expectNextCount(1)
-                .expectComplete()
-                .verify();
-    }
+        @Test
+        @DisplayName("subscribe 성공 테스트 - missedNotification 발송")
+        void testSubscribe() {
+            NotificationResponseDto notificationResponseDto = new NotificationResponseDto(notification);
+            when(notificationProcessor.stream()).thenReturn(Flux.just(notificationResponseDto));
+            when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(anyLong(), anyBoolean()))
+                    .thenReturn(Flux.empty());
 
-    @Test
-    void testSubscribeWithFilter() {
-        NotificationResponseDto notificationResponseDto = new NotificationResponseDto(notification);
-        when(notificationProcessor.stream()).thenReturn(Flux.just(notificationResponseDto));
-        when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(anyLong(), anyBoolean()))
-                .thenReturn(Flux.just(notification));
+            StepVerifier.create(notificationService.subscribe(sender.getId()))
+                    .expectNextCount(1)
+                    .expectComplete()
+                    .verify();
+        }
 
-        StepVerifier.create(notificationService.subscribe(receiver.getId()))
-                .expectNextCount(2)
-                .expectComplete()
-                .verify();
-    }
+        @Test
+        @DisplayName("subscribe 성공 테스트 - newNotification 발송")
+        void testSubscribeWithFilter() {
+            NotificationResponseDto notificationResponseDto = new NotificationResponseDto(notification);
+            when(notificationProcessor.stream()).thenReturn(Flux.just(notificationResponseDto));
+            when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(anyLong(), anyBoolean()))
+                    .thenReturn(Flux.just(notification));
 
-    @Test
-    void testSubscribeWithError() {
-        when(notificationProcessor.stream()).thenReturn(Flux.error(new RuntimeException("Test exception")));
-        when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(anyLong(), anyBoolean()))
-                .thenReturn(Flux.just(notification));
+            StepVerifier.create(notificationService.subscribe(receiver.getId()))
+                    .expectNextCount(2)
+                    .expectComplete()
+                    .verify();
+        }
 
-        StepVerifier.create(notificationService.subscribe(sender.getId()))
-                .expectNextCount(1)
-                .expectError(RuntimeException.class)
-                .verify();
-    }
+        @Test
+        @DisplayName("subscribe 실패 테스트 - doOnError 테스트")
+        void testSubscribeWithError() {
+            when(notificationProcessor.stream()).thenReturn(Flux.error(new RuntimeException("Test exception")));
+            when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(anyLong(), anyBoolean()))
+                    .thenReturn(Flux.just(notification));
 
-    @Test
-    void testSend() {
-        NotificationType notificationType = NotificationType.LOGIN;
-        String content = "content";
-        String url = "url";
-        Notification notification = Notification.builder()
-                .receiverId(receiver.getId())
-                .readStatus(false)
-                .notificationId(Uuids.timeBased())
-                .createdAt(Instant.now())
-                .senderNickname(sender.getNickname())
-                .receiverNickname(receiver.getNickname())
-                .content(content)
-                .url(url)
-                .type(notificationType)
-                .senderProfileUrl(sender.getProfileImage())
-                .build();
-
-        when(notificationReactiveRepository.save(any(Notification.class))).thenReturn(Mono.just(notification));
-        doNothing().when(notificationProcessor).publish(any(NotificationResponseDto.class));
-
-        StepVerifier.create(notificationService.send(sender, receiver, notificationType, content, url))
-                .verifyComplete();
-
-        verify(notificationReactiveRepository, times(1)).save(any(Notification.class));
-        verify(notificationProcessor, times(1)).publish(any(NotificationResponseDto.class));
-    }
-
-    @Test
-    void testSendWithError() {
-        NotificationType notificationType = NotificationType.LOGIN;
-        String content = "content";
-        String url = "url";
-
-        RuntimeException exception = new RuntimeException("Test exception");
-        when(notificationReactiveRepository.save(any(Notification.class))).thenReturn(Mono.error(exception));
-
-        // Act
-        StepVerifier.create(notificationService.send(sender, receiver, notificationType, content, url))
-                .expectError(RuntimeException.class)
-                .verify();
-    }
-
-    @Test
-    void testFindUnreadNotificationList(){
-        Long memberId = 1L;
-        RuntimeException exception = new RuntimeException("Test exception");
-        when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(memberId, false))
-                .thenReturn(Flux.error(exception));
-
-
-        // Act
-        StepVerifier.create(notificationService.findUnreadNotificationList(memberId))
-                .expectError(RuntimeException.class)
-                .verify();
+            StepVerifier.create(notificationService.subscribe(sender.getId()))
+                    .expectNextCount(1)
+                    .expectError(RuntimeException.class)
+                    .verify();
+        }
 
     }
+
+
+    @Nested
+    @DisplayName("Flux 를 활용한 NotificationService 의 send Method 테스트")
+    class TestSend{
+        @Test
+        @DisplayName("send 성공 테스트")
+        void testSend() {
+            NotificationType notificationType = NotificationType.LOGIN;
+            String content = "content";
+            String url = "url";
+            Notification notification = Notification.builder()
+                    .receiverId(receiver.getId())
+                    .readStatus(false)
+                    .notificationId(Uuids.timeBased())
+                    .createdAt(Instant.now())
+                    .senderNickname(sender.getNickname())
+                    .receiverNickname(receiver.getNickname())
+                    .content(content)
+                    .url(url)
+                    .type(notificationType)
+                    .senderProfileUrl(sender.getProfileImage())
+                    .build();
+
+            when(notificationReactiveRepository.save(any(Notification.class))).thenReturn(Mono.just(notification));
+            doNothing().when(notificationProcessor).publish(any(NotificationResponseDto.class));
+
+            StepVerifier.create(notificationService.send(sender, receiver, notificationType, content, url))
+                    .verifyComplete();
+
+            verify(notificationReactiveRepository, times(1)).save(any(Notification.class));
+            verify(notificationProcessor, times(1)).publish(any(NotificationResponseDto.class));
+        }
+
+        @Test
+        @DisplayName("send 실패 테스트")
+        void testSendWithError() {
+            NotificationType notificationType = NotificationType.LOGIN;
+            String content = "content";
+            String url = "url";
+
+            RuntimeException exception = new RuntimeException("Test exception");
+            when(notificationReactiveRepository.save(any(Notification.class))).thenReturn(Mono.error(exception));
+
+            // Act
+            StepVerifier.create(notificationService.send(sender, receiver, notificationType, content, url))
+                    .expectError(RuntimeException.class)
+                    .verify();
+        }
+
+    }
+
+    @Nested
+    @DisplayName("findUnreadNotificationList 테스트")
+    class TestFindUnreadNotificationList{
+        @Test
+        void testFindUnreadNotificationList(){
+            Long memberId = 1L;
+            RuntimeException exception = new RuntimeException("Test exception");
+            when(notificationReactiveRepository.findAllByReceiverIdAndReadStatus(memberId, false))
+                    .thenReturn(Flux.error(exception));
+
+
+            // Act
+            StepVerifier.create(notificationService.findUnreadNotificationList(memberId))
+                    .expectError(RuntimeException.class)
+                    .verify();
+
+        }
+
+    }
+
+
 }
