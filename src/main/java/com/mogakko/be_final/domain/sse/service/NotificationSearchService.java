@@ -21,9 +21,7 @@ public class NotificationSearchService {
     private final NotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
-    public ResponseEntity<Message> getMyNotification(UserDetailsImpl userDetails) {
-        Members receiver = userDetails.getMember();
-
+    public ResponseEntity<Message> getMyNotification(Members receiver) {
         List<Notification> notificationList = notificationRepository.findAllByReceiverId(receiver.getId());
         List<NotificationResponseDto> receivedNotificationList = new ArrayList<>();
         for (Notification notification : notificationList) {
