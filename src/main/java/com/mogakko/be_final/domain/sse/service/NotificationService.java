@@ -53,7 +53,7 @@ public class NotificationService {
                     () -> new CustomException(USER_NOT_FOUND)
             );
             String senderProfileUrl = sender.getProfileImage();
-            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification, senderProfileUrl));
+            sendToClient(emitter, emitterId, new NotificationResponseDto(missedNotification, senderProfileUrl), missedNotification);
         }
         return emitter;
     }

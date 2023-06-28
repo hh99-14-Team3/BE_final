@@ -4,6 +4,7 @@ import com.mogakko.be_final.domain.members.entity.MemberStatusCode;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
+import com.mogakko.be_final.domain.sse.dto.response.NotificationResponseDto;
 import com.mogakko.be_final.domain.sse.entity.Notification;
 import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepository;
@@ -16,14 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -127,7 +126,7 @@ class NotificationServiceTest {
             when(membersRepository.findById(memberId)).thenReturn(Optional.empty());
 
             // when & then
-            CustomException customException =  assertThrows(CustomException.class, ()-> notificationService.subscribe(memberId, lastEventId));
+            CustomException customException = assertThrows(CustomException.class, () -> notificationService.subscribe(memberId, lastEventId));
             assertEquals(USER_NOT_FOUND, customException.getErrorCode());
         }
 
@@ -150,11 +149,11 @@ class NotificationServiceTest {
             when(membersRepository.findById(memberId)).thenReturn(Optional.of(member1));
             when(notificationRepository.findAllByReceiverIdAndReadStatusAndCreatedAtLessThan(any(), eq(false), any()))
                     .thenReturn(notificationList);
-                when(membersRepository.findByNickname(notification.getSenderNickname())).thenReturn(Optional.empty());
+            when(membersRepository.findByNickname(notification.getSenderNickname())).thenReturn(Optional.empty());
 
 
             // when & then
-            CustomException customException =  assertThrows(CustomException.class, ()-> notificationService.subscribe(memberId, lastEventId));
+            CustomException customException = assertThrows(CustomException.class, () -> notificationService.subscribe(memberId, lastEventId));
             assertEquals(USER_NOT_FOUND, customException.getErrorCode());
         }
 
@@ -228,8 +227,28 @@ class NotificationServiceTest {
         }
     }
 
-    @Test
-    void send() {
+    @Nested
+    @DisplayName("send Method 테스트")
+    class Send {
+        @DisplayName("send 성공 테스트")
+        @Test
+        void send() {
+            // given
+            String content = "content";
+            String url = "url";
+
+            Map<String, SseEmitter> sseEmitters = new HashMap<>();
+            sseEmitters.put("key1", new SseEmitter());
+            sseEmitters.put("key2", new SseEmitter());
+            when(emitterRepository.findAllEmitterStartWithByMemberId(anyString())).thenReturn(sseEmitters);
+
+            // when
+            notificationService.send(member1, member2, NotificationType.LOGIN, content, url);
+
+            // then
+            verify(emitterRepository).saveEventCache(anyString(), any());
+            verify(emitterRepository).findAllEmitterStartWithByMemberId(anyString());
+        }
     }
 
     @Test
