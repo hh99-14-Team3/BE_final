@@ -19,10 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static com.mogakko.be_final.exception.ErrorCode.NOT_SUPPORTED_SOCIALTYPE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +31,8 @@ class CustomOAuth2UserServiceTest {
     OAuth2UserInfo oauth2UserInfo;
     @Mock
     MembersRepository membersRepository;
+    @Mock
+    CustomOAuth2UserService oAuth2UserService;
     @InjectMocks
     CustomOAuth2UserService customOAuth2UserService;
 
@@ -112,7 +112,7 @@ class CustomOAuth2UserServiceTest {
     class GetMembers {
         @DisplayName("getMembers 기존 유저 테스트")
         @Test
-        void getMembers() {
+        void getMembers_successWithReturnMember() {
             // given
             OAuthAttributes oAuthAttributes = mock(OAuthAttributes.class);
             SocialType socialType = SocialType.GOOGLE;
@@ -123,6 +123,32 @@ class CustomOAuth2UserServiceTest {
 
             // when
             Members response = customOAuth2UserService.getMembers(oAuthAttributes, socialType);
+
+            // then
+            assertEquals(member, response);
+        }
+    }
+
+    @Nested
+    @DisplayName("saveMembers Method 테스트")
+    class SaveMembers {
+        @DisplayName("saveMembers 성공 테스트")
+        @Test
+        void saveMembers() {
+            // given
+            OAuthAttributes oAuthAttributes = mock(OAuthAttributes.class);
+            SocialType socialType = SocialType.GOOGLE;
+
+            when(oAuthAttributes.getOauth2UserInfo()).thenReturn(oauth2UserInfo);
+            when(oauth2UserInfo.getEmail()).thenReturn("test@test.com");
+            when(membersRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+            when(membersRepository.existsByFriendCode(anyInt())).thenReturn(false);
+            when(oAuthAttributes.toEntity(eq(socialType), eq(oauth2UserInfo), anyInt())).thenReturn(member);
+            when(membersRepository.existsByNickname(anyString())).thenReturn(false);
+            when(membersRepository.save(member)).thenReturn(member);
+
+            // when
+            Members response = customOAuth2UserService.saveMembers(oAuthAttributes, socialType);
 
             // then
             assertEquals(member, response);
