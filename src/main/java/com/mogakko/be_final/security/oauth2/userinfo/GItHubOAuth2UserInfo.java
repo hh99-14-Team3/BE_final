@@ -2,15 +2,14 @@ package com.mogakko.be_final.security.oauth2.userinfo;
 
 import java.util.Map;
 
-public class GItHubOAuth2UserInfo extends OAuth2UserInfo{
+public class GItHubOAuth2UserInfo extends OAuth2UserInfo {
     public GItHubOAuth2UserInfo(Map<String, Object> attributes) {
         super(attributes);
     }
 
-
     @Override
     public String getId() {
-        Integer id = (int)attributes.get("id");
+        Integer id = (int) attributes.get("id");
         System.out.println(attributes);
         return String.valueOf(id);
     }

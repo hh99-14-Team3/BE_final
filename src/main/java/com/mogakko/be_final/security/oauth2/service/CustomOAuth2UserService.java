@@ -110,11 +110,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         if (KAKAO.equals(registrationId)) {
             return SocialType.KAKAO;
-        }
-        else if (GOOGLE.equals(registrationId)) {
+        } else if (GOOGLE.equals(registrationId)) {
             return SocialType.GOOGLE;
-        }
-        else if (GITHUB.equals(registrationId)) {
+        } else if (GITHUB.equals(registrationId)) {
             return SocialType.GITHUB;
         } else {
             throw new CustomException(NOT_SUPPORTED_SOCIALTYPE);
@@ -127,9 +125,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      */
     protected Members getMembers(OAuthAttributes attributes, SocialType socialType) {
         Optional<Members> findUser = membersRepository.findBySocialUidAndSocialType(attributes.getOauth2UserInfo().getId(), socialType);
-
         return findUser.orElseGet(() -> saveMembers(attributes, socialType));
-
     }
 
     /**
@@ -138,9 +134,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      */
     protected Members saveMembers(OAuthAttributes attributes, SocialType socialType) {
         Optional<Members> existMember = membersRepository.findByEmail(attributes.getOauth2UserInfo().getEmail());
-        if(existMember.isPresent()){
+        if (existMember.isPresent()) {
             throw new CustomException(ErrorCode.DUPLICATE_IDENTIFIER);
-        }else{
+        } else {
             int friendCode;
             do {
                 friendCode = (int) ((Math.random() * ((999999 - 100000) + 1)) + 100000);
@@ -148,14 +144,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
             Members createdMembers = attributes.toEntity(socialType, attributes.getOauth2UserInfo(), friendCode);
 
-            if(membersRepository.existsByNickname(createdMembers.getNickname())){
+            if (membersRepository.existsByNickname(createdMembers.getNickname())) {
                 String temporaryNickname = createdMembers.getNickname() + "_" + Integer.toString(friendCode);
                 createdMembers.updateNickname(temporaryNickname);
             }
-
-
             return membersRepository.save(createdMembers);
         }
-
     }
 }

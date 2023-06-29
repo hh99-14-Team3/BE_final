@@ -26,7 +26,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."),
     MOGAKKO_NOT_FOUND(HttpStatus.NOT_FOUND, "모각코 방이 없습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "찾을 수 없습니다."),
-    CANNOT_FOUND_FRIEND(HttpStatus.NOT_FOUND,"친구를 찾을 수 없습니다."),
+    CANNOT_FOUND_FRIEND(HttpStatus.NOT_FOUND, "친구를 찾을 수 없습니다."),
     NOT_SUPPORTED_SOCIALTYPE(HttpStatus.NOT_FOUND, "지원하지 않는 소셜로그인 입니다."),
     NOTIFICATION_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "알림 발송에 실패했습니다"),
     MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 메세지가 존재하지 않습니다."),
@@ -36,9 +36,7 @@ public enum ErrorCode {
     PLZ_INPUT_REASON_OF_REPORT(HttpStatus.BAD_REQUEST, "신고 이유를 입력해주세요."),
     GITHUB_TOKEN_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GitHub 에서 엑세스 토큰을 가져오지 못했습니다."),
     FAILED_TO_GET_USERINFO(HttpStatus.BAD_REQUEST, "GitHub로 부터 정보를 받아오지 못했습니다."),
-    TTL_IS_NULL(HttpStatus.FORBIDDEN, "다시 친구요청을 할 수 있습니다."),
     USER_MISMATCH_ERROR(HttpStatus.BAD_REQUEST, "사용자와 해당 메세지의 발신자 혹은 수신자가 일치하지 않습니다."),
-
 
     //인증
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "인증에 실패했습니다."),

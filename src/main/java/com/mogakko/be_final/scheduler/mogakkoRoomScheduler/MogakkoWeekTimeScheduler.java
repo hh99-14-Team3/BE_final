@@ -1,9 +1,7 @@
 package com.mogakko.be_final.scheduler.mogakkoRoomScheduler;
 
 import com.mogakko.be_final.domain.members.entity.MemberWeekStatistics;
-import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MemberWeekStatisticsRepository;
-import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
