@@ -26,6 +26,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static com.mogakko.be_final.exception.ErrorCode.NOT_SUPPORTED_SOCIALTYPE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -66,7 +68,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if (socialType.equals(SocialType.GITHUB)) {
             log.info("github 진입");
             String token = userRequest.getAccessToken().getTokenValue();
-            System.out.println(token);
 
             // Create headers
             HttpHeaders headers = new HttpHeaders();
@@ -83,7 +84,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     .orElseThrow(() -> new RuntimeException("No primary email found"));
 
             String email = primaryEmailNode.get("email").asText();
-            System.out.println(email);
 
             if (email != null) {
                 attributes.put("email", email);
@@ -106,7 +106,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         );
     }
 
-    private SocialType getSocialType(String registrationId) {
+    protected SocialType getSocialType(String registrationId) {
 
         if (KAKAO.equals(registrationId)) {
             return SocialType.KAKAO;
@@ -117,7 +117,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         else if (GITHUB.equals(registrationId)) {
             return SocialType.GITHUB;
         } else {
-            throw new CustomException(ErrorCode.NOT_SUPPORTED_SOCIALTYPE);
+            throw new CustomException(NOT_SUPPORTED_SOCIALTYPE);
         }
     }
 
@@ -125,7 +125,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * SocialType과 attributes에 들어있는 소셜 로그인의 식별값 id를 통해 회원을 찾아 반환하는 메소드
      * 만약 찾은 회원이 있다면, 그대로 반환하고 없다면 saveUser()를 호출하여 회원을 저장한다.
      */
-    private Members getMembers(OAuthAttributes attributes, SocialType socialType) {
+    protected Members getMembers(OAuthAttributes attributes, SocialType socialType) {
         Optional<Members> findUser = membersRepository.findBySocialUidAndSocialType(attributes.getOauth2UserInfo().getId(), socialType);
 
         return findUser.orElseGet(() -> saveMembers(attributes, socialType));
@@ -136,7 +136,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * OAuthAttributes의 toEntity() 메소드를 통해 빌더로 User 객체 생성 후 반환
      * 생성된 User 객체를 DB에 저장 : socialType, socialId, email, role 값만 있는 상태
      */
-    private Members saveMembers(OAuthAttributes attributes, SocialType socialType) {
+    protected Members saveMembers(OAuthAttributes attributes, SocialType socialType) {
         Optional<Members> existMember = membersRepository.findByEmail(attributes.getOauth2UserInfo().getEmail());
         if(existMember.isPresent()){
             throw new CustomException(ErrorCode.DUPLICATE_IDENTIFIER);
