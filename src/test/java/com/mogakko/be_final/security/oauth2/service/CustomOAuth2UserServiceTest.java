@@ -192,5 +192,28 @@ class CustomOAuth2UserServiceTest {
             // then
             assertEquals(member, response);
         }
+
+        @DisplayName("saveMembers 중복 닉네임 테스트")
+        @Test
+        void saveMembers_successWithNicknameDuplication() {
+            // given
+            OAuthAttributes oAuthAttributes = mock(OAuthAttributes.class);
+            SocialType socialType = SocialType.GOOGLE;
+
+            when(oAuthAttributes.getOauth2UserInfo()).thenReturn(oauth2UserInfo);
+            when(oauth2UserInfo.getEmail()).thenReturn("test@test.com");
+            when(membersRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+            when(membersRepository.existsByFriendCode(anyInt())).thenReturn(true, false);
+            when(oAuthAttributes.toEntity(eq(socialType), eq(oauth2UserInfo), anyInt())).thenReturn(member);
+            when(membersRepository.existsByNickname(anyString())).thenReturn(true);
+            when(membersRepository.save(member)).thenReturn(member);
+
+            // when
+            Members response = customOAuth2UserService.saveMembers(oAuthAttributes, socialType);
+
+            // then
+            assertEquals(member, response);
+            assertNotEquals("nickname", response.getNickname());
+        }
     }
 }
