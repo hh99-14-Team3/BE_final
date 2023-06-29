@@ -31,7 +31,7 @@ public class MogakkoServiceUtilMethod {
         this.openvidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
     }
 
-    // 채팅방 생성 시 세션 발급
+    // 모각코 룸 생성 시 세션 발급
     public MogakkoRoomCreateResponseDto createNewToken(Members member) throws OpenViduJavaClientException, OpenViduHttpException {
 
         // 사용자 연결 시 닉네임 전달
