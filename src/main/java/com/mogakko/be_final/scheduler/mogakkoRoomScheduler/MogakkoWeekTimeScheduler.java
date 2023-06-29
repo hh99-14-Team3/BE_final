@@ -20,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 public class MogakkoWeekTimeScheduler {
-    private final MembersRepository membersRepository;
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
 
     @Async
