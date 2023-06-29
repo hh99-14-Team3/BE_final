@@ -35,6 +35,19 @@ class CustomOAuth2UserServiceTest {
             // then
             assertEquals(SocialType.KAKAO, socialType);
         }
+
+        @DisplayName("getSocialType GOOGLE 테스트")
+        @Test
+        void getSocialType_successWithGOOGLE() {
+            // given
+            String registrationId = "google";
+
+            // when
+            SocialType socialType = customOAuth2UserService.getSocialType(registrationId);
+
+            // then
+            assertEquals(SocialType.GOOGLE, socialType);
+        }
     }
 
 }
