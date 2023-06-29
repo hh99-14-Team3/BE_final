@@ -26,6 +26,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static com.mogakko.be_final.exception.ErrorCode.NOT_SUPPORTED_SOCIALTYPE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -115,7 +117,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         else if (GITHUB.equals(registrationId)) {
             return SocialType.GITHUB;
         } else {
-            throw new CustomException(ErrorCode.NOT_SUPPORTED_SOCIALTYPE);
+            throw new CustomException(NOT_SUPPORTED_SOCIALTYPE);
         }
     }
 

@@ -48,6 +48,19 @@ class CustomOAuth2UserServiceTest {
             // then
             assertEquals(SocialType.GOOGLE, socialType);
         }
+
+        @DisplayName("getSocialType GITHUB 테스트")
+        @Test
+        void getSocialType_successWithGITHUB() {
+            // given
+            String registrationId = "github";
+
+            // when
+            SocialType socialType = customOAuth2UserService.getSocialType(registrationId);
+
+            // then
+            assertEquals(SocialType.GITHUB, socialType);
+        }
     }
 
 }
