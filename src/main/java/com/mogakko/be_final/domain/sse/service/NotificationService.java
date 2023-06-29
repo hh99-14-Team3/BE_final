@@ -8,7 +8,6 @@ import com.mogakko.be_final.domain.sse.entity.NotificationType;
 import com.mogakko.be_final.domain.sse.repository.EmitterRepository;
 import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -59,7 +58,6 @@ public class NotificationService {
         return emitter;
     }
 
-
     public void send(Members sender, Members receiver, NotificationType notificationType, String content, String url) {
         Notification notification = createNotification(sender, receiver, notificationType, content, url);
         notificationRepository.save(notification);
@@ -89,7 +87,6 @@ public class NotificationService {
                 .build();
     }
 
-
     public void sendToClient(SseEmitter emitter, String emitterId, Object data, Notification notification) {
         try {
             emitter.send(SseEmitter.event()
@@ -115,13 +112,11 @@ public class NotificationService {
         }
     }
 
-
     public void markAsRead(Notification notification) {
         notificationRepository.delete(notification);
         notification.changeReadStatus();
         notificationRepository.save(notification);
     }
-
 
     @Scheduled(fixedDelay = 30000)  // every 30 seconds
     public void sendHeartbeat() {
@@ -144,6 +139,5 @@ public class NotificationService {
         return notificationRepository.findAllByReceiverIdAndReadStatusAndCreatedAtLessThan(
                 memberId, false, Instant.now(Clock.system(ZoneId.of("Asia/Seoul"))));
     }
-
 }
 

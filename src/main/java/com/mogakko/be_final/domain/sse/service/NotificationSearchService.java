@@ -4,7 +4,6 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.sse.dto.response.NotificationResponseDto;
 import com.mogakko.be_final.domain.sse.entity.Notification;
 import com.mogakko.be_final.domain.sse.repository.NotificationRepository;
-import com.mogakko.be_final.userDetails.UserDetailsImpl;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,13 +28,10 @@ public class NotificationSearchService {
             receivedNotificationList.add(receivedNotification);
         }
 
-
         if (!notificationList.isEmpty()) {
             return new ResponseEntity<>(new Message("알림 조회 완료", receivedNotificationList), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new Message("알림이 없습니다.", null), HttpStatus.OK);
         }
-
-
     }
 }
