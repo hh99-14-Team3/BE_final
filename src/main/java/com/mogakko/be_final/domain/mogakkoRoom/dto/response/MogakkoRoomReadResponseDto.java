@@ -10,7 +10,7 @@ public class MogakkoRoomReadResponseDto {
     private MogakkoRoom mogakkoRoom;
     private String elapsedTime;
 
-    public MogakkoRoomReadResponseDto(MogakkoRoom mogakkoRoom, String elapsedTime){
+    public MogakkoRoomReadResponseDto(MogakkoRoom mogakkoRoom, String elapsedTime) {
         this.mogakkoRoom = mogakkoRoom;
         this.elapsedTime = elapsedTime;
     }
