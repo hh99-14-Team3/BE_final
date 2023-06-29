@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.mogakko.be_final.exception.ErrorCode.MOGAKKO_NOT_FOUND;
@@ -66,13 +67,25 @@ class MogakkoServiceUtilMethodTest {
     void enterRoomCreateSession() throws OpenViduJavaClientException, OpenViduHttpException {
         // Given
         Session session = mock(Session.class);
-        when(openvidu.createSession()).thenReturn(session);
+        Connection connection = mock(Connection.class);
         String sessionId = "sessionId";
+        String token = "token";
+
+        when(openvidu.createSession()).thenReturn(session);
         when(session.getSessionId()).thenReturn(sessionId);
-        // When, Then
-        mogakkoServiceUtilMethod.createNewToken(member);
+        when(openvidu.getActiveSessions()).thenReturn(Collections.singletonList(session));
+        when(session.createConnection(any(ConnectionProperties.class))).thenReturn(connection);
+        when(connection.getToken()).thenReturn(token);
 
+        // When
+        String response = mogakkoServiceUtilMethod.enterRoomCreateSession(member, sessionId);
+
+        // Then
+        assertEquals(token, response);
+        verify(openvidu).createSession();
+        verify(session).getSessionId();
+        verify(openvidu).getActiveSessions();
+        verify(session).createConnection(any(ConnectionProperties.class));
+        verify(connection).getToken();
     }
-
-
 }
