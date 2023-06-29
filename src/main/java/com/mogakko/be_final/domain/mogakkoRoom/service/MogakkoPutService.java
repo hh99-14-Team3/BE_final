@@ -28,7 +28,6 @@ import static com.mogakko.be_final.exception.ErrorCode.USER_NOT_FOUND;
 public class MogakkoPutService {
     private final MembersRepository membersRepository;
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
-    private final MogakkoServiceUtilMethod mogakkoServiceUtilMethod;
 
     // 타이머
     @Transactional
