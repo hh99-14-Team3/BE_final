@@ -424,14 +424,19 @@
 
 <br>
 
-## ↗️ BACKEND TEST CODE
+##  ↗️ BACKEND TEST CODE
+
+<div align=center>
+
 
 Total of 295 Test Case / Code Coverage 82% 달성 (Unit Test)
 
 | ![Untitled video - Made with Clipchamp (1)](https://github.com/hh99-14-Team3/BE_final/assets/123082067/8cec8da4-d160-45a6-95a3-671254359e69)  | <img src="https://github.com/hh99-14-Team3/BE_final/assets/123082067/6194652d-969d-4127-8684-12ada5f7ea6f" width="300" height="400"> |
 |-----------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+</div>
 
-# 💻 Tech Stack
+## 💻 Tech Stack
+
 **FRONT-END**
 <br>
 <div align=center> 
@@ -455,6 +460,8 @@ Total of 295 Test Case / Code Coverage 82% 달성 (Unit Test)
 <img src="https://img.shields.io/badge/Redux ToolKit-4D148C?style=flat-square&logo=redux&logoColor=white"/>
 <img src="https://img.shields.io/badge/lighthouse-F44B21?style=flat-square&logo=lighthouse&logoColor=white"/>
 </div>
+
+<br>
 
 **BACK-END**
 <br>
@@ -487,10 +494,15 @@ Total of 295 Test Case / Code Coverage 82% 달성 (Unit Test)
 <img src="https://img.shields.io/badge/redis PUB/SUB-DC382D?style=for-the-badge&logo=redis&logoColor=white">
 <img src="https://img.shields.io/badge/apachecassandra-1287B1?style=for-the-badge&logo=apachecassandra&logoColor=white">
 </div>
+<br>
 
+<br>
 
 
 ##  🎓 프로젝트 멤버
+
+<div align=center>
+
 
 |  이름  |    주특기    |        | GitHub                             | 
 |:----:|:---------:|:------:|:-----------------------------------|
@@ -502,3 +514,6 @@ Total of 295 Test Case / Code Coverage 82% 달성 (Unit Test)
 | 정종현  |  Spring   |        | https://github.com/Shuan75         |
 | 변희준  |  Spring   |        | https://github.com/bheejun         |
 | 임현서  | Designer  |  디자이너  |
+
+
+</div>
