@@ -30,7 +30,13 @@ public class S3Uploader {
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 
-    private String getFileExtension(MultipartFile file) {
+    public void delete(String fileUrl) {
+        String[] temp = fileUrl.split("/");
+        String fileKey = temp[temp.length - 1];
+        amazonS3.deleteObject(bucket, fileKey);
+    }
+
+    String getFileExtension(MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
         assert originalFileName != null;
         int dotIndex = originalFileName.lastIndexOf(".");
@@ -39,11 +45,5 @@ public class S3Uploader {
 
     private String getFileContentType(MultipartFile file) {
         return file.getContentType();
-    }
-
-    public void delete(String fileUrl) {
-        String[] temp = fileUrl.split("/");
-        String fileKey = temp[temp.length - 1];
-        amazonS3.deleteObject(bucket, fileKey);
     }
 }
