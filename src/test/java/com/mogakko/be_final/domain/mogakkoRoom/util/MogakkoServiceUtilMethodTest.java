@@ -5,7 +5,6 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomCreateResponseDto;
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.exception.ErrorCode;
 import io.openvidu.java.client.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,7 +70,6 @@ class MogakkoServiceUtilMethodTest {
         String sessionId = "sessionId";
         String token = "token";
 
-        when(openvidu.createSession()).thenReturn(session);
         when(session.getSessionId()).thenReturn(sessionId);
         when(openvidu.getActiveSessions()).thenReturn(Collections.singletonList(session));
         when(session.createConnection(any(ConnectionProperties.class))).thenReturn(connection);
@@ -82,10 +80,29 @@ class MogakkoServiceUtilMethodTest {
 
         // Then
         assertEquals(token, response);
-        verify(openvidu).createSession();
         verify(session).getSessionId();
         verify(openvidu).getActiveSessions();
         verify(session).createConnection(any(ConnectionProperties.class));
         verify(connection).getToken();
+    }
+
+    @DisplayName("모각코 입장 시 토큰 발급 예외 테스트")
+    @Test
+    void enterRoomCreateSession_failWithNotFound() throws OpenViduJavaClientException, OpenViduHttpException {
+        // Given
+        Session session = mock(Session.class);
+        Connection connection = mock(Connection.class);
+        String sessionId = "sessionId";
+        String token = "token";
+
+        List<Session> sessionList = new ArrayList<>();
+        sessionList.add(session);
+
+        when(openvidu.getActiveSessions()).thenReturn(sessionList);
+        when(session.getSessionId()).thenReturn("noSessionId");
+
+        // When & Then
+        CustomException customException = assertThrows(CustomException.class, () -> mogakkoServiceUtilMethod.enterRoomCreateSession(member, sessionId));
+        assertEquals(MOGAKKO_NOT_FOUND, customException.getErrorCode());
     }
 }
