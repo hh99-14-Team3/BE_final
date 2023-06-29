@@ -13,7 +13,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static com.mogakko.be_final.exception.ErrorCode.*;
 
@@ -23,7 +26,6 @@ public class GitHubLoginService {
 
     private final RestTemplate restTemplate;
     private final MembersRepository membersRepository;
-
 
 
     @Value("${GITHUB_CLIENT_ID}")
@@ -36,7 +38,7 @@ public class GitHubLoginService {
     private String githubClientSecret;
 
 
-    public ResponseEntity<Map<String, String>> startGithubLogin(Members member){
+    public ResponseEntity<Map<String, String>> startGithubLogin(Members member) {
         String stateCode = UUID.randomUUID().toString();
         member.setGithubStateCode(stateCode);
         membersRepository.save(member);
@@ -52,7 +54,7 @@ public class GitHubLoginService {
         return ResponseEntity.ok(response);
     }
 
-    public String requestAccessTokenFromGithub(String code){
+    public String requestAccessTokenFromGithub(String code) {
         String accessTokenUrl = "https://github.com/login/oauth/access_token";
 
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
@@ -67,12 +69,13 @@ public class GitHubLoginService {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
 
 
-        ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {});
+        ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {
+        });
 
         Map<String, Object> map = responseEntity.getBody();
-        if(responseEntity.getStatusCode() == HttpStatus.OK && map != null) {
+        if (responseEntity.getStatusCode() == HttpStatus.OK && map != null) {
             return (String) map.get("access_token");
-        }else{
+        } else {
             throw new CustomException(GITHUB_TOKEN_REQUEST_ERROR);
         }
     }
@@ -91,13 +94,13 @@ public class GitHubLoginService {
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(memberInfoUrl, HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, Object>>() {});
 
         Map<String, Object> map = response.getBody();
-        if(response.getStatusCode() == HttpStatus.OK && map != null) {
+        if (response.getStatusCode() == HttpStatus.OK && map != null) {
             Members member = membersRepository.findByGithubStateCode(state).orElseThrow(
                     () -> new CustomException(USER_NOT_FOUND)
             );
             member.setGithubId((String) map.get("login"));
             membersRepository.save(member);
-        }else {
+        } else {
             throw new CustomException(FAILED_TO_GET_USERINFO);
         }
 

@@ -1,5 +1,6 @@
 package com.mogakko.be_final.domain.sse.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import java.time.Instant;
 @Getter
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Notification {
     @PrimaryKeyColumn(name = "receiver_id", type = PrimaryKeyType.PARTITIONED, ordinal = 0)
     private Long receiverId;
@@ -41,29 +43,6 @@ public class Notification {
     @Column
     @Enumerated(EnumType.STRING)
     private NotificationType type;
-
-    @Builder
-    public Notification(Long receiverId, boolean readStatus, Instant createdAt, String content, String senderNickname, String receiverNickname, String url, NotificationType type) {
-        this.receiverId = receiverId;
-        this.readStatus = readStatus;
-        this.createdAt = createdAt;
-        this.content = content;
-        this.senderNickname = senderNickname;
-        this.receiverNickname = receiverNickname;
-        this.url = url;
-        this.type = type;
-    }
-
-    public Notification(Notification notification) {
-        this.receiverId = notification.getReceiverId();
-        this.readStatus = notification.isReadStatus();
-        this.createdAt = notification.getCreatedAt();
-        this.content = notification.getContent();
-        this.senderNickname = notification.getSenderNickname();
-        this.receiverNickname = notification.getReceiverNickname();
-        this.url = notification.getUrl();
-        this.type = notification.getType();
-    }
 
     public void changeReadStatus() {
         this.readStatus = true;
