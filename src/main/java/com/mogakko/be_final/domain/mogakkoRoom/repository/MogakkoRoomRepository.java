@@ -13,7 +13,6 @@ import javax.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
 public interface MogakkoRoomRepository extends JpaRepository<MogakkoRoom, String> {
 

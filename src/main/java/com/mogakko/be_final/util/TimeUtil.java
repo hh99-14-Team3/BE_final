@@ -10,8 +10,8 @@ public class TimeUtil {
         return String.format("%02dH%02dM", hour, min);
     }
 
-    public static Double changeSecToMin (Long timeSec){
-        return (double) Math.round((timeSec / 60.0)* 0.1);
+    public static Double changeSecToMin(Long timeSec) {
+        return (double) Math.round((timeSec / 60.0) * 0.1);
     }
 
     public static String formatSeconds(Long remainingTime) {

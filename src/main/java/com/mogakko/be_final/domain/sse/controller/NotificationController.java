@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.sse.controller;
 
-import com.mogakko.be_final.domain.sse.repository.EmitterRepositoryImpl;
 import com.mogakko.be_final.domain.sse.service.NotificationSearchService;
 import com.mogakko.be_final.domain.sse.service.NotificationService;
 import com.mogakko.be_final.userDetails.UserDetailsImpl;

@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -35,10 +33,10 @@ public class DirectMessage extends Timestamped {
     private String content;
 
     @Column(name = "delete_by_sender")
-    private  boolean deleteBySender = false;
+    private boolean deleteBySender = false;
 
     @Column(name = "delete_by_receiver")
-    private  boolean deleteByReceiver =false;
+    private boolean deleteByReceiver = false;
 
     private boolean isRead;
 
@@ -50,9 +48,13 @@ public class DirectMessage extends Timestamped {
         this.isRead = isRead;
     }
 
-    public void markDeleteBySenderTrue() { this.deleteBySender = true; }
+    public void markDeleteBySenderTrue() {
+        this.deleteBySender = true;
+    }
 
-    public void markDeleteByReceiverTrue() { this.deleteByReceiver = true; }
+    public void markDeleteByReceiverTrue() {
+        this.deleteByReceiver = true;
+    }
 
     public void markRead() {
         this.isRead = true;

@@ -68,7 +68,6 @@ public class GitHubLoginService {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
 
-
         ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(accessTokenUrl, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {
         });
 
@@ -91,7 +90,8 @@ public class GitHubLoginService {
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(memberInfoUrl, HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, Object>>() {});
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(memberInfoUrl, HttpMethod.GET, entity, new ParameterizedTypeReference<Map<String, Object>>() {
+        });
 
         Map<String, Object> map = response.getBody();
         if (response.getStatusCode() == HttpStatus.OK && map != null) {
@@ -103,6 +103,5 @@ public class GitHubLoginService {
         } else {
             throw new CustomException(FAILED_TO_GET_USERINFO);
         }
-
     }
 }

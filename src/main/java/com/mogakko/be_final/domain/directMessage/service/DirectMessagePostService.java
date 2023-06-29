@@ -86,10 +86,10 @@ public class DirectMessagePostService {
                     directMessageRepository.save(directMessage);
                 }
             } else {
-                if(directMessage.getReceiver().getNickname().equals(member.getNickname())|| directMessage.getSender().getNickname().equals(member.getNickname())){
+                if (directMessage.getReceiver().getNickname().equals(member.getNickname()) || directMessage.getSender().getNickname().equals(member.getNickname())) {
                     throw new CustomException(MESSAGE_NOT_FOUND);
-                }else {
-                throw new CustomException(USER_MISMATCH_ERROR);
+                } else {
+                    throw new CustomException(USER_MISMATCH_ERROR);
                 }
             }
         }

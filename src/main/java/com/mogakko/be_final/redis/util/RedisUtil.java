@@ -43,8 +43,9 @@ public class RedisUtil {
     }
 
     public void setRejectedFriendshipWithExpireTime(String key, Object value, long timeout, TimeUnit unit) {
-       redisFriendshipTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(RejectedFriendship.class));
-       redisFriendshipTemplate.opsForValue().set(key, value, timeout, unit);    }
+        redisFriendshipTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(RejectedFriendship.class));
+        redisFriendshipTemplate.opsForValue().set(key, value, timeout, unit);
+    }
 
     public boolean hasKeyFriendship(String key) {
         return Boolean.TRUE.equals(redisFriendshipTemplate.hasKey(key));

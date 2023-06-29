@@ -70,7 +70,7 @@ public class EmailPostService {
         emailMsg += "</div>";
         emailMsg += "</div>";
         message.setText(emailMsg, "utf-8", "html");
-        message.setFrom(new InternetAddress("bhjun95@gmail.com", "모각코ON:"));
+        message.setFrom(new InternetAddress("example@email.com", "모각코ON:"));
 
         return message;
     }

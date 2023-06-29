@@ -37,8 +37,9 @@ public class GlobalExceptionHandler {
         log.error("===== Exception 메세지 확인 : {}", e.getMessage());
         return ErrorResponse.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());
     }
+
     @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e){
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
         e.printStackTrace();
         log.error("===== RuntimeException 메세지 확인 : {}", e.getMessage());
         return ErrorResponse.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e.toString());

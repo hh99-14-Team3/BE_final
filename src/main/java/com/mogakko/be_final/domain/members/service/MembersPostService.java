@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.members.service;
 
-import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.dto.request.GithubIdRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.LoginRequestDto;
 import com.mogakko.be_final.domain.members.dto.request.SignupRequestDto;
@@ -39,7 +38,6 @@ public class MembersPostService {
     private final RedisUtil redisUtil;
     private final BadWordFiltering badWordFiltering;
     private final PasswordEncoder passwordEncoder;
-    private final FriendshipRepository friendshipRepository;
     private final MembersRepository membersRepository;
     private final MemberWeekStatisticsRepository memberWeekStatisticsRepository;
 

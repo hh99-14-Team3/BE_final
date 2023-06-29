@@ -160,9 +160,12 @@ public class MogakkoPostService {
         double lon = mogakko12KmRequestDto.getLon();
         List<MogakkoRoom> mogakkoList;
         if (language == null && searchKeyword == null) mogakkoList = mogakkoRoomRepository.findAllByLatAndLon(lat, lon);
-        else if (searchKeyword == null) mogakkoList = mogakkoRoomRepository.findAllByLatAndLonAndLanguage(lat, lon, LanguageEnum.valueOf(language));
-        else if (language == null) mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLatAndLon(searchKeyword, lat, lon);
-        else mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLanguageAndLatAndLon(searchKeyword, LanguageEnum.valueOf(language), lat, lon);
+        else if (searchKeyword == null)
+            mogakkoList = mogakkoRoomRepository.findAllByLatAndLonAndLanguage(lat, lon, LanguageEnum.valueOf(language));
+        else if (language == null)
+            mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLatAndLon(searchKeyword, lat, lon);
+        else
+            mogakkoList = mogakkoRoomRepository.findAllBySearchKeywordAndLanguageAndLatAndLon(searchKeyword, LanguageEnum.valueOf(language), lat, lon);
 
         if (mogakkoList.size() == 0) return new ResponseEntity<>(new Message("근처에 모각코가 없습니다.", null), HttpStatus.OK);
 
