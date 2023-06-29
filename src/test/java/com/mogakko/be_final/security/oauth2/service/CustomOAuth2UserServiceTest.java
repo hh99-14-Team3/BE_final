@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.mogakko.be_final.exception.ErrorCode.DUPLICATE_IDENTIFIER;
 import static com.mogakko.be_final.exception.ErrorCode.NOT_SUPPORTED_SOCIALTYPE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -134,7 +135,7 @@ class CustomOAuth2UserServiceTest {
     class SaveMembers {
         @DisplayName("saveMembers 성공 테스트")
         @Test
-        void saveMembers() {
+        void saveMembers_success() {
             // given
             OAuthAttributes oAuthAttributes = mock(OAuthAttributes.class);
             SocialType socialType = SocialType.GOOGLE;
@@ -152,6 +153,22 @@ class CustomOAuth2UserServiceTest {
 
             // then
             assertEquals(member, response);
+        }
+
+        @DisplayName("saveMembers 중복 계정 테스트")
+        @Test
+        void saveMembers_failWithDuplicate() {
+            // given
+            OAuthAttributes oAuthAttributes = mock(OAuthAttributes.class);
+            SocialType socialType = SocialType.GOOGLE;
+
+            when(oAuthAttributes.getOauth2UserInfo()).thenReturn(oauth2UserInfo);
+            when(oauth2UserInfo.getEmail()).thenReturn("test@test.com");
+            when(membersRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
+
+            // when & then
+            CustomException customException = assertThrows(CustomException.class, ()-> customOAuth2UserService.saveMembers(oAuthAttributes, socialType));
+            assertEquals(DUPLICATE_IDENTIFIER, customException.getErrorCode());
         }
     }
 }
