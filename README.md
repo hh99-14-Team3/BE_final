@@ -441,7 +441,7 @@
 <img src="https://img.shields.io/badge/HTML5-CANVAS-F68D2E?style=flat-square&logo=&logoColor=white"/>
 <img src="https://img.shields.io/badge/SockJS-000000?style=flat-square&logo=SockJS&logoColor=white"/>
 <img src="https://img.shields.io/badge/STOMP-000000?style=flat-square&logo=STOMP&logoColor=white"/>
-<img src="https://img.shields.io/badge/chartdotjs-FF6384?style=flat-square&logo=chartdotjs&logoColor=white"/>
+<img src="https://img.shields.io/badge/chart.js-FF6384?style=flat-square&logo=chartdotjs&logoColor=white"/>
 <img src="https://img.shields.io/badge/Monaco Editor-673AB8?style=flat-square&logo=REACT&logoColor=white"/>
 <img src="https://img.shields.io/badge/redux-764ABC?style=flat-square&logo=redux&logoColor=white"/>
 <img src="https://img.shields.io/badge/Redux thuck-999999?style=flat-square&logo=redux&logoColor=white"/>
