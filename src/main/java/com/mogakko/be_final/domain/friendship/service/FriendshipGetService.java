@@ -7,7 +7,6 @@ import com.mogakko.be_final.domain.friendship.repository.FriendshipRepository;
 import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.repository.MembersRepository;
 import com.mogakko.be_final.exception.CustomException;
-import com.mogakko.be_final.exception.ErrorCode;
 import com.mogakko.be_final.util.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

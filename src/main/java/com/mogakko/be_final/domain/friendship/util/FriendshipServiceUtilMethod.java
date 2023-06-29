@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class FriendshipServiceUtilMethod {
 
     private final FriendshipRepository friendshipRepository;
+
     public boolean checkFriend(Members member, Members findMember) {
         boolean isFriend = false;
         if (friendshipRepository.findBySenderAndReceiverAndStatus(findMember, member, FriendshipStatus.ACCEPT).isPresent())
