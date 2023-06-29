@@ -94,4 +94,13 @@ public class S3UploaderTest {
         assertEquals(".jpg", extension);
     }
 
+    @DisplayName("파일 삭제 테스트")
+    @Test
+    public void testDelete() {
+        // Given
+        String fileUrl = "https://s3.amazonaws.com/bucket/testfile.jpg";
+
+        // When, Then
+        s3Uploader.delete(fileUrl);
+    }
 }
