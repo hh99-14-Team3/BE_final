@@ -74,4 +74,19 @@ class GitHubLoginControllerTest {
         verify(githubLoginService, times(1)).startGithubLogin(member);
     }
 
+    @DisplayName("[GET] 깃허브 callback 처리 테스트")
+    @Test
+    void handleCallback() {
+        // Given
+        String state = "state";
+        String code = "code";
+        RedirectView expectedRedirectView = new RedirectView("/");
+
+        // When
+        RedirectView actualRedirectView = gitHubLoginController.handleCallback(state, code);
+
+        // Then
+        assertEquals(expectedRedirectView.getUrl(), actualRedirectView.getUrl());
+        verify(githubLoginService).getUserDetailsFromGithub(state, code);
+    }
 }
