@@ -1,6 +1,5 @@
 package com.mogakko.be_final.domain.members.dto.response;
 
-import com.mogakko.be_final.domain.friendship.entity.FriendshipStatus;
 import com.mogakko.be_final.domain.members.entity.Members;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
