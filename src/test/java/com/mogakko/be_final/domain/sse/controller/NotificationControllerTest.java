@@ -65,5 +65,17 @@ class NotificationControllerTest {
         assertEquals(expectedEmitter, result);
         verify(notificationService, times(1)).subscribe(anyLong(), anyString());
     }
-    
+
+    @DisplayName("[GET] SSE 알림 조회 테스트")
+    @Test
+    void getAllNotification() {
+        // Given
+        ResponseEntity<Message> expectedResponse = new ResponseEntity<>(new Message("알림이 없습니다.", null), HttpStatus.OK);
+        when(notificationSearchService.getMyNotification(any(Members.class))).thenReturn(expectedResponse);
+        // When
+        ResponseEntity<Message> result = notificationController.getAllNotification(userDetails);
+        // Then
+        assertEquals(expectedResponse, result);
+        verify(notificationSearchService, times(1)).getMyNotification(any(Members.class));
+    }
 }
