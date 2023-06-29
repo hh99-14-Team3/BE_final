@@ -429,7 +429,7 @@
 Total of 295 Test Case / Code Coverage 82% 달성 (Unit Test)
 
 | ![Untitled video - Made with Clipchamp (1)](https://github.com/hh99-14-Team3/BE_final/assets/123082067/8cec8da4-d160-45a6-95a3-671254359e69)| ![image](https://github.com/hh99-14-Team3/BE_final/assets/123082067/6194652d-969d-4127-8684-12ada5f7ea6f)|
-| -------------------------- |-------------------------|
+| -------------------------- | ------------ |
 
 # 💻 Tech Stack
 **FRONT-END**
