@@ -25,15 +25,15 @@ public class GitHubLoginController {
 
     @Operation(summary = "소셜 인증 요청 API", description = "이 API에 요청이 도달하면 소셜 인증이 시작됩니다.")
     @GetMapping("/githubLogin")
-    public ResponseEntity<Map<String, String>> startGithubLogin(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<Map<String, String>> startGithubLogin(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return githubLoginService.startGithubLogin(userDetails.getMember());
     }
 
     @Operation(summary = "callback 처리 API", description = "소셜 로그인 과정중에 자동으로 도달합니다. 인증 서버에서 code와 state를 받아와서 처리합니다")
     @GetMapping("/callback/github")
-    public RedirectView handleCallback(@RequestParam("state") String state, @RequestParam("code") String code){
+    public RedirectView handleCallback(@RequestParam("state") String state, @RequestParam("code") String code) {
         githubLoginService.getUserDetailsFromGithub(state, code);
-        //TODO: FE 페이지로 리다이렉트 할 예정
+        // TODO: FE 페이지로 리다이렉트 할 예정
         return new RedirectView("/");
 
     }
