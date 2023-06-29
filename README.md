@@ -428,8 +428,8 @@
 
 Total of 295 Test Case / Code Coverage 82% 달성 (Unit Test)
 
-|![Untitled-video-Made-with-Clipchamp-_3_.gif](..%2F..%2FDownloads%2FUntitled-video-Made-with-Clipchamp-_3_.gif)| ![스크린샷 2023-06-30 040822.png](..%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202023-06-30%20040822.png) |
-| ------ |----------------------------------------------------------------------------------------------------|
+| ![Untitled-video-Made-with-Clipchamp-_3_.gif](..%2F..%2FDownloads%2FUntitled-video-Made-with-Clipchamp-_3_.gif) | ![스크린샷 2023-06-30 040822.png](..%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202023-06-30%20040822.png) |
+| -------------------------- |----------------------------------------------------------------------------------------------------|
 
 # 💻 Tech Stack
 **FRONT-END**
