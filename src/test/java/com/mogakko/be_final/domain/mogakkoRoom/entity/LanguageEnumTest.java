@@ -14,7 +14,7 @@ class LanguageEnumTest {
     class From {
         @DisplayName("from 성공 테스트")
         @Test
-        void from() {
+        void from_success() {
             // given
             String value = "JAVA";
 
@@ -23,6 +23,19 @@ class LanguageEnumTest {
 
             // then
             assertEquals(LanguageEnum.JAVA, languageEnum);
+        }
+
+        @DisplayName("from 실패 테스트")
+        @Test
+        void from_failWithReturnNull() {
+            // given
+            String value = "JAVAA";
+
+            // when
+            LanguageEnum languageEnum = LanguageEnum.from(value);
+
+            // then
+            assertNull(languageEnum);
         }
     }
 
