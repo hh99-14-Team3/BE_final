@@ -39,7 +39,16 @@ class LanguageEnumTest {
         }
     }
 
+    @DisplayName("getValue Method 테스트")
     @Test
     void getValue() {
+        // given
+        String java;
+
+        // when
+        java = LanguageEnum.JAVA.getValue();
+
+        // then
+        assertEquals("JAVA", java);
     }
 }
