@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith({MockitoExtension.class})
 class MemberStatusCodeTest {
@@ -27,5 +28,17 @@ class MemberStatusCodeTest {
             assertEquals(MemberStatusCode.NORMAL, memberStatusCode);
         }
 
+        @DisplayName("from Method 실패 테스트")
+        @Test
+        void from_failWithReturnNull() {
+            // given
+            String value = "2222222";
+
+            // when
+            MemberStatusCode memberStatusCode = MemberStatusCode.from(value);
+
+            // then
+            assertNull(memberStatusCode);
+        }
     }
 }
