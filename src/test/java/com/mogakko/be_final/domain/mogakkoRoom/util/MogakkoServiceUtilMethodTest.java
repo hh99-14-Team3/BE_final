@@ -5,6 +5,7 @@ import com.mogakko.be_final.domain.members.entity.Members;
 import com.mogakko.be_final.domain.members.entity.Role;
 import com.mogakko.be_final.domain.mogakkoRoom.dto.response.MogakkoRoomCreateResponseDto;
 import com.mogakko.be_final.exception.CustomException;
+import com.mogakko.be_final.exception.ErrorCode;
 import io.openvidu.java.client.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mogakko.be_final.exception.ErrorCode.MOGAKKO_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,5 +61,18 @@ class MogakkoServiceUtilMethodTest {
         verify(session).getSessionId();
     }
 
-  
+    @DisplayName("모각코 입장 시 토큰 발급 성공 테스트")
+    @Test
+    void enterRoomCreateSession() throws OpenViduJavaClientException, OpenViduHttpException {
+        // Given
+        Session session = mock(Session.class);
+        when(openvidu.createSession()).thenReturn(session);
+        String sessionId = "sessionId";
+        when(session.getSessionId()).thenReturn(sessionId);
+        // When, Then
+        mogakkoServiceUtilMethod.createNewToken(member);
+
+    }
+
+
 }
