@@ -66,5 +66,32 @@ public class S3UploaderTest {
         assertEquals("java.lang.AssertionError", assertionError.toString());
     }
 
-    
+    @DisplayName("파일 확장자가 없는 경우 처리 테스트")
+    @Test
+    void getFileExtension_NoExtension() {
+        // given
+        MultipartFile file = mock(MultipartFile.class);
+        String originalFileName = "file";
+        when(file.getOriginalFilename()).thenReturn(originalFileName);
+
+        // when
+        String extension = s3Uploader.getFileExtension(file);
+
+        // then
+        assertEquals("", extension);
+    }
+
+    @DisplayName("파일 확장자가 있는 경우 처리 테스트")
+    @Test
+    void getFileExtension_WithExtension() {
+        // Given
+        MultipartFile file = mock(MultipartFile.class);
+        String originalFileName = "file.jpg";
+        when(file.getOriginalFilename()).thenReturn(originalFileName);
+        // When
+        String extension = s3Uploader.getFileExtension(file);
+        // Then
+        assertEquals(".jpg", extension);
+    }
+
 }
