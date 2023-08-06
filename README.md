@@ -141,11 +141,12 @@
  <li>
  <table width='800px'>
   <tr>
-    <th colspan="2" align="center" height="50">하나의 인스턴스에 api서버와 openvidu 서버를 동시에 배포 시 두 서버간 연결이 안되고, 포트가 충돌하는 문제 발생</th>
+    <th colspan="2" height="50">하나의 인스턴스에 api서버와 openvidu 서버를 동시에 배포 시 두 서버간 연결이 안되고, 포트가 충돌하는 문제 발생</th>
   </tr>
   <tr>
 <th width="70">원인</th>
-    <td>화면공유 시 보안상의 이유로 https 배포 시도 But, openvidu 서버 자체적으로 nginx를 사용하고 있어서 https 포트가 충돌하는 것이 원인이었음</td>
+    <td>화면공유 시 보안상의 이유로 https 배포 시도 <br>
+        But, openvidu 서버 자체적으로 nginx를 사용하고 있어서 https 포트가 충돌하는 것이 원인이었음</td>
   </tr>
   <tr>
     <th>시도</th>
@@ -162,7 +163,7 @@
  <li>
  <table width='800px'>
   <tr>
-    <th colspan="2" align="center" height="50">SSE 기능 구현 시 구독 후 connection pool을 계속 차지하여 pending 이 발생하고 DB에 deadLock이 걸리는 문제</th>
+    <th colspan="2" height="50">SSE 기능 구현 시 구독 후 connection pool을 계속 차지하여 pending 이 발생하고 DB에 deadLock이 걸리는 문제</th>
   </tr>
   <tr>
 <th width="70">원인</th>
@@ -186,7 +187,7 @@
  <li>
  <table width='800px'>
   <tr>
-    <th colspan="2" align="center" height="50">
+    <th colspan="2" height="50">
     클라이언트에서 서버로 요청을 보냈을 때 CORS 에러가 비주기적으로 발생하는 문제
     </th>
   </tr>
