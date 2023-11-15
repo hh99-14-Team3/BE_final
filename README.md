@@ -130,7 +130,7 @@
 ## 🖥️ 기술 아키텍쳐
 
 <div align = center>
-<img width="900" alt="architecture" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/1b33e2cd-d970-4e3c-8822-0299335dad5e">
+<img width="900" alt="architecture" src="https://github.com/hh99-14-Team3/BE_final/assets/102853354/25549d3b-fb63-4438-a980-a34b37900569">
 </div>
 <br>
 <br>
